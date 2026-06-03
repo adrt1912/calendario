@@ -22,21 +22,29 @@ public class GestorTareas {
         comprobarTareas();
         Scanner scanner =new Scanner(System.in);
         System.out.println("Buenas, que deseas hacer, especifica el numero porfa" +
-                "\n 1.Ver Tareas\n 2.Añadir tarea\n 3.Eliminar tarea\n 4.Modificar tarea\n 5. Gestionar ficheros\n 6.Salir");
+                "\n 1.Ver Tareas\n 2.Añadir tarea\n 3.Eliminar tarea\n 4.Modificar tarea\n 5.Gestionar ficheros\n 6.Completar tarea \n 7.Salir");
 
         String action=scanner.nextLine();
 
         switch (action) {
-            case "Ver Tareas" -> mostrarTareas();
-            case "Añadir tarea" -> anadirTarea();
-            case "Eliminar tarea" -> eliminarTarea();
-            case "Completar tarea" -> completarTarea();
-            case "Gestionar ficheros" -> gestionarFicheros();
-            case "Salir" -> salir();
+            case "Ver Tareas","1" -> mostrarTareas();
+            case "Añadir tarea","2" -> anadirTarea();
+            case "Eliminar tarea" ,"3"-> eliminarTarea();
+            case "Completar tarea" ,"4"-> completarTarea();
+            case "Gestionar ficheros","5" -> gestionarFicheros();
+            case "Salir", "salir" ,"6"-> salir();
             default -> {
                 System.out.println("Dime un comando correcto");
                 iniciarGestor();
             }
+        }
+    }
+
+    public void añadirTarea(Tarea tarea){
+        switch (tarea.getEstadoTarea()){
+            case CADUCADA ->  tareasCaducadas.add(tarea);
+            case EN_PROCESO -> tareasEnProceso.add(tarea);
+            default -> tareasFinalizadas.add(tarea);
         }
     }
 
@@ -123,7 +131,7 @@ public class GestorTareas {
         System.out.println("Descripcion: ");
         String descripcion=scanner.nextLine();
 
-        Tarea tareaNueva=new Tarea(titulo, LocalDate.now(),fechaFin,descripcion,sitio,time);
+        Tarea tareaNueva=new Tarea(titulo, LocalDate.now(),fechaFin,EstadoTarea.EN_PROCESO,descripcion,sitio,time);
         tareasEnProceso.add(tareaNueva);
         System.out.println("La tarea "+ titulo+"a sido añadida con exito");
         iniciarGestor();
@@ -183,14 +191,33 @@ public class GestorTareas {
         Scanner scanner=new Scanner(System.in);
         String accion=scanner.nextLine();
         switch (accion) {
-            case "Guardar tareas" -> {
-
+            case "Guardar tareas","1" -> {
+                List<Tarea>listaTotal=new ArrayList<>();
+                listaTotal.addAll(tareasFinalizadas);
+                listaTotal.addAll(tareasCaducadas);
+                listaTotal.addAll(tareasEnProceso);
+                GestionEnFicheros.getGestionEnFicheros().guardarEnFichero(listaTotal);
             }
-            case "Descargar tareas" -> {
+            case "Descargar tareas" ,"2"-> {
 
+                System.out.println("Nombre del fichero, o por defecto(no escribir nada)");
+                String nomF= scanner.nextLine();
+                if(nomF.isEmpty())
+                {nomF="tareas.txt";}
+                else{
+                    nomF=nomF+".txt";
+                }
+                GestionEnFicheros.getGestionEnFicheros().leerFichero(nomF);
             }
-            case "Limpiar ficheros" -> {
-
+            case "Limpiar ficheros","3" -> {
+                System.out.println("Nombre del fichero, o por defecto(no escribir nada)");
+                String nomF= scanner.nextLine();
+                if(nomF.isEmpty())
+                {nomF="tareas.txt";}
+                else{
+                    nomF=nomF+".txt";
+                }
+                GestionEnFicheros.getGestionEnFicheros().borrarFichero(nomF);
             }
         }
         iniciarGestor();
@@ -200,7 +227,20 @@ public class GestorTareas {
 
 
     private void salir(){
-        System.out.println("Cerrando todo, en esta version se perderan lso datos");
+        System.out.println("Quieres guardar las tareas?");
+        Scanner scanner=new Scanner(System.in);
+        String accion=scanner.nextLine();
+        switch (accion) {
+            case "si", "SI", "Si", "YES", "Yes", "1" -> {
+                List<Tarea> listaTotal = new ArrayList<>();
+                listaTotal.addAll(tareasFinalizadas);
+                listaTotal.addAll(tareasCaducadas);
+                listaTotal.addAll(tareasEnProceso);
+                GestionEnFicheros.getGestionEnFicheros().guardarEnFichero(listaTotal);
+            }
+
+            default -> System.out.println("Cerrando todo, en esta version se perderan lso datos");
+        }
         System.exit(1);
     }
 

@@ -42,14 +42,14 @@ public class Tarea {
     }
 
 
-    public Tarea(String nombreTarea, LocalDate fechaInicio, LocalDate fechaFin, String descripcion, String sitio, LocalTime hora){
+    public Tarea(String nombreTarea, LocalDate fechaInicio, LocalDate fechaFin, EstadoTarea estadoTarea, String descripcion, String sitio, LocalTime hora){
         this.nombreTarea=nombreTarea;
         this.fechaInicio=fechaInicio;
         this.fechaFin=fechaFin;
+        this.estadoTarea=estadoTarea;
         this.descripcion=descripcion;
         this.sitio=sitio;
         this.hora=hora;
-        estadoTarea=EstadoTarea.EN_PROCESO;
         comprobarEstado();
     }
 
@@ -71,7 +71,7 @@ public class Tarea {
 
     private void comprobarEstado(){
 
-        if(fechaFin!=null && LocalDate.now().isAfter(fechaFin)){
+        if(fechaFin!=null && LocalDate.now().isAfter(fechaFin)&&estadoTarea.equals(EstadoTarea.EN_PROCESO)){
             estadoTarea=EstadoTarea.CADUCADA;
         }
 
