@@ -11,6 +11,7 @@ public class Tarea {
     private String descripcion;
     private String sitio;
     private LocalTime hora;
+    private Integer frecuencia;
 
     //Getters
     public EstadoTarea getEstadoTarea() {
@@ -41,6 +42,8 @@ public class Tarea {
         return sitio;
     }
 
+    public Integer getFrecuencia(){return frecuencia;}
+
     public void setEstadoTarea(EstadoTarea estadoTarea) {
         this.estadoTarea = estadoTarea;
     }
@@ -69,8 +72,12 @@ public class Tarea {
         this.fechaInicio = fechaInicio;
     }
 
+    public void setFrecuencia(int frecuencia){
+        this.frecuencia=frecuencia;
+    }
 
-    public Tarea(String nombreTarea, LocalDate fechaInicio, LocalDate fechaFin, EstadoTarea estadoTarea, String descripcion, String sitio, LocalTime hora){
+
+    public Tarea(String nombreTarea, LocalDate fechaInicio, LocalDate fechaFin, EstadoTarea estadoTarea, String descripcion, String sitio, LocalTime hora,String frecuencia){
         this.nombreTarea=nombreTarea;
         this.fechaInicio=fechaInicio;
         this.fechaFin=fechaFin;
@@ -78,7 +85,12 @@ public class Tarea {
         this.descripcion=descripcion;
         this.sitio=sitio;
         this.hora=hora;
+        if(frecuencia != null && !frecuencia.isEmpty() && !frecuencia.equals("null")){
+        this.frecuencia=Integer.parseInt(frecuencia);}else{
+            this.frecuencia=null;
+        }
         comprobarEstado();
+
     }
 
     public void mostrarTarea(){
@@ -87,7 +99,7 @@ public class Tarea {
         System.out.println(" "+nombreTarea + " se establecio en la fecha "+fechaInicio.toString()+ " termina en la fecha "+ fechaFin +" a las: "+ hora +" lugar: "+sitio
         + "cuya descripcion es:"+descripcion);}
         else {
-            System.out.println(" "+nombreTarea + "se establecio en la fecha "+fechaInicio.toString()+" lugar: "+sitio
+            System.out.println(" "+nombreTarea + " se establecio en la fecha "+fechaInicio.toString()+" lugar: "+sitio
                     + "cuya descripcion es:"+descripcion);
         }
         comprobarEstado();

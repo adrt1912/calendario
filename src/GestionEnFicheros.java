@@ -33,7 +33,6 @@ public class GestionEnFicheros {
                 Scanner lectorFichero=new Scanner(new File(nombreFichero))){
             DateTimeFormatter formatoHora = DateTimeFormatter.ofPattern("HH:mm");
 
-
             while(lectorFichero.hasNextLine()) {
 
                 String titulo=lectorFichero.nextLine();
@@ -69,9 +68,10 @@ public class GestionEnFicheros {
                 if(!horaTexto.equals("null")&&!horaTexto.isEmpty()){
                  time = LocalTime.parse(horaTexto, formatoHora);}
 
-                Tarea tarea = new Tarea(titulo,fechainic,fechaFin, estadoTarea,descripcion,sitio,time);
-                GestorTareas.getGestorTareas().añadirTareaALista(tarea);
+                String frecuencia=lectorFichero.nextLine();
 
+                Tarea tarea = new Tarea(titulo,fechainic,fechaFin, estadoTarea,descripcion,sitio,time,frecuencia);
+                GestorTareas.getGestorTareas().añadirTareaALista(tarea);
 
             }
         } catch (Exception e) {
@@ -79,27 +79,23 @@ public class GestionEnFicheros {
         }
     }
 
-
     public void guardarEnFichero(List<Tarea> listaTareas){
-
 
         try (
             FileWriter printWriter=new FileWriter("tareas.txt");
             PrintWriter pw=new PrintWriter(printWriter){})
         {
             for (Tarea tarea : listaTareas){
-                pw.println(tarea.getNombreTarea() + "\n" + tarea.getFechaInicio() + "\n" + tarea.getFechaFin() + "\n" + tarea.getEstadoTarea() + "\n" + tarea.getDescripcion() + "\n" + tarea.getSitio() + "\n" + tarea.getHora() );
+                pw.println(tarea.getNombreTarea() + "\n" + tarea.getFechaInicio() + "\n" + tarea.getFechaFin() + "\n" + tarea.getEstadoTarea() + "\n" + tarea.getDescripcion() + "\n" + tarea.getSitio() + "\n" + tarea.getHora() + "\n"+tarea.getFrecuencia() );
             }
                 System.out.println("Tareas guardadas correctamente");
 
         } catch (Exception e) {
             System.out.println("ALgo fallo");
         }
-
     }
 
     public void borrarFichero(String nomF){
-
         File archivo=new File(nomF);
 
         if(archivo.delete()){
@@ -107,5 +103,4 @@ public class GestionEnFicheros {
         }else{System.out.println("No se pudo borrar");}
 
     }
-
 }

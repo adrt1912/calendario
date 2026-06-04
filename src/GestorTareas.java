@@ -17,13 +17,46 @@ public class GestorTareas {
     //PAra evitar repetir la llamada al metodo constantemente lo guardamos
     private GestionEnFicheros gestionEnFicheros=GestionEnFicheros.getGestionEnFicheros();
 
-    private GestorTareas(){   //Primero se descargan las tareas guardadas
-        gestionEnFicheros.leerFichero("tareas.txt");}
+    private GestorTareas(){}
+
+    public void mostrarTareasUrgentes(){
+//Cogemos solo las tareas en proceso
+        List<Tarea> tareasProcesar=todasTareas.stream().filter(a->a.getEstadoTarea()==EstadoTarea.EN_PROCESO).toList();
+        boolean primermensaje=true; //Para que solo se escriba una vez el mensaje
+        for (Tarea todasTarea : tareasProcesar) {
+            //Si su fecha fin es hoy la mostrara por pantalla
+            if (Objects.equals(todasTarea.getFechaFin(), LocalDate.now())) {
+                if(primermensaje){
+                    System.out.println("Tienes tareas para hoy!!!!!");
+                    primermensaje=false;
+                }
+                System.out.println(todasTarea.getNombreTarea()+" a las: "+todasTarea.getHora());
+            }
+        }
+        primermensaje=true;//Para que solo se escriba una vez el mensaje
+        for(Tarea todasTareaM : tareasProcesar){
+            //Si su fecha fin es mañana la mostrara por pantalla
+            if (Objects.equals(todasTareaM.getFechaFin(),LocalDate.now().plusDays(1))) {
+                if(primermensaje){
+                    System.out.println("Tienes tareas para mañana!!!");
+                    primermensaje=false;
+                }
+                System.out.println(todasTareaM.getNombreTarea()+" a las: "+todasTareaM.getHora());
+            }
+        }
+    }
+    //Solo se ejecuta una vez, pero no puede ir en el constructor ya que al usar la otra clase, esa otra es null
+    boolean primerGestor=true;
 
     //Metodo que inicia el gestor
     public void iniciarGestor(){
-
-
+        if(primerGestor){
+            //Se encarga de la primera carga y de mostrar tareas urgentes
+        gestionEnFicheros.leerFichero("tareas.txt");
+        mostrarTareasUrgentes();
+        primerGestor=false;
+        System.out.println("\n \n \n");
+        }
         //Se muestra el menu por la terminal, a cambiar en el futuro
         Scanner scanner =new Scanner(System.in);
         System.out.println("""
@@ -144,7 +177,11 @@ public class GestorTareas {
         System.out.println("Descripcion: ");
         String descripcion=scanner.nextLine();
 
-        Tarea tareaNueva=new Tarea(titulo, LocalDate.now(),fechaFin,EstadoTarea.EN_PROCESO,descripcion,sitio,time);
+
+        System.out.println("Quieres que sea periodica, si es asi introducir frecuencia");
+            String frecuencia=scanner.nextLine();
+
+        Tarea tareaNueva=new Tarea(titulo, LocalDate.now(),fechaFin,EstadoTarea.EN_PROCESO,descripcion,sitio,time,frecuencia);
         añadirTareaALista(tareaNueva);
         gestionEnFicheros.guardarEnFichero(todasTareas);
 
@@ -159,7 +196,7 @@ public class GestorTareas {
         String tareaEliminar=scanner.nextLine();
         List<Tarea> listTareaActuar=buscadorInteligente(tareaEliminar);
         if(!listTareaActuar.isEmpty()) {
-            for (int i = 0; i < listTareaActuar.size(); i++) {
+            for(int i = 0; i < listTareaActuar.size(); i++) {
                 System.out.println(i + 1 + ": " + listTareaActuar.get(i).getNombreTarea());
             }
             System.out.println("Dime el numero de la tarea a eliminar y 0 para cancelar");
@@ -185,7 +222,8 @@ public class GestorTareas {
 
         System.out.println("Dime la tarea a marcar");
         String tareaCompletada = scanner.nextLine();
-        List<Tarea> listTareaActuar = buscadorInteligente(tareaCompletada);
+        List<Tarea> listTareaActuar = buscadorInteligente(tareaCompletada).stream().filter(a->a.getEstadoTarea()==EstadoTarea.EN_PROCESO).toList();
+
         if (!listTareaActuar.isEmpty()) {
             for (int i = 0; i < listTareaActuar.size(); i++) {
                 System.out.println(i + 1 + ": " + listTareaActuar.get(i).getNombreTarea());
@@ -197,6 +235,9 @@ public class GestorTareas {
                 Tarea tarea = listTareaActuar.get(numModificar - 1);
                 tarea.completarTarea();
                 System.out.println("La tarea se ha marcado como completada");
+                if(tarea.getFrecuencia()!=null){
+                    todasTareas.add(new Tarea(tarea.getNombreTarea(),tarea.getFechaInicio(),tarea.getFechaFin().plusDays(tarea.getFrecuencia()),EstadoTarea.EN_PROCESO,tarea.getDescripcion(),tarea.getSitio(),tarea.getHora(), tarea.getFrecuencia().toString()));
+                }
             } else {
                 System.out.println("La tarea no se ha modificado");
             }
@@ -250,9 +291,7 @@ public class GestorTareas {
         Scanner scanner=new Scanner(System.in);
         String accion=scanner.nextLine();
         switch (accion) {
-            case "Guardar tareas","1" -> {
-                gestionEnFicheros.guardarEnFichero(todasTareas);
-            }
+            case "Guardar tareas","1" -> gestionEnFicheros.guardarEnFichero(todasTareas);
             case "Descargar tareas" ,"2"-> {
 
                 System.out.println("Nombre del fichero, o por defecto(no escribir nada)");
