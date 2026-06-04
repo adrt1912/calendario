@@ -177,7 +177,11 @@ public class GestorTareas {
         System.out.println("Descripcion: ");
         String descripcion=scanner.nextLine();
 
-        Tarea tareaNueva=new Tarea(titulo, LocalDate.now(),fechaFin,EstadoTarea.EN_PROCESO,descripcion,sitio,time);
+
+        System.out.println("Quieres que sea periodica, si es asi introducir frecuencia");
+            String frecuencia=scanner.nextLine();
+
+        Tarea tareaNueva=new Tarea(titulo, LocalDate.now(),fechaFin,EstadoTarea.EN_PROCESO,descripcion,sitio,time,frecuencia);
         añadirTareaALista(tareaNueva);
         gestionEnFicheros.guardarEnFichero(todasTareas);
 
@@ -218,7 +222,8 @@ public class GestorTareas {
 
         System.out.println("Dime la tarea a marcar");
         String tareaCompletada = scanner.nextLine();
-        List<Tarea> listTareaActuar = buscadorInteligente(tareaCompletada);
+        List<Tarea> listTareaActuar = buscadorInteligente(tareaCompletada).stream().filter(a->a.getEstadoTarea()==EstadoTarea.EN_PROCESO).toList();
+
         if (!listTareaActuar.isEmpty()) {
             for (int i = 0; i < listTareaActuar.size(); i++) {
                 System.out.println(i + 1 + ": " + listTareaActuar.get(i).getNombreTarea());
@@ -230,6 +235,9 @@ public class GestorTareas {
                 Tarea tarea = listTareaActuar.get(numModificar - 1);
                 tarea.completarTarea();
                 System.out.println("La tarea se ha marcado como completada");
+                if(tarea.getFrecuencia()!=null){
+                    todasTareas.add(new Tarea(tarea.getNombreTarea(),tarea.getFechaInicio(),tarea.getFechaFin().plusDays(tarea.getFrecuencia()),EstadoTarea.EN_PROCESO,tarea.getDescripcion(),tarea.getSitio(),tarea.getHora(), tarea.getFrecuencia().toString()));
+                }
             } else {
                 System.out.println("La tarea no se ha modificado");
             }
