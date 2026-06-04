@@ -1,6 +1,6 @@
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Date;
+import java.util.Objects;
 
 public class Tarea {
 
@@ -41,6 +41,34 @@ public class Tarea {
         return sitio;
     }
 
+    public void setEstadoTarea(EstadoTarea estadoTarea) {
+        this.estadoTarea = estadoTarea;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public void setFechaFin(LocalDate fechaFin) {
+        this.fechaFin = fechaFin;
+    }
+
+    public void setHora(LocalTime hora) {
+        this.hora = hora;
+    }
+
+    public void setSitio(String sitio) {
+        this.sitio = sitio;
+    }
+
+    public void setNombreTarea(String nombreTarea) {
+        this.nombreTarea = nombreTarea;
+    }
+
+    public void setFechaInicio(LocalDate fechaInicio) {
+        this.fechaInicio = fechaInicio;
+    }
+
 
     public Tarea(String nombreTarea, LocalDate fechaInicio, LocalDate fechaFin, EstadoTarea estadoTarea, String descripcion, String sitio, LocalTime hora){
         this.nombreTarea=nombreTarea;
@@ -56,7 +84,7 @@ public class Tarea {
     public void mostrarTarea(){
 
         if(fechaFin!=null && hora!=null){
-        System.out.println(" "+nombreTarea + "se establecio en la fecha "+fechaInicio.toString()+ " termina en la fecha "+fechaFin.toString()+" a las: "+hora.toString()+" lugar: "+sitio
+        System.out.println(" "+nombreTarea + " se establecio en la fecha "+fechaInicio.toString()+ " termina en la fecha "+ fechaFin +" a las: "+ hora +" lugar: "+sitio
         + "cuya descripcion es:"+descripcion);}
         else {
             System.out.println(" "+nombreTarea + "se establecio en la fecha "+fechaInicio.toString()+" lugar: "+sitio
@@ -77,4 +105,19 @@ public class Tarea {
 
     }
 
+    @Override
+    public boolean equals(Object tarea1) {
+        if(this==tarea1){return true;}
+        if (tarea1 instanceof Tarea tarea) {
+           return Objects.equals(tarea.getFechaFin(),fechaFin)&&
+                   Objects.equals(tarea.getFechaInicio(),fechaInicio)&&
+                   Objects.equals(tarea.getNombreTarea(),nombreTarea)&&
+                   tarea.getEstadoTarea()==estadoTarea&&
+                   Objects.equals(tarea.getDescripcion(),descripcion)&&
+                   Objects.equals(tarea.getSitio(),sitio)&&
+                   Objects.equals(tarea.getHora(),hora);
+        }
+        return false;
+
+    }
 }
