@@ -1,10 +1,7 @@
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
 public class GestorTareas {
 
@@ -20,11 +17,13 @@ public class GestorTareas {
     //PAra evitar repetir la llamada al metodo constantemente lo guardamos
     private GestionEnFicheros gestionEnFicheros=GestionEnFicheros.getGestionEnFicheros();
 
+    private GestorTareas(){   //Primero se descargan las tareas guardadas
+        gestionEnFicheros.leerFichero("tareas.txt");}
+
     //Metodo que inicia el gestor
     public void iniciarGestor(){
 
-        //Primero se descargan las tareas guardadas
-        gestionEnFicheros.leerFichero("tareas.txt");
+
         //Se muestra el menu por la terminal, a cambiar en el futuro
         Scanner scanner =new Scanner(System.in);
         System.out.println("""
@@ -38,7 +37,7 @@ public class GestorTareas {
                  7.Salir""");
 
         String action=scanner.nextLine();
-
+        todasTareas.sort(Comparator.comparing(Tarea::getEstadoTarea).thenComparing(Tarea::getFechaFin,Comparator.nullsLast(Comparator.naturalOrder())));
         //Segun lo que se pida se hace una cosa u otra
         switch (action) {
             case "Ver Tareas","1" -> mostrarTareas();
@@ -101,10 +100,11 @@ public class GestorTareas {
                     System.out.println("La lista de tareas caducadas esta vacia");
                 }
             }
-            iniciarGestor();
         }  else{
             System.out.println("La lista de tareas en proceso esta vacia");
         }
+        iniciarGestor();
+
     }
 
     private void anadirTarea(){
@@ -157,31 +157,55 @@ public class GestorTareas {
 
         System.out.println("Dime la tarea a eliminar");
         String tareaEliminar=scanner.nextLine();
-        Tarea tarea= todasTareas.stream().filter(tarea1 -> tarea1.getNombreTarea().equals(tareaEliminar)).findFirst().orElse(null);
-        if(tarea!=null){
-            todasTareas.remove(tarea);
-        System.out.println("Tarea "+tareaEliminar+" eliminada");}
-        else {
-            System.out.println("Esta tarea no esta en la lista");
+        List<Tarea> listTareaActuar=buscadorInteligente(tareaEliminar);
+        if(!listTareaActuar.isEmpty()) {
+            for (int i = 0; i < listTareaActuar.size(); i++) {
+                System.out.println(i + 1 + ": " + listTareaActuar.get(i).getNombreTarea());
+            }
+            System.out.println("Dime el numero de la tarea a eliminar y 0 para cancelar");
+            int numEliminar = scanner.nextInt();
+            scanner.nextLine();
+            if (numEliminar != 0) {
+                Tarea tarea = listTareaActuar.get(numEliminar - 1);
+                todasTareas.remove(tarea);
+                System.out.println("Tarea " + tareaEliminar + " eliminada");
+            } else {
+                System.out.println("Esta tarea no se ha eliminado");
+            }
+            gestionEnFicheros.guardarEnFichero(todasTareas);
+            iniciarGestor();
+        }else {
+            System.out.println("No se encuentra la tarea");
+            iniciarGestor();
         }
-        gestionEnFicheros.guardarEnFichero(todasTareas);
-        iniciarGestor();
-    }
+        }
 
-    private void completarTarea(){
-        Scanner scanner =new Scanner(System.in);
+    private void completarTarea() {
+        Scanner scanner = new Scanner(System.in);
 
         System.out.println("Dime la tarea a marcar");
-        String tareaCompletada=scanner.nextLine();
-        Tarea tarea= todasTareas.stream().filter(tarea1 -> tarea1.getNombreTarea().equals(tareaCompletada)).findFirst().orElse(null);
-        if(tarea!=null){
-        tarea.completarTarea();
-        System.out.println("La tarea se ha marcado como completada");}
-        else {
-            System.out.println("La tarea no se encuentra");
+        String tareaCompletada = scanner.nextLine();
+        List<Tarea> listTareaActuar = buscadorInteligente(tareaCompletada);
+        if (!listTareaActuar.isEmpty()) {
+            for (int i = 0; i < listTareaActuar.size(); i++) {
+                System.out.println(i + 1 + ": " + listTareaActuar.get(i).getNombreTarea());
+            }
+            System.out.println("Dime el numero de la tarea a eliminar y 0 para cancelar");
+            int numModificar = scanner.nextInt();
+            scanner.nextLine();
+            if (numModificar != 0) {
+                Tarea tarea = listTareaActuar.get(numModificar - 1);
+                tarea.completarTarea();
+                System.out.println("La tarea se ha marcado como completada");
+            } else {
+                System.out.println("La tarea no se ha modificado");
+            }
+            gestionEnFicheros.guardarEnFichero(todasTareas);
+            iniciarGestor();
+        } else {
+            System.out.println("No se encuentra la tarea");
+            iniciarGestor();
         }
-        gestionEnFicheros.guardarEnFichero(todasTareas);
-        iniciarGestor();
     }
 
     private void modificarTarea(){
@@ -252,6 +276,17 @@ public class GestorTareas {
             }
         }
         iniciarGestor();
+    }
+
+    private List<Tarea> buscadorInteligente (String palabraBuscar){
+        List<Tarea> listaTareaCoincidentes=new ArrayList<>();
+
+        for (Tarea todasTarea : todasTareas) {
+            if (todasTarea.getNombreTarea().toLowerCase().contains(palabraBuscar.toLowerCase())) {
+                listaTareaCoincidentes.add(todasTarea);
+            }
+        }
+        return listaTareaCoincidentes;
     }
 
     private void salir(){
