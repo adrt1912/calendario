@@ -254,28 +254,36 @@ public class GestorTareas {
         Scanner scanner =new Scanner(System.in);
         System.out.println("Que tarea se desea cambiar? Introducir el titulo");
         String titulo=scanner.nextLine();
-        Tarea tarea=todasTareas.stream().filter(a-> Objects.equals(a.getNombreTarea(), titulo)).findFirst().orElse(null);
-        if(tarea==null){System.out.println("No existe esa tarea");}
-        else{
-
-            System.out.println("Que se desea cambiar \n 1.Titulo \n 2.FechaFin \n 3.Hora \n 4.Descripcion \n 5.Sitio");
-            String accion=scanner.nextLine();
-            System.out.println("Especifica el nuevo valor");
-            String nuevo=scanner.nextLine();
-           try {
-
-
-            switch (accion){
-                case "1","Titulo","titulo" -> tarea.setNombreTarea(nuevo);
-                case "2","FechaFin","fechafin","Fechafin","fechaFin" -> tarea.setFechaFin(LocalDate.parse(nuevo,DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-                case "3","Hora","hora"->tarea.setHora(LocalTime.parse(nuevo,DateTimeFormatter.ofPattern("HH:mm")));
-                case "4","Descripcion","descripcion"->tarea.setDescripcion(nuevo);
-                case "5","Sitio","sitio"->tarea.setSitio(nuevo);
+        List<Tarea> tareas=buscadorInteligente(titulo);
+        if(!tareas.isEmpty()) {
+            for (int i = 0; i < tareas.size(); i++) {
+                System.out.println(i + 1 + ": " + tareas.get(i).getNombreTarea());
             }
-            gestionEnFicheros.guardarEnFichero(todasTareas);
-        } catch (Exception e) {
-               System.out.println("El dato es erroneo");
-           }
+            System.out.println("Dimer el numero de la tarea a modificar y 0 para cancelar");
+            int numMod = scanner.nextInt();
+            scanner.nextLine();
+            if (numMod != 0) {
+                Tarea tarea = tareas.get(numMod);
+                System.out.println("Que se desea cambiar \n 1.Titulo \n 2.FechaFin \n 3.Hora \n 4.Descripcion \n 5.Sitio");
+                String accion = scanner.nextLine();
+                System.out.println("Especifica el nuevo valor");
+                String nuevo = scanner.nextLine();
+                try {
+                    switch (accion) {
+                        case "1", "Titulo", "titulo" -> tarea.setNombreTarea(nuevo);
+                        case "2", "FechaFin", "fechafin", "Fechafin", "fechaFin" ->
+                                tarea.setFechaFin(LocalDate.parse(nuevo, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                        case "3", "Hora", "hora" ->
+                                tarea.setHora(LocalTime.parse(nuevo, DateTimeFormatter.ofPattern("HH:mm")));
+                        case "4", "Descripcion", "descripcion" -> tarea.setDescripcion(nuevo);
+                        case "5", "Sitio", "sitio" -> tarea.setSitio(nuevo);
+                    }
+                    gestionEnFicheros.guardarEnFichero(todasTareas);
+                } catch (Exception e) {
+                    System.out.println("El dato es erroneo");
+                }
+
+            }
         }
         iniciarGestor();
     }
