@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 public class GestionEnFicheros {
 
-    private static GestionEnFicheros gestionEnFicheros=new GestionEnFicheros();
+    private static final GestionEnFicheros gestionEnFicheros=new GestionEnFicheros();
 
     public static GestionEnFicheros getGestionEnFicheros() {
         return gestionEnFicheros;
@@ -30,13 +30,13 @@ public class GestionEnFicheros {
          */
 
         try (
-                Scanner lectorFichero=new Scanner(new File(nombreFichero));){
+                Scanner lectorFichero=new Scanner(new File(nombreFichero))){
             DateTimeFormatter formatoHora = DateTimeFormatter.ofPattern("HH:mm");
-
 
             while(lectorFichero.hasNextLine()) {
 
                 String titulo=lectorFichero.nextLine();
+                if(titulo.isBlank()){continue;}
 
                 String fechainicstring = lectorFichero.nextLine();
                 LocalDate fechainic=null;
@@ -48,8 +48,16 @@ public class GestionEnFicheros {
                 if(!fechafinstring.equals("null")&&!fechafinstring.isEmpty()){
                  fechaFin = LocalDate.parse(fechafinstring);}
 
-                EstadoTarea estado= EstadoTarea.valueOf(lectorFichero.nextLine());
-
+                String estadoTexto= lectorFichero.nextLine();
+                EstadoTarea estadoTarea=null;
+                if (!estadoTexto.equals("null") && !estadoTexto.isBlank()) {
+                    estadoTarea = switch (estadoTexto) {
+                        case "COMPLETADA" -> EstadoTarea.COMPLETADA;
+                        case "CADUCADA" -> EstadoTarea.CADUCADA;
+                        case "EN_PROCESO" -> EstadoTarea.EN_PROCESO;
+                        default -> null;
+                    };
+                }
                 String descripcion = lectorFichero.nextLine();
 
 
@@ -60,9 +68,10 @@ public class GestionEnFicheros {
                 if(!horaTexto.equals("null")&&!horaTexto.isEmpty()){
                  time = LocalTime.parse(horaTexto, formatoHora);}
 
-                Tarea tarea = new Tarea(titulo,fechainic,fechaFin, estado,descripcion,sitio,time);
-                GestorTareas.getGestorTareas().añadirTarea(tarea);
-                lectorFichero.nextLine();
+                String frecuencia=lectorFichero.nextLine();
+
+                Tarea tarea = new Tarea(titulo,fechainic,fechaFin, estadoTarea,descripcion,sitio,time,frecuencia);
+                GestorTareas.getGestorTareas().añadirTareaALista(tarea);
 
             }
         } catch (Exception e) {
@@ -70,27 +79,23 @@ public class GestionEnFicheros {
         }
     }
 
-
     public void guardarEnFichero(List<Tarea> listaTareas){
-
 
         try (
             FileWriter printWriter=new FileWriter("tareas.txt");
-            PrintWriter pw=new PrintWriter(printWriter){};)
+            PrintWriter pw=new PrintWriter(printWriter){})
         {
             for (Tarea tarea : listaTareas){
-                pw.println(tarea.getNombreTarea() + "\n" + tarea.getFechaInicio() + "\n" + tarea.getFechaFin() + "\n" + tarea.getEstadoTarea() + "\n" + tarea.getDescripcion() + "\n" + tarea.getSitio() + "\n" + tarea.getHora() );
+                pw.println(tarea.getNombreTarea() + "\n" + tarea.getFechaInicio() + "\n" + tarea.getFechaFin() + "\n" + tarea.getEstadoTarea() + "\n" + tarea.getDescripcion() + "\n" + tarea.getSitio() + "\n" + tarea.getHora() + "\n"+tarea.getFrecuencia() );
             }
                 System.out.println("Tareas guardadas correctamente");
 
         } catch (Exception e) {
             System.out.println("ALgo fallo");
         }
-
     }
 
     public void borrarFichero(String nomF){
-
         File archivo=new File(nomF);
 
         if(archivo.delete()){
@@ -98,5 +103,4 @@ public class GestionEnFicheros {
         }else{System.out.println("No se pudo borrar");}
 
     }
-
 }
