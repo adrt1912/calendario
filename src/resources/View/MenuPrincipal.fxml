@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -80,7 +81,7 @@
                         </Text>
                      </children>
                   </HBox>
-                  <Button fx:id="botonPasarMes" mnemonicParsing="false" onAction="#pasarMes" prefHeight="100.0" prefWidth="389.0" text="Pasar Mes">
+                  <Button fx:id="botonPasarMes" mnemonicParsing="false" onAction="#pasarMes" prefHeight="96.0" prefWidth="389.0" text="Pasar Mes">
                      <font>
                         <Font size="32.0" />
                      </font>
@@ -88,21 +89,6 @@
                </children>
             </HBox>
          </bottom>
-         <right>
-            <ScrollPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-              <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0">
-                     <children>
-                        <VBox layoutY="5.0" prefHeight="117.0" prefWidth="178.0">
-                           <children>
-                              <Text fx:id="MostradorDeTareas" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" wrappingWidth="177.13000106811523" />
-                           </children>
-                        </VBox>
-                     </children>
-                  </AnchorPane>
-              </content>
-            </ScrollPane>
-         </right>
          <left>
             <VBox prefHeight="579.0" prefWidth="132.0" spacing="6.0" BorderPane.alignment="CENTER">
                <children>
@@ -120,6 +106,14 @@
                </children>
             </VBox>
          </left>
+         <right>
+            <VBox prefHeight="579.0" prefWidth="218.0" BorderPane.alignment="CENTER">
+               <children>
+                  <ScrollPane fx:id="mostradorTareas" prefHeight="200.0" prefWidth="200.0" />
+                  <TextArea prefHeight="200.0" prefWidth="200.0" />
+               </children>
+            </VBox>
+         </right>
       </BorderPane>
    </children>
 </AnchorPane>

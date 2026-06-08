@@ -95,16 +95,19 @@ public class Tarea {
 
     }
 
-    public void mostrarTarea(){
+    public String mostrarTarea(){
 
         if(fechaFin!=null && hora!=null){
-        System.out.println(" "+nombreTarea + " se establecio en la fecha "+fechaInicio.toString()+ " termina en la fecha "+ fechaFin +" a las: "+ hora +" lugar: "+sitio
+            comprobarEstado();
+
+            return(" "+nombreTarea + " se establecio en la fecha "+fechaInicio.toString()+ " termina en la fecha "+ fechaFin +" a las: "+ hora +" lugar: "+sitio
         + "cuya descripcion es:"+descripcion);}
         else {
-            System.out.println(" "+nombreTarea + " se establecio en la fecha "+fechaInicio.toString()+" lugar: "+sitio
+            comprobarEstado();
+
+            return (" "+nombreTarea + " se establecio en la fecha "+fechaInicio.toString()+" lugar: "+sitio
                     + "cuya descripcion es:"+descripcion);
         }
-        comprobarEstado();
     }
 
     public void completarTarea(){

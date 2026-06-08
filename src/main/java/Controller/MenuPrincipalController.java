@@ -1,8 +1,13 @@
 package Controller;
 
+import Model.EstadoTarea;
 import Model.GestorTareas;
+import Model.Tarea;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import java.time.LocalDate;
@@ -12,14 +17,15 @@ public class MenuPrincipalController {
 
     GestorTareas gestorTareas=GestorTareas.getGestorTareas();
 
-    LocalDate fechaActual=LocalDate.now();
+    //Guardamos la fecha que se muestra por pantalla
     LocalDate fechaSeleccionada=LocalDate.now();
-    private int mesMostrando=fechaActual.getMonthValue();
-
-    private int añoMostrando=fechaActual.getYear();
-
     @FXML
     private GridPane calendario;
+
+    private VBox[][] calendarioVBox=new VBox[7][7];
+
+    @FXML
+    private ScrollPane mostradorTareas;
 
     @FXML
     private Text cartelAño;
@@ -27,84 +33,99 @@ public class MenuPrincipalController {
     @FXML
     private Text cartelMes;
 
-
-    private String[] semana= {"Lunes","Martes","Miercoles","Jueves","Viernes","Sábado","Domingo"};
-
-    private String[] mes={"Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"};
-
-
+    //Para escribir el titulo
+   private final String[] semana= {"Lunes","Martes","Miercoles","Jueves","Viernes","Sábado","Domingo"};
+   // private String[] mes={"Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"};
 
     public void initialize(){
+        gestorTareas.iniciarGestor();
+
+        iniciarMatrizVBox();
         mostrarCalendario();
         TareasPendientesHoy.setText(gestorTareas.mostrarTareasUrgentesHoy());
         TareasPendientesMañana.setText(gestorTareas.mostrarTareasUrgentesMañana());
     }
+    private void iniciarMatrizVBox(){
+
+        for(int i=0;i<7;i++){
+            for (int j=0;j<7;j++){
+                calendarioVBox[j][i]=new VBox();
+                int finalJ = j;
+                int finalI = i;
+                calendarioVBox[j][i].setOnMouseClicked(event -> {
+                    int dia=((finalI-1)*7)+finalJ-LocalDate.of(fechaSeleccionada.getYear(),fechaSeleccionada.getMonthValue(), 1).getDayOfWeek().getValue()+2;
+                    fechaSeleccionada=LocalDate.of(fechaSeleccionada.getYear(),fechaSeleccionada.getMonth(),dia);
+                    mostrarTareas();
+                });
+            }
+        }
+    }
+
+
+    private void mostrarTareas(){
+        List<Tarea> listaTareasMostrar=gestorTareas.getTodasTareas().stream().filter(tarea -> tarea.getFechaFin().equals(fechaSeleccionada)).toList();
+        VBox vBox=new VBox();
+        for (Tarea tarea : listaTareasMostrar) {
+            String text = tarea.mostrarTarea();
+            vBox.getChildren().add(new Text(text));
+        }
+        mostradorTareas.setContent(vBox);
+
+    }
 
     public void mostrarCalendario(){
+        //Para borrar lo que hay escrito en el calendario
         calendario.getChildren().clear();
+        iniciarMatrizVBox();
 
-        añoMostrando=fechaSeleccionada.getYear();
-        mesMostrando=fechaSeleccionada.getMonthValue();
+        //Se obtene la cantidad de dias del mes
         int numDiasMes=fechaSeleccionada.lengthOfMonth();
-        int fechaPrimerDiaMes=LocalDate.of(añoMostrando,mesMostrando, 1).getDayOfWeek().getValue();
+        //Para ver que dia empieza el mes
+        int fechaPrimerDiaMes=LocalDate.of(fechaSeleccionada.getYear(),fechaSeleccionada.getMonthValue(), 1).getDayOfWeek().getValue();
 
         cartelMes.setText(" "+fechaSeleccionada.getMonth().name());
         cartelAño.setText(""+fechaSeleccionada.getYear());
 
+
         int numMes=1;
         for(int i=0;i<calendario.getRowCount();i++){
             for (int j=0;j< calendario.getColumnCount();j++){
+                calendario.add(calendarioVBox[j][i], j, i);
+
                 if(i==0){
-                    calendario.add(new javafx.scene.control.Label(semana[j]),j,i);
+                     calendarioVBox[j][i].getChildren().add(new Label(semana[j]));
                 }
                 else{
                     if(i==1){
                         if(j>=fechaPrimerDiaMes-1){
-                            calendario.add(new javafx.scene.control.Label(numMes+""),j,i);
+                            calendarioVBox[j][i].getChildren().add(new Label(numMes+""));
                             numMes++;
                         }
                     }else{
                         if(numMes<=numDiasMes){
-                        calendario.add(new javafx.scene.control.Label(numMes+""),j,i);
+                            calendarioVBox[j][i].getChildren().add(new Label(numMes+""));
                         numMes++;
                         }
                     }
                 }
             }
         }
-
+        mostrarEtiquetas();
     }
-
-
-    //EStos dos metodos hay que cambiar, segun configuracion tal, version inicial
-private void iniciarSemanaIdioma(){
-    semana[0]="Lunes";
-    semana[1]="Martes";
-    semana[2]="Miercoles";
-    semana[3]="Jueves";
-    semana[4]="Viernes";
-    semana[5]="Sabado";
-    semana[6]="Domingo";
-}
-
-private void iniciarMesIdioma(){
-    mes[0]="Enero";
-    mes[1]="Febrero";
-    mes[2]="Marzo";
-    mes[3]="Abril";
-    mes[4]="Mayo";
-    mes[5]="Junio";
-    mes[6]="Julio";
-    mes[7]="Agosto";
-    mes[8]="Septiembre";
-    mes[9]="Octubre";
-    mes[10]="Noviembre";
-    mes[11]="Diciembre";
-
-
-}
-
-
+    private void mostrarEtiquetas(){
+        List<Tarea> listaTareas=gestorTareas.getTodasTareas();
+        for (Tarea tarea : listaTareas) {
+            LocalDate fecha = tarea.getFechaFin();
+            if (fecha.getMonth().equals(fechaSeleccionada.getMonth())&&fecha.getYear()==fechaSeleccionada.getYear()) {
+                String titulo=tarea.getNombreTarea();
+                int primerDiaMes=LocalDate.of(fechaSeleccionada.getYear(),fechaSeleccionada.getMonthValue(), 1).getDayOfWeek().getValue();
+                int pos=(fecha.getDayOfMonth()-1)+primerDiaMes;
+                int columna=pos%7;
+                int fila=(pos/7)+1;
+                calendarioVBox[columna][fila].getChildren().add(new Label(titulo));
+            }
+        }
+    }
 
     @FXML
     private void retrocederMes(){
@@ -143,13 +164,13 @@ private void iniciarMesIdioma(){
     private void descargarDatos(){}
 
     @FXML
-    private void limpiarFichero(){}
+    private void limpiarFichero(){
+    }
 
     @FXML
     private Text TareasPendientesHoy;
 
     @FXML
     private Text TareasPendientesMañana;
-
 
 }

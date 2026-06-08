@@ -1,6 +1,5 @@
 package View;
 
-import Controller.MenuPrincipalController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -24,7 +23,5 @@ public class view {
             stage.setTitle("Calendario");
             stage.setScene(scene);
             stage.show();
-            var controller = (MenuPrincipalController)fxmlLoader.getController(); //obtener el controlador de la vista
         }
-
     }

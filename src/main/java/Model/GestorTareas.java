@@ -16,6 +16,10 @@ public class GestorTareas {
 
     private List<Tarea> todasTareas=new ArrayList<>();
 
+    public List<Tarea> getTodasTareas() {
+        return todasTareas;
+    }
+
     //PAra evitar repetir la llamada al metodo constantemente lo guardamos
     private GestionEnFicheros gestionEnFicheros= GestionEnFicheros.getGestionEnFicheros();
 
@@ -49,46 +53,12 @@ public class GestorTareas {
     }
 
 
-    //Solo se ejecuta una vez, pero no puede ir en el constructor ya que al usar la otra clase, esa otra es null
-    boolean primerGestor=true;
-
     //Metodo que inicia el gestor
-    public void iniciarGestor(){
-        if(primerGestor){
-            //Se encarga de la primera carga y de mostrar tareas urgentes
+    public void iniciarGestor() {
+        //Se encarga de la primera carga y de mostrar tareas urgentes
         gestionEnFicheros.leerFichero("tareas.txt");
-        primerGestor=false;
-        System.out.println("\n \n \n");
-        }
-        //Se muestra el menu por la terminal, a cambiar en el futuro
-        Scanner scanner =new Scanner(System.in);
-        System.out.println("""
-                Buenas, que deseas hacer, especifica el numero porfa
-                 1.Ver Tareas
-                 2.Añadir tarea
-                 3.Eliminar tarea
-                 4.Completar tarea
-                 5.Gestionar ficheros
-                 6.Modificar tarea\s
-                 7.Salir""");
-
-        String action=scanner.nextLine();
-        todasTareas.sort(Comparator.comparing(Tarea::getEstadoTarea).thenComparing(Tarea::getFechaFin,Comparator.nullsLast(Comparator.naturalOrder())));
-        //Segun lo que se pida se hace una cosa u otra
-        switch (action) {
-            case "Ver Tareas","1" -> mostrarTareas();
-            case "Añadir tarea","2" -> anadirTarea();
-            case "Eliminar tarea" ,"3"-> eliminarTarea();
-            case "Completar tarea" ,"4"-> completarTarea();
-            case "Gestionar ficheros","5" -> gestionarFicheros();
-            case "Modificar tarea","6" -> modificarTarea();
-            case "Salir", "salir" ,"7"-> salir();
-            default -> {
-                System.out.println("Dime un comando correcto");
-                iniciarGestor();
-            }
-        }
     }
+
 
     //Comprueba si la tarea esta ya creada, si no es asi la guarda
     public void añadirTareaALista(Tarea tarea){
