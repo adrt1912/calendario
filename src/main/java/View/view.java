@@ -13,7 +13,7 @@ public class view {
         public static void showInitialView() throws IOException {
             //Abre la ventana inicial
             FXMLLoader fxmlLoader = new FXMLLoader(view.class.getResource("/View/MenuPrincipal.fxml"));
-            Scene scene= new Scene(fxmlLoader.load(), 1300,800);
+            Scene scene= new Scene(fxmlLoader.load(), 1400,900);
 
             //Si no está abierta se hace una nueva ventana
             if(stage==null){

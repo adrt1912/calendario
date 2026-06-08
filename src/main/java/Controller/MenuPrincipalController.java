@@ -6,11 +6,15 @@ import Model.Tarea;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class MenuPrincipalController {
@@ -32,6 +36,9 @@ public class MenuPrincipalController {
 
     @FXML
     private Text cartelMes;
+
+    @FXML
+    private Text textFecha;
 
     //Para escribir el titulo
    private final String[] semana= {"Lunes","Martes","Miercoles","Jueves","Viernes","Sábado","Domingo"};
@@ -63,11 +70,14 @@ public class MenuPrincipalController {
 
 
     private void mostrarTareas(){
+        textFecha.setText(fechaSeleccionada.toString());
         List<Tarea> listaTareasMostrar=gestorTareas.getTodasTareas().stream().filter(tarea -> tarea.getFechaFin().equals(fechaSeleccionada)).toList();
         VBox vBox=new VBox();
         for (Tarea tarea : listaTareasMostrar) {
-            String text = tarea.mostrarTarea();
-            vBox.getChildren().add(new Text(text));
+            Text text = new Text(tarea.mostrarTarea());
+            text.setFont(Font.font(12));
+
+            vBox.getChildren().add(text);
         }
         mostradorTareas.setContent(vBox);
 
@@ -120,12 +130,13 @@ public class MenuPrincipalController {
                 String titulo=tarea.getNombreTarea();
                 int primerDiaMes=LocalDate.of(fechaSeleccionada.getYear(),fechaSeleccionada.getMonthValue(), 1).getDayOfWeek().getValue();
                 int pos=(fecha.getDayOfMonth()-1)+primerDiaMes;
-                int columna=pos%7;
+                int columna=pos%7-1;
                 int fila=(pos/7)+1;
                 calendarioVBox[columna][fila].getChildren().add(new Label(titulo));
             }
         }
     }
+
 
     @FXML
     private void retrocederMes(){
@@ -140,8 +151,41 @@ public class MenuPrincipalController {
     }
 
     @FXML
-    private void añadirEvento(){
-        gestorTareas.anadirTarea();
+    private void añadirEvento() {
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter formatoHora = DateTimeFormatter.ofPattern("HH:mm");
+
+        textoReceptor.setText("Dime titulo");
+        String titulo = textoReceptor.getText();
+        textoReceptor.setText("Fecha fin, introducir en formato dd/mm/yyyy");
+        String fechaText = textoReceptor.getText();
+        LocalDate fechaFin;
+        try {
+            fechaFin = LocalDate.parse(fechaText);
+        } catch (Exception e) {
+            textoReceptor.setText("La fecha esta mal introducida, se considerara vacia");
+            fechaFin = null;
+        }
+
+        textoReceptor.setText("Hora, introducir en formato HH:mm");
+        LocalTime time;
+        String horaText=textoReceptor.getText();
+        try {
+            time=LocalTime.parse(horaText);
+        } catch (Exception e) {
+            textoReceptor.setText("La hora esta mal introducida, se considerara vacia");
+            time=null;
+        }
+        textoReceptor.setText("Sitio: ");
+        String sitio=textoReceptor.getText();
+        textoReceptor.setText("Descripcion: ");
+        String descripcion=textoReceptor.getText();
+
+        textoReceptor.setText("Quieres que sea periodica, si es asi introducir frecuencia");
+        String perioricidad= (textoReceptor.getText());
+
+            gestorTareas.anadirTarea(titulo,fechaFin,descripcion,sitio,time,perioricidad);
+
     }
     @FXML
     private void eliminarTarea(){
@@ -172,5 +216,9 @@ public class MenuPrincipalController {
 
     @FXML
     private Text TareasPendientesMañana;
+
+    @FXML
+    private TextArea textoReceptor;
+
 
 }

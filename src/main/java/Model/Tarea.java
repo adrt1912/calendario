@@ -100,12 +100,12 @@ public class Tarea {
         if(fechaFin!=null && hora!=null){
             comprobarEstado();
 
-            return(" "+nombreTarea + " se establecio en la fecha "+fechaInicio.toString()+ " termina en la fecha "+ fechaFin +" a las: "+ hora +" lugar: "+sitio
-        + "cuya descripcion es:"+descripcion);}
+            return(" "+nombreTarea + " termina el "+ fechaFin +" a las: "+ hora +"\n lugar: "+sitio
+        + " descripcion es:"+descripcion);}
         else {
             comprobarEstado();
 
-            return (" "+nombreTarea + " se establecio en la fecha "+fechaInicio.toString()+" lugar: "+sitio
+            return (" "+nombreTarea +" lugar: "+sitio
                     + "cuya descripcion es:"+descripcion);
         }
     }

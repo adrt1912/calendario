@@ -113,46 +113,8 @@ public class GestorTareas {
 
     }
 
-    public void anadirTarea(){
-        Scanner scanner =new Scanner(System.in);
+    public void anadirTarea(String titulo,LocalDate fechaFin,String descripcion,String sitio,LocalTime time,String frecuencia){
 
-        System.out.println("Dime la tarea a añadir, si no se desea rellenar un apartado solo saltar ");
-        System.out.println("Titulo:");
-        String titulo=scanner.nextLine();
-        System.out.println("Fecha fin, introducir en formato dd/mm/yyyy");
-        //Se define el tipo de fecha
-        LocalDate fechaFin;
-       try {
-        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        String fechaFinString=scanner.nextLine();
-         fechaFin=LocalDate.parse(fechaFinString,formato);}
-       catch (Exception e) {
-           System.out.println("Has puesto mal la fecha, se considerara vacia");
-            fechaFin=null;
-       }
-
-        System.out.println("Hora, introducir en formato HH:mm");
-       LocalTime time;
-       try {
-
-
-        DateTimeFormatter formatoHora = DateTimeFormatter.ofPattern("HH:mm");
-        String horaTexto=scanner.nextLine();
-         time=LocalTime.parse(horaTexto,formatoHora);}
-       catch (Exception e) {
-           System.out.println("Has puesto mal la hora, se considerara vacia");
-           time=null;
-       }
-
-        System.out.println("Sitio: ");
-        String sitio=scanner.nextLine();
-
-        System.out.println("Descripcion: ");
-        String descripcion=scanner.nextLine();
-
-
-        System.out.println("Quieres que sea periodica, si es asi introducir frecuencia");
-            String frecuencia=scanner.nextLine();
 
         Tarea tareaNueva=new Tarea(titulo, LocalDate.now(),fechaFin, EstadoTarea.EN_PROCESO,descripcion,sitio,time,frecuencia);
         añadirTareaALista(tareaNueva);
