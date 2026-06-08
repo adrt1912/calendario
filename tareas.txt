@@ -1,0 +1,64 @@
+entrenar
+2026-06-04
+2026-06-04
+CADUCADA
+Entrenar hockey con infantiles y seniors
+Ribabellosa
+19:00
+7
+Prueba
+2026-06-04
+2026-06-05
+CADUCADA
+hola
+vitoria
+12:21
+7
+PruebaFrecuencai
+2026-06-04
+2026-06-12
+COMPLETADA
+Pruieba
+Vitoria
+12:43
+7
+PruebaFrecuencai
+2026-06-04
+2026-06-19
+EN_PROCESO
+Pruieba
+Vitoria
+12:43
+7
+Prueba urgentes
+2026-06-08
+2026-06-08
+EN_PROCESO
+Prueba
+Casa
+18:50
+null
+Prueva Añadir
+2026-06-08
+2026-06-23
+EN_PROCESO
+Probar
+En mi casa
+12:23
+null
+otraPruebaañadir
+2026-06-08
+2026-06-30
+EN_PROCESO
+
+
+null
+null
+nose preubashowwair
+2026-06-08
+2026-06-22
+EN_PROCESO
+
+
+null
+null

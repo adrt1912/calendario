@@ -24,4 +24,16 @@ public class view {
             stage.setScene(scene);
             stage.show();
         }
+
+
+        public static void showCrearTArea() throws IOException {
+            FXMLLoader fxmlLoader=new FXMLLoader(view.class.getResource("/View/crearTarea.fxml"));
+            Scene scene=new Scene(fxmlLoader.load(),600,500);
+
+            Stage stage1=new Stage();
+            stage1.setTitle("Crear Tarea Nueva");
+            stage1.setScene(scene);
+            stage1.showAndWait();
+        }
+
     }

@@ -1,8 +1,8 @@
 package Controller;
 
-import Model.EstadoTarea;
 import Model.GestorTareas;
 import Model.Tarea;
+import View.view;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -13,13 +13,12 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class MenuPrincipalController {
 
     GestorTareas gestorTareas=GestorTareas.getGestorTareas();
+
 
     //Guardamos la fecha que se muestra por pantalla
     LocalDate fechaSeleccionada=LocalDate.now();
@@ -152,40 +151,12 @@ public class MenuPrincipalController {
 
     @FXML
     private void añadirEvento() {
-        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        DateTimeFormatter formatoHora = DateTimeFormatter.ofPattern("HH:mm");
-
-        textoReceptor.setText("Dime titulo");
-        String titulo = textoReceptor.getText();
-        textoReceptor.setText("Fecha fin, introducir en formato dd/mm/yyyy");
-        String fechaText = textoReceptor.getText();
-        LocalDate fechaFin;
         try {
-            fechaFin = LocalDate.parse(fechaText);
+            view.showCrearTArea();
+            mostrarCalendario();
         } catch (Exception e) {
-            textoReceptor.setText("La fecha esta mal introducida, se considerara vacia");
-            fechaFin = null;
+            throw new RuntimeException(e);
         }
-
-        textoReceptor.setText("Hora, introducir en formato HH:mm");
-        LocalTime time;
-        String horaText=textoReceptor.getText();
-        try {
-            time=LocalTime.parse(horaText);
-        } catch (Exception e) {
-            textoReceptor.setText("La hora esta mal introducida, se considerara vacia");
-            time=null;
-        }
-        textoReceptor.setText("Sitio: ");
-        String sitio=textoReceptor.getText();
-        textoReceptor.setText("Descripcion: ");
-        String descripcion=textoReceptor.getText();
-
-        textoReceptor.setText("Quieres que sea periodica, si es asi introducir frecuencia");
-        String perioricidad= (textoReceptor.getText());
-
-            gestorTareas.anadirTarea(titulo,fechaFin,descripcion,sitio,time,perioricidad);
-
     }
     @FXML
     private void eliminarTarea(){

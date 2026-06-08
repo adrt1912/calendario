@@ -90,7 +90,7 @@
             </HBox>
          </bottom>
          <left>
-            <VBox prefHeight="579.0" prefWidth="122.0" spacing="6.0" BorderPane.alignment="CENTER">
+            <VBox prefHeight="679.0" prefWidth="148.0" spacing="6.0" BorderPane.alignment="CENTER">
                <children>
                   <Text fx:id="textoTarea" strokeType="OUTSIDE" strokeWidth="0.0" text="Tareas:" wrappingWidth="87.22600173950195" />
                   <Button fx:id="botonEvento" mnemonicParsing="false" onAction="#añadirEvento" prefHeight="26.0" prefWidth="126.0" text="Añadir Tarea" />
