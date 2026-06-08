@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.MenuPrincipalController">
+   <children>
+      <BorderPane prefHeight="800.0" prefWidth="1203.0">
+         <top>
+            <VBox prefHeight="121.0" prefWidth="1271.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Text fx:id="textoBienvenida" strokeType="OUTSIDE" strokeWidth="0.0" text="Buenos Dias" textAlignment="CENTER" wrappingWidth="1283.2340049743652">
+                     <font>
+                        <Font size="35.0" />
+                     </font>
+                  </Text>
+                  <Text fx:id="TareasPendientesHoy" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" wrappingWidth="1283.1300010681152">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Text>
+                  <Text fx:id="TareasPendientesMañana" strokeType="OUTSIDE" strokeWidth="0.0" text="Text">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Text>
+               </children>
+            </VBox>
+         </top>
+         <center>
+            <GridPane fx:id="calendario" BorderPane.alignment="CENTER">
+              <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+            </GridPane>
+         </center>
+         <bottom>
+            <HBox prefHeight="100.0" prefWidth="1274.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Button fx:id="botonRetrocederMes" mnemonicParsing="false" onAction="#retrocederMes" prefHeight="97.0" prefWidth="389.0" text="Retroceder Mes">
+                     <font>
+                        <Font size="32.0" />
+                     </font>
+                  </Button>
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Text fx:id="cartelMes" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" wrappingWidth="279.13000106811523">
+                           <font>
+                              <Font size="40.0" />
+                           </font>
+                        </Text>
+                        <Text fx:id="cartelAño" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" wrappingWidth="184.13000106811523">
+                           <font>
+                              <Font size="42.0" />
+                           </font>
+                        </Text>
+                     </children>
+                  </HBox>
+                  <Button fx:id="botonPasarMes" mnemonicParsing="false" onAction="#pasarMes" prefHeight="100.0" prefWidth="389.0" text="Pasar Mes">
+                     <font>
+                        <Font size="32.0" />
+                     </font>
+                  </Button>
+               </children>
+            </HBox>
+         </bottom>
+         <right>
+            <ScrollPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0">
+                     <children>
+                        <VBox layoutY="5.0" prefHeight="117.0" prefWidth="178.0">
+                           <children>
+                              <Text fx:id="MostradorDeTareas" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" wrappingWidth="177.13000106811523" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </AnchorPane>
+              </content>
+            </ScrollPane>
+         </right>
+         <left>
+            <VBox prefHeight="579.0" prefWidth="132.0" spacing="6.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Text fx:id="textoTarea" strokeType="OUTSIDE" strokeWidth="0.0" text="Tareas:" wrappingWidth="87.22600173950195" />
+                  <Button fx:id="botonEvento" mnemonicParsing="false" onAction="#añadirEvento" prefHeight="26.0" prefWidth="126.0" text="Añadir Tarea" />
+                  <Button fx:id="botonEliminar" mnemonicParsing="false" onAction="#eliminarTarea" prefHeight="26.0" prefWidth="126.0" text="Eliminar Tarea" />
+                  <Button fx:id="botonModificar" mnemonicParsing="false" onAction="#modificarTarea" prefHeight="26.0" prefWidth="126.0" text="Modificar Tarea" />
+                  <Button fx:id="botonCompletar" mnemonicParsing="false" onAction="#completarTarea" prefWidth="126.0" text="Completar Tarea" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Almacenamiento" />
+                  <Button fx:id="botonGuardar" mnemonicParsing="false" onAction="#guardarDatos" prefHeight="26.0" prefWidth="126.0" text="Guardar Datos" />
+                  <Button fx:id="botonDescargar" mnemonicParsing="false" onAction="#descargarDatos" prefWidth="126.0" text="Descargar Datos" />
+                  <Button fx:id="botonLimpiar" mnemonicParsing="false" onAction="#limpiarFichero" prefHeight="26.0" prefWidth="126.0" text="Limpiar Datos" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+                  <Button fx:id="botonConfiguracion" mnemonicParsing="false" text="Configuración" />
+               </children>
+            </VBox>
+         </left>
+      </BorderPane>
+   </children>
+</AnchorPane>

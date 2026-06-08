@@ -1,3 +1,5 @@
+package Model;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -15,36 +17,38 @@ public class GestorTareas {
     private List<Tarea> todasTareas=new ArrayList<>();
 
     //PAra evitar repetir la llamada al metodo constantemente lo guardamos
-    private GestionEnFicheros gestionEnFicheros=GestionEnFicheros.getGestionEnFicheros();
+    private GestionEnFicheros gestionEnFicheros= GestionEnFicheros.getGestionEnFicheros();
 
     private GestorTareas(){}
 
-    public void mostrarTareasUrgentes(){
+    public String mostrarTareasUrgentesHoy(){
 //Cogemos solo las tareas en proceso
-        List<Tarea> tareasProcesar=todasTareas.stream().filter(a->a.getEstadoTarea()==EstadoTarea.EN_PROCESO).toList();
-        boolean primermensaje=true; //Para que solo se escriba una vez el mensaje
+        StringBuilder taresDevolver= new StringBuilder();
+
+        List<Tarea> tareasProcesar=todasTareas.stream().filter(a->a.getEstadoTarea()== EstadoTarea.EN_PROCESO).toList();
         for (Tarea todasTarea : tareasProcesar) {
             //Si su fecha fin es hoy la mostrara por pantalla
             if (Objects.equals(todasTarea.getFechaFin(), LocalDate.now())) {
-                if(primermensaje){
-                    System.out.println("Tienes tareas para hoy!!!!!");
-                    primermensaje=false;
-                }
-                System.out.println(todasTarea.getNombreTarea()+" a las: "+todasTarea.getHora());
+
+               taresDevolver.append(" ").append(todasTarea.getNombreTarea()).append(" a las: ").append(todasTarea.getHora());
             }
         }
-        primermensaje=true;//Para que solo se escriba una vez el mensaje
+        return taresDevolver.toString();
+    }
+
+    public String mostrarTareasUrgentesMañana(){
+        StringBuilder taresDevolver= new StringBuilder();        List<Tarea> tareasProcesar=todasTareas.stream().filter(a->a.getEstadoTarea()== EstadoTarea.EN_PROCESO).toList();
+
         for(Tarea todasTareaM : tareasProcesar){
             //Si su fecha fin es mañana la mostrara por pantalla
             if (Objects.equals(todasTareaM.getFechaFin(),LocalDate.now().plusDays(1))) {
-                if(primermensaje){
-                    System.out.println("Tienes tareas para mañana!!!");
-                    primermensaje=false;
-                }
-                System.out.println(todasTareaM.getNombreTarea()+" a las: "+todasTareaM.getHora());
+                taresDevolver.append(" ").append(todasTareaM.getNombreTarea()).append(" a las: ").append(todasTareaM.getHora());
             }
         }
+        return taresDevolver.toString();
     }
+
+
     //Solo se ejecuta una vez, pero no puede ir en el constructor ya que al usar la otra clase, esa otra es null
     boolean primerGestor=true;
 
@@ -53,7 +57,6 @@ public class GestorTareas {
         if(primerGestor){
             //Se encarga de la primera carga y de mostrar tareas urgentes
         gestionEnFicheros.leerFichero("tareas.txt");
-        mostrarTareasUrgentes();
         primerGestor=false;
         System.out.println("\n \n \n");
         }
@@ -95,7 +98,7 @@ public class GestorTareas {
     }
 
 //Metodo que muestra las tareas
-    private void mostrarTareas(){
+    public void mostrarTareas(){
         if(!todasTareas.isEmpty()) {
             System.out.println("Las tareas en proceso:");
             List<Tarea> listaMostrar = todasTareas.stream().filter(a -> a.getEstadoTarea() == EstadoTarea.EN_PROCESO).toList();
@@ -110,7 +113,7 @@ public class GestorTareas {
             String accion = scanner.nextLine();
 
             if (accion.equals("Completados")) {
-                listaMostrar=todasTareas.stream().filter(a->a.getEstadoTarea()==EstadoTarea.COMPLETADA).toList();
+                listaMostrar=todasTareas.stream().filter(a->a.getEstadoTarea()== EstadoTarea.COMPLETADA).toList();
                 if (!listaMostrar.isEmpty()) {
                     System.out.println("Las tareas en proceso:");
                     for (int i = 0; i < listaMostrar.size(); i++) {
@@ -122,7 +125,7 @@ public class GestorTareas {
                 }
 
             } else if (accion.equals("Caducados")) {
-                listaMostrar=todasTareas.stream().filter(a->a.getEstadoTarea()==EstadoTarea.CADUCADA).toList();
+                listaMostrar=todasTareas.stream().filter(a->a.getEstadoTarea()== EstadoTarea.CADUCADA).toList();
                 if (!listaMostrar.isEmpty()) {
                     System.out.println("Las tareas en proceso:");
                     for (int i = 0; i < listaMostrar.size(); i++) {
@@ -140,7 +143,7 @@ public class GestorTareas {
 
     }
 
-    private void anadirTarea(){
+    public void anadirTarea(){
         Scanner scanner =new Scanner(System.in);
 
         System.out.println("Dime la tarea a añadir, si no se desea rellenar un apartado solo saltar ");
@@ -181,7 +184,7 @@ public class GestorTareas {
         System.out.println("Quieres que sea periodica, si es asi introducir frecuencia");
             String frecuencia=scanner.nextLine();
 
-        Tarea tareaNueva=new Tarea(titulo, LocalDate.now(),fechaFin,EstadoTarea.EN_PROCESO,descripcion,sitio,time,frecuencia);
+        Tarea tareaNueva=new Tarea(titulo, LocalDate.now(),fechaFin, EstadoTarea.EN_PROCESO,descripcion,sitio,time,frecuencia);
         añadirTareaALista(tareaNueva);
         gestionEnFicheros.guardarEnFichero(todasTareas);
 
@@ -189,7 +192,7 @@ public class GestorTareas {
         iniciarGestor();
     }
 
-    private void eliminarTarea(){
+    public void eliminarTarea(){
         Scanner scanner =new Scanner(System.in);
 
         System.out.println("Dime la tarea a eliminar");
@@ -205,7 +208,7 @@ public class GestorTareas {
             if (numEliminar != 0) {
                 Tarea tarea = listTareaActuar.get(numEliminar - 1);
                 todasTareas.remove(tarea);
-                System.out.println("Tarea " + tareaEliminar + " eliminada");
+                System.out.println("Java.Controller.Model.Tarea " + tareaEliminar + " eliminada");
             } else {
                 System.out.println("Esta tarea no se ha eliminado");
             }
@@ -217,12 +220,12 @@ public class GestorTareas {
         }
         }
 
-    private void completarTarea() {
+    public void completarTarea() {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Dime la tarea a marcar");
         String tareaCompletada = scanner.nextLine();
-        List<Tarea> listTareaActuar = buscadorInteligente(tareaCompletada).stream().filter(a->a.getEstadoTarea()==EstadoTarea.EN_PROCESO).toList();
+        List<Tarea> listTareaActuar = buscadorInteligente(tareaCompletada).stream().filter(a->a.getEstadoTarea()== EstadoTarea.EN_PROCESO).toList();
 
         if (!listTareaActuar.isEmpty()) {
             for (int i = 0; i < listTareaActuar.size(); i++) {
@@ -236,7 +239,7 @@ public class GestorTareas {
                 tarea.completarTarea();
                 System.out.println("La tarea se ha marcado como completada");
                 if(tarea.getFrecuencia()!=null){
-                    todasTareas.add(new Tarea(tarea.getNombreTarea(),tarea.getFechaInicio(),tarea.getFechaFin().plusDays(tarea.getFrecuencia()),EstadoTarea.EN_PROCESO,tarea.getDescripcion(),tarea.getSitio(),tarea.getHora(), tarea.getFrecuencia().toString()));
+                    todasTareas.add(new Tarea(tarea.getNombreTarea(),tarea.getFechaInicio(),tarea.getFechaFin().plusDays(tarea.getFrecuencia()), EstadoTarea.EN_PROCESO,tarea.getDescripcion(),tarea.getSitio(),tarea.getHora(), tarea.getFrecuencia().toString()));
                 }
             } else {
                 System.out.println("La tarea no se ha modificado");
@@ -249,7 +252,7 @@ public class GestorTareas {
         }
     }
 
-    private void modificarTarea(){
+    public void modificarTarea(){
 
         Scanner scanner =new Scanner(System.in);
         System.out.println("Que tarea se desea cambiar? Introducir el titulo");
@@ -288,7 +291,7 @@ public class GestorTareas {
         iniciarGestor();
     }
 
-    private void gestionarFicheros(){
+    public void gestionarFicheros(){
 
         System.out.println("""
                 Sobre ficheros que desa
