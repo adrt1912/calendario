@@ -1,7 +1,6 @@
 package Controller;
 
 import Model.GestorTareas;
-import View.view;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
@@ -14,42 +13,6 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 public class CrearTareaController {
-    /*
-      DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        DateTimeFormatter formatoHora = DateTimeFormatter.ofPattern("HH:mm");
-
-        textoReceptor.setText("Dime titulo");
-        String titulo = textoReceptor.getText();
-        textoReceptor.setText("Fecha fin, introducir en formato dd/mm/yyyy");
-        String fechaText = textoReceptor.getText();
-        LocalDate fechaFin;
-        try {
-            fechaFin = LocalDate.parse(fechaText);
-        } catch (Exception e) {
-            textoReceptor.setText("La fecha esta mal introducida, se considerara vacia");
-            fechaFin = null;
-        }
-
-        textoReceptor.setText("Hora, introducir en formato HH:mm");
-        LocalTime time;
-        String horaText=textoReceptor.getText();
-        try {
-            time=LocalTime.parse(horaText);
-        } catch (Exception e) {
-            textoReceptor.setText("La hora esta mal introducida, se considerara vacia");
-            time=null;
-        }
-        textoReceptor.setText("Sitio: ");
-        String sitio=textoReceptor.getText();
-        textoReceptor.setText("Descripcion: ");
-        String descripcion=textoReceptor.getText();
-
-        textoReceptor.setText("Quieres que sea periodica, si es asi introducir frecuencia");
-        String perioricidad= (textoReceptor.getText());
-
-            gestorTareas.anadirTarea(titulo,fechaFin,descripcion,sitio,time,perioricidad);
-
-     */
     @FXML
     private Button botonCancelar;
 
@@ -79,10 +42,7 @@ public class CrearTareaController {
 
     @FXML
     private void guardarTarea(){
-        DateTimeFormatter formatoHora = DateTimeFormatter.ofPattern("HH:mm");
-
         LocalDate fecha=texFecha.getValue();
-
 
         String titulo=textoTitulo.getText();
 
@@ -108,7 +68,5 @@ public class CrearTareaController {
 
         Stage ventanaActual = (Stage) botonCancelar.getScene().getWindow();
         ventanaActual.close();
-
-
     }
 }

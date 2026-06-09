@@ -67,160 +67,29 @@ public class GestorTareas {
         }
     }
 
-//Metodo que muestra las tareas
-    public void mostrarTareas(){
-        if(!todasTareas.isEmpty()) {
-            System.out.println("Las tareas en proceso:");
-            List<Tarea> listaMostrar = todasTareas.stream().filter(a -> a.getEstadoTarea() == EstadoTarea.EN_PROCESO).toList();
-            for (int i = 0; i < listaMostrar.size(); i++) {
-                System.out.print(i + 1 + ":");
-                listaMostrar.get(i).mostrarTarea();
-            }
-
-            Scanner scanner = new Scanner(System.in);
-
-            System.out.println("Dime que lista de tares quieres ver (Completados o Caducados), o para salir escribir otra cosa");
-            String accion = scanner.nextLine();
-
-            if (accion.equals("Completados")) {
-                listaMostrar=todasTareas.stream().filter(a->a.getEstadoTarea()== EstadoTarea.COMPLETADA).toList();
-                if (!listaMostrar.isEmpty()) {
-                    System.out.println("Las tareas en proceso:");
-                    for (int i = 0; i < listaMostrar.size(); i++) {
-                        System.out.print(i + 1 + ":");
-                        listaMostrar.get(i).mostrarTarea();
-                    }
-                } else {
-                    System.out.println("La lista de tareas en finalizadas esta vacia");
-                }
-
-            } else if (accion.equals("Caducados")) {
-                listaMostrar=todasTareas.stream().filter(a->a.getEstadoTarea()== EstadoTarea.CADUCADA).toList();
-                if (!listaMostrar.isEmpty()) {
-                    System.out.println("Las tareas en proceso:");
-                    for (int i = 0; i < listaMostrar.size(); i++) {
-                        System.out.print(i + 1 + ":");
-                        listaMostrar.get(i).mostrarTarea();
-                    }
-                } else {
-                    System.out.println("La lista de tareas caducadas esta vacia");
-                }
-            }
-        }  else{
-            System.out.println("La lista de tareas en proceso esta vacia");
-        }
-        iniciarGestor();
-
-    }
-
     public void anadirTarea(String titulo,LocalDate fechaFin,String descripcion,String sitio,LocalTime time,String frecuencia){
-
-
         Tarea tareaNueva=new Tarea(titulo, LocalDate.now(),fechaFin, EstadoTarea.EN_PROCESO,descripcion,sitio,time,frecuencia);
         añadirTareaALista(tareaNueva);
         gestionEnFicheros.guardarEnFichero(todasTareas);
-
         System.out.println("La tarea "+ titulo+"a sido añadida con exito");
         iniciarGestor();
     }
 
-    public void eliminarTarea(){
-        Scanner scanner =new Scanner(System.in);
-
-        System.out.println("Dime la tarea a eliminar");
-        String tareaEliminar=scanner.nextLine();
-        List<Tarea> listTareaActuar=buscadorInteligente(tareaEliminar);
-        if(!listTareaActuar.isEmpty()) {
-            for(int i = 0; i < listTareaActuar.size(); i++) {
-                System.out.println(i + 1 + ": " + listTareaActuar.get(i).getNombreTarea());
-            }
-            System.out.println("Dime el numero de la tarea a eliminar y 0 para cancelar");
-            int numEliminar = scanner.nextInt();
-            scanner.nextLine();
-            if (numEliminar != 0) {
-                Tarea tarea = listTareaActuar.get(numEliminar - 1);
-                todasTareas.remove(tarea);
-                System.out.println("Java.Controller.Model.Tarea " + tareaEliminar + " eliminada");
-            } else {
-                System.out.println("Esta tarea no se ha eliminado");
-            }
-            gestionEnFicheros.guardarEnFichero(todasTareas);
-            iniciarGestor();
-        }else {
-            System.out.println("No se encuentra la tarea");
-            iniciarGestor();
-        }
-        }
-
-    public void completarTarea() {
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.println("Dime la tarea a marcar");
-        String tareaCompletada = scanner.nextLine();
-        List<Tarea> listTareaActuar = buscadorInteligente(tareaCompletada).stream().filter(a->a.getEstadoTarea()== EstadoTarea.EN_PROCESO).toList();
-
-        if (!listTareaActuar.isEmpty()) {
-            for (int i = 0; i < listTareaActuar.size(); i++) {
-                System.out.println(i + 1 + ": " + listTareaActuar.get(i).getNombreTarea());
-            }
-            System.out.println("Dime el numero de la tarea a eliminar y 0 para cancelar");
-            int numModificar = scanner.nextInt();
-            scanner.nextLine();
-            if (numModificar != 0) {
-                Tarea tarea = listTareaActuar.get(numModificar - 1);
-                tarea.completarTarea();
-                System.out.println("La tarea se ha marcado como completada");
-                if(tarea.getFrecuencia()!=null){
-                    todasTareas.add(new Tarea(tarea.getNombreTarea(),tarea.getFechaInicio(),tarea.getFechaFin().plusDays(tarea.getFrecuencia()), EstadoTarea.EN_PROCESO,tarea.getDescripcion(),tarea.getSitio(),tarea.getHora(), tarea.getFrecuencia().toString()));
-                }
-            } else {
-                System.out.println("La tarea no se ha modificado");
-            }
-            gestionEnFicheros.guardarEnFichero(todasTareas);
-            iniciarGestor();
-        } else {
-            System.out.println("No se encuentra la tarea");
-            iniciarGestor();
-        }
+    public void eliminarTarea(Tarea tarea){
+        todasTareas.remove(tarea);
+        gestionEnFicheros.guardarEnFichero(todasTareas);
     }
 
-    public void modificarTarea(){
+    public void modificarTarea(Tarea tarea,String titulo,LocalDate fechaFin,String descripcion,String sitio,LocalTime time,String frecuencia,EstadoTarea estadoTarea){
 
-        Scanner scanner =new Scanner(System.in);
-        System.out.println("Que tarea se desea cambiar? Introducir el titulo");
-        String titulo=scanner.nextLine();
-        List<Tarea> tareas=buscadorInteligente(titulo);
-        if(!tareas.isEmpty()) {
-            for (int i = 0; i < tareas.size(); i++) {
-                System.out.println(i + 1 + ": " + tareas.get(i).getNombreTarea());
-            }
-            System.out.println("Dimer el numero de la tarea a modificar y 0 para cancelar");
-            int numMod = scanner.nextInt();
-            scanner.nextLine();
-            if (numMod != 0) {
-                Tarea tarea = tareas.get(numMod);
-                System.out.println("Que se desea cambiar \n 1.Titulo \n 2.FechaFin \n 3.Hora \n 4.Descripcion \n 5.Sitio");
-                String accion = scanner.nextLine();
-                System.out.println("Especifica el nuevo valor");
-                String nuevo = scanner.nextLine();
-                try {
-                    switch (accion) {
-                        case "1", "Titulo", "titulo" -> tarea.setNombreTarea(nuevo);
-                        case "2", "FechaFin", "fechafin", "Fechafin", "fechaFin" ->
-                                tarea.setFechaFin(LocalDate.parse(nuevo, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-                        case "3", "Hora", "hora" ->
-                                tarea.setHora(LocalTime.parse(nuevo, DateTimeFormatter.ofPattern("HH:mm")));
-                        case "4", "Descripcion", "descripcion" -> tarea.setDescripcion(nuevo);
-                        case "5", "Sitio", "sitio" -> tarea.setSitio(nuevo);
-                    }
-                    gestionEnFicheros.guardarEnFichero(todasTareas);
-                } catch (Exception e) {
-                    System.out.println("El dato es erroneo");
-                }
-
-            }
-        }
-        iniciarGestor();
+        tarea.setNombreTarea(titulo);
+        tarea.setFechaFin(fechaFin);
+        tarea.setDescripcion(descripcion);
+        tarea.setSitio(sitio);
+        tarea.setHora(time);
+        tarea.setFrecuencia(Integer.parseInt(frecuencia));
+        tarea.setEstadoTarea(estadoTarea);
+        gestionEnFicheros.guardarEnFichero(todasTareas);
     }
 
     public void gestionarFicheros(){
@@ -269,11 +138,6 @@ public class GestorTareas {
             }
         }
         return listaTareaCoincidentes;
-    }
-
-    private void salir(){
-        System.out.println("Cerrando todo");
-        System.exit(1);
     }
 
 }

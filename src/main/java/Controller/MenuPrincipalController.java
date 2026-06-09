@@ -19,7 +19,6 @@ public class MenuPrincipalController {
 
     GestorTareas gestorTareas=GestorTareas.getGestorTareas();
 
-
     //Guardamos la fecha que se muestra por pantalla
     LocalDate fechaSeleccionada=LocalDate.now();
     @FXML
@@ -38,6 +37,8 @@ public class MenuPrincipalController {
 
     @FXML
     private Text textFecha;
+
+    private Tarea tareaSelec;
 
     //Para escribir el titulo
    private final String[] semana= {"Lunes","Martes","Miercoles","Jueves","Viernes","Sábado","Domingo"};
@@ -72,14 +73,22 @@ public class MenuPrincipalController {
         textFecha.setText(fechaSeleccionada.toString());
         List<Tarea> listaTareasMostrar=gestorTareas.getTodasTareas().stream().filter(tarea -> tarea.getFechaFin().equals(fechaSeleccionada)).toList();
         VBox vBox=new VBox();
+        int i=1;
         for (Tarea tarea : listaTareasMostrar) {
-            Text text = new Text(tarea.mostrarTarea());
+            Text text = new Text(i+": "+tarea.mostrarTarea());
             text.setFont(Font.font(12));
+           vBox.getChildren().add(text);
+           i++;
 
-            vBox.getChildren().add(text);
+           text.setOnMouseClicked(event -> {
+               try{
+                   view.showTareaVentana(tarea);
+                   mostrarCalendario();
+                   mostrarTareas();
+               } catch (Exception ignored) {}
+           });
         }
         mostradorTareas.setContent(vBox);
-
     }
 
     public void mostrarCalendario(){
@@ -94,7 +103,6 @@ public class MenuPrincipalController {
 
         cartelMes.setText(" "+fechaSeleccionada.getMonth().name());
         cartelAño.setText(""+fechaSeleccionada.getYear());
-
 
         int numMes=1;
         for(int i=0;i<calendario.getRowCount();i++){
@@ -136,7 +144,6 @@ public class MenuPrincipalController {
         }
     }
 
-
     @FXML
     private void retrocederMes(){
         fechaSeleccionada=fechaSeleccionada.minusMonths(1);
@@ -154,22 +161,16 @@ public class MenuPrincipalController {
         try {
             view.showCrearTArea();
             mostrarCalendario();
+        } catch (Exception ignored) {}
+    }
+    @FXML
+    private void modificarTarea(){
+        if(tareaSelec==null) 
+        try {
+            view.showTareaVentana(tareaSelec);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-    @FXML
-    private void eliminarTarea(){
-        gestorTareas.eliminarTarea();
-    }
-
-    @FXML
-    private void modificarTarea(){
-        gestorTareas.modificarTarea();
-    }
-    @FXML
-    private void completarTarea(){
-        gestorTareas.completarTarea();
     }
 
     @FXML
@@ -179,8 +180,7 @@ public class MenuPrincipalController {
     private void descargarDatos(){}
 
     @FXML
-    private void limpiarFichero(){
-    }
+    private void limpiarFichero(){}
 
     @FXML
     private Text TareasPendientesHoy;
@@ -190,6 +190,5 @@ public class MenuPrincipalController {
 
     @FXML
     private TextArea textoReceptor;
-
 
 }

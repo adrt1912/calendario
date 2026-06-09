@@ -2,7 +2,6 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -38,7 +37,7 @@
             </VBox>
          </top>
          <center>
-            <GridPane fx:id="calendario" BorderPane.alignment="CENTER">
+            <GridPane fx:id="calendario" gridLinesVisible="true" BorderPane.alignment="CENTER">
               <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -94,24 +93,15 @@
                <children>
                   <Text fx:id="textoTarea" strokeType="OUTSIDE" strokeWidth="0.0" text="Tareas:" wrappingWidth="87.22600173950195" />
                   <Button fx:id="botonEvento" mnemonicParsing="false" onAction="#añadirEvento" prefHeight="26.0" prefWidth="126.0" text="Añadir Tarea" />
-                  <Button fx:id="botonEliminar" mnemonicParsing="false" onAction="#eliminarTarea" prefHeight="26.0" prefWidth="126.0" text="Eliminar Tarea" />
-                  <Button fx:id="botonModificar" mnemonicParsing="false" onAction="#modificarTarea" prefHeight="26.0" prefWidth="126.0" text="Modificar Tarea" />
-                  <Button fx:id="botonCompletar" mnemonicParsing="false" onAction="#completarTarea" prefWidth="126.0" text="Completar Tarea" />
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Almacenamiento" />
-                  <Button fx:id="botonGuardar" mnemonicParsing="false" onAction="#guardarDatos" prefHeight="26.0" prefWidth="126.0" text="Guardar Datos" />
-                  <Button fx:id="botonDescargar" mnemonicParsing="false" onAction="#descargarDatos" prefWidth="126.0" text="Descargar Datos" />
-                  <Button fx:id="botonLimpiar" mnemonicParsing="false" onAction="#limpiarFichero" prefHeight="26.0" prefWidth="126.0" text="Limpiar Datos" />
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
-                  <Button fx:id="botonConfiguracion" mnemonicParsing="false" text="Configuración" />
+                  <Button fx:id="botonConfiguracion" mnemonicParsing="false" prefHeight="32.0" prefWidth="127.0" text="Configuración" />
                </children>
             </VBox>
          </left>
          <right>
-            <VBox prefHeight="679.0" prefWidth="321.0" BorderPane.alignment="CENTER">
+            <VBox alignment="TOP_CENTER" prefHeight="596.0" prefWidth="321.0" BorderPane.alignment="CENTER">
                <children>
                   <Text fx:id="textFecha" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
-                  <ScrollPane fx:id="mostradorTareas" prefHeight="207.0" prefWidth="227.0" />
-                  <TextArea fx:id="textoReceptor" prefHeight="200.0" prefWidth="200.0" />
+                  <ScrollPane fx:id="mostradorTareas" prefHeight="408.0" prefWidth="321.0" />
                </children>
             </VBox>
          </right>
