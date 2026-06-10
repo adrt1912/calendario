@@ -73,9 +73,10 @@ public class GestionEnFicheros {
                 Periodicidad frecuencia= Periodicidad.valueOf(lectorFichero.nextLine());
                 String idFamilia=lectorFichero.nextLine();
 
+                String etiquetaText=lectorFichero.nextLine().trim();
+                Etiqueta etiquetaAsignada=GestorTareas.getGestorTareas().getListaEtiquetas().stream().filter(e ->e.getNombreEtiqueta()!=null && e.getNombreEtiqueta().equals(etiquetaText)).findFirst().orElse(null);
 
-
-                Tarea tarea = new Tarea(titulo,fechainic,fechaFin, estadoTarea,descripcion,sitio,time,frecuencia,idFamilia);
+                Tarea tarea = new Tarea(titulo,fechainic,fechaFin, estadoTarea,descripcion,sitio,time,frecuencia,idFamilia,etiquetaAsignada);
                 GestorTareas.getGestorTareas().añadirTareaALista(tarea);
 
             }
@@ -91,7 +92,7 @@ public class GestionEnFicheros {
             PrintWriter pw=new PrintWriter(printWriter){})
         {
             for (Tarea tarea : listaTareas){
-                pw.println(tarea.getNombreTarea() + "\n" + tarea.getFechaInicio() + "\n" + tarea.getFechaFin() + "\n" + tarea.getEstadoTarea() + "\n" + tarea.getDescripcion() + "\n" + tarea.getSitio() + "\n" + tarea.getHora() + "\n"+tarea.getFrecuencia() +"\n"+tarea.getIdFamilia());
+                pw.println(tarea.getNombreTarea() + "\n" + tarea.getFechaInicio() + "\n" + tarea.getFechaFin() + "\n" + tarea.getEstadoTarea() + "\n" + tarea.getDescripcion() + "\n" + tarea.getSitio() + "\n" + tarea.getHora() + "\n"+tarea.getFrecuencia() +"\n"+tarea.getIdFamilia()+"\n"+tarea.getEtiqueta());
             }
 
         } catch (Exception e) {
@@ -105,6 +106,28 @@ public class GestionEnFicheros {
         if(archivo.delete()){
             System.out.println("Se borro correctamente");
         }else{System.out.println("No se pudo borrar");}
+    }
 
+    public void guardarEtiquetas(List<Etiqueta> listaEtiquetas){
+        try (
+                FileWriter printWriter=new FileWriter("etiquetas.txt");
+                PrintWriter pw=new PrintWriter(printWriter){}){
+            for(Etiqueta etiqueta : listaEtiquetas){
+                pw.println(etiqueta.getNombreEtiqueta()+"\n"+etiqueta.getCodColor());
+            }
+        } catch (Exception e) {
+
+        }
+    }
+    public void leerEtiquetas(){
+        try (
+                Scanner lectorFichero=new Scanner(new File("etiquetas.txt"))){
+            while (lectorFichero.hasNext()) {
+                String nomE = lectorFichero.nextLine();
+                String color = lectorFichero.nextLine();
+                GestorTareas.getGestorTareas().nuevaEtiqueta(color,nomE);
+            }
+        } catch (Exception e) {
+        }
     }
 }

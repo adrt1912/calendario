@@ -1,25 +1,30 @@
 package Controller;
 
+import Model.Etiqueta;
 import Model.GestorTareas;
 import Model.Periodicidad;
 import Model.Tarea;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
 public class CrearTareaController {
     @FXML
     private Button botonCancelar;
 
     @FXML
+    private Text textoError;
+
+    @FXML
     private Button botonGuardar;
 
     public void initialize(){
         textoPeriodicidad.getItems().addAll(Periodicidad.values());
+        boxEtiquetas.getItems().addAll(GestorTareas.getGestorTareas().getListaEtiquetas());
     }
     @FXML
     private TextField textoTitulo;
@@ -31,13 +36,16 @@ public class CrearTareaController {
     private TextField textoHora;
 
     @FXML
-    private  TextField textoSitio;
+    private TextField textoSitio;
 
     @FXML
     private ComboBox textoPeriodicidad;
 
     @FXML
     private TextArea textoDescripcion;
+
+    @FXML
+    private ComboBox boxEtiquetas;
 
     @FXML
     private void guardarTarea(){
@@ -60,10 +68,15 @@ public class CrearTareaController {
         }
         String descripcion=textoDescripcion.getText();
 
-        Tarea tarea=GestorTareas.getGestorTareas().anadirTarea(titulo,fecha,descripcion,sitio,time,frecuencia,titulo);
+        Etiqueta etiqueta= (Etiqueta) boxEtiquetas.getValue();
+
+        if(titulo.isBlank()){
+            textoError.setText("Introduzca un titulo");
+        }else{
+        Tarea tarea=GestorTareas.getGestorTareas().anadirTarea(titulo,fecha,descripcion,sitio,time,frecuencia,titulo,etiqueta);
         if(tarea!=null) tratarTareasPeriodicas(tarea);
         Stage ventanaActual = (Stage) botonCancelar.getScene().getWindow();
-        ventanaActual.close();
+        ventanaActual.close();}
     }
 
 
@@ -73,7 +86,7 @@ public class CrearTareaController {
             int anio=tarea.getFrecuencia().getAnios();
             for(int i=0;i<40;i++){
                 LocalDate fecha=tarea.getFechaFin().plusDays((long) i *dias).plusMonths((long) i *mes).plusYears((long) i *anio);
-                GestorTareas.getGestorTareas().anadirTarea(tarea.getNombreTarea(),fecha,tarea.getDescripcion(),tarea.getSitio(),tarea.getHora(),tarea.getFrecuencia(), tarea.getIdTarea());
+                GestorTareas.getGestorTareas().anadirTarea(tarea.getNombreTarea(),fecha,tarea.getDescripcion(),tarea.getSitio(),tarea.getHora(),tarea.getFrecuencia(), tarea.getIdTarea(),tarea.getEtiqueta());
             }
 
     }

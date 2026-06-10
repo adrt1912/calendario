@@ -14,7 +14,7 @@ public class view {
         public static void showInitialView() throws IOException {
             //Abre la ventana inicial
             FXMLLoader fxmlLoader = new FXMLLoader(view.class.getResource("/View/MenuPrincipal.fxml"));
-            Scene scene= new Scene(fxmlLoader.load(), 1400,900);
+            Scene scene= new Scene(fxmlLoader.load(), 1600,900);
 
             //Si no está abierta se hace una nueva ventana
             if(stage==null){
@@ -61,6 +61,14 @@ public class view {
         stage1.setTitle("Eliminar Tarea ");
         stage1.setScene(scene);
         stage1.showAndWait();
-
     }
+    public static void showNuevaEtiqueta()throws IOException{
+        FXMLLoader fxmlLoader=new FXMLLoader(view.class.getResource("/View/crearEtiqueta.fxml"));
+        Scene scene=new Scene(fxmlLoader.load(),600,232);
+
+        Stage stage1=new Stage();
+        stage1.setTitle("Crear Etiqueta ");
+        stage1.setScene(scene);
+        stage1.showAndWait();
+        }
     }

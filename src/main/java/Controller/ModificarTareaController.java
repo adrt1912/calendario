@@ -1,12 +1,10 @@
 package Controller;
 
-import Model.EstadoTarea;
-import Model.GestorTareas;
-import Model.Periodicidad;
-import Model.Tarea;
+import Model.*;
 import View.view;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.time.LocalDate;
@@ -32,8 +30,10 @@ private TextArea campoDescripcion;
 private CheckBox checkCompletada;
 @FXML
 private Label textoTituloTop;
-
-
+@FXML
+private ComboBox boxEtiquetas;
+@FXML
+private Text textoError;
 
 public void setTareaMos(Tarea tareaMos) {
         this.tareaMos = tareaMos;
@@ -47,7 +47,6 @@ public void setTareaMos(Tarea tareaMos) {
         if(tareaMos.getSitio()!=null){
             campoHora.setText(tareaMos.getSitio());
         }
-
         if(tareaMos.getDescripcion()!=null){
             campoDescripcion.setText(tareaMos.getDescripcion());
         }
@@ -55,6 +54,7 @@ public void setTareaMos(Tarea tareaMos) {
             checkCompletada.setSelected(true);
         }
     campoPerioricidad.getItems().addAll(Periodicidad.values());
+    boxEtiquetas.getItems().addAll(GestorTareas.getGestorTareas().getListaEtiquetas());
     textoTituloTop.setText(tareaMos.getNombreTarea());
 }
 @FXML
@@ -90,30 +90,38 @@ private void eliminarTarea(){
 }
 
 @FXML
-private void modificarTarea(){
+private void modificarTarea() {
     DateTimeFormatter formatoHora = DateTimeFormatter.ofPattern("HH:mm");
 
-    String titulo=campoTitulo.getText();
-    LocalDate fechaFin=campoFecha.getValue();
-    if(fechaFin==null){fechaFin=LocalDate.now();}
-    String descripcion=campoDescripcion.getText();
-    String sitio= campoSitio.getText();
+    String titulo = campoTitulo.getText();
+    LocalDate fechaFin = campoFecha.getValue();
+    if (fechaFin == null) {
+        fechaFin = LocalDate.now();
+    }
+    String descripcion = campoDescripcion.getText();
+    String sitio = campoSitio.getText();
     LocalTime time;
-    String horaText=campoHora.getText();
+    String horaText = campoHora.getText();
     try {
-        time=LocalTime.parse(horaText);
+        time = LocalTime.parse(horaText);
     } catch (Exception e) {
-        time=null;
+        time = null;
     }
 
-    Periodicidad frecuencia= (Periodicidad) campoPerioricidad.getValue();
+    Periodicidad frecuencia = (Periodicidad) campoPerioricidad.getValue();
     if (frecuencia == null) {
         frecuencia = Periodicidad.NUNCA; // Le damos un valor por defecto
     }
-    EstadoTarea estado=tareaMos.getEstadoTarea();
+    EstadoTarea estado = tareaMos.getEstadoTarea();
 
-    GestorTareas.getGestorTareas().modificarTarea(tareaMos,titulo,fechaFin,descripcion,sitio,time,frecuencia,estado);
-    cerrarTodo();
+    Etiqueta etiqueta = (Etiqueta) boxEtiquetas.getValue();
+
+    if (titulo.isBlank()) {
+        textoError.setText("Introduzca un titulo");
+    } else {
+        GestorTareas.getGestorTareas().modificarTarea(tareaMos, titulo, fechaFin, descripcion, sitio, time, frecuencia, estado, etiqueta);
+        cerrarTodo();
+    }
 }
 
 }

@@ -18,6 +18,8 @@ public class Tarea {
 
     private String idTarea;
     private String idFamilia;
+
+    private Etiqueta etiqueta;
     //Getters
     public EstadoTarea getEstadoTarea() {
         return estadoTarea;
@@ -59,6 +61,10 @@ public class Tarea {
         return idFamilia;
     }
 
+    public Etiqueta getEtiqueta() {
+        return etiqueta;
+    }
+
     //Setters
     public void setEstadoTarea(EstadoTarea estadoTarea) {
         this.estadoTarea = estadoTarea;
@@ -88,8 +94,8 @@ public class Tarea {
         this.fechaInicio = fechaInicio;
     }
 
-    public void setFrecuencia(Periodicidad frecuencia) {this.frecuencia = frecuencia;
-    }
+    public void setFrecuencia(Periodicidad frecuencia) {this.frecuencia = frecuencia;}
+
     public void setIdTarea(String idTarea) {
         this.idTarea = idTarea;
     }
@@ -98,8 +104,12 @@ public class Tarea {
         this.idFamilia = idFamilia;
     }
 
+    public void setEtiqueta(Etiqueta etiqueta) {
+        this.etiqueta = etiqueta;
+    }
+
     //Constructor
-    public Tarea(String nombreTarea, LocalDate fechaInicio, LocalDate fechaFin, EstadoTarea estadoTarea, String descripcion, String sitio, LocalTime hora, Periodicidad frecuencia,String idFamilia) {
+    public Tarea(String nombreTarea, LocalDate fechaInicio, LocalDate fechaFin, EstadoTarea estadoTarea, String descripcion, String sitio, LocalTime hora, Periodicidad frecuencia,String idFamilia,Etiqueta etiqueta) {
         this.nombreTarea = nombreTarea;
         this.fechaInicio = fechaInicio;
         if(fechaFin==null)this.fechaFin=LocalDate.now();
@@ -111,6 +121,8 @@ public class Tarea {
         this.frecuencia = frecuencia;
         idTarea= UUID.randomUUID().toString();
         this.idFamilia=idFamilia;
+
+        this.etiqueta=etiqueta;
 
         comprobarEstado();
     }
@@ -130,8 +142,13 @@ public class Tarea {
 
     //Compureba que no se ha caducado la tarea
     private void comprobarEstado() {
-        if (fechaFin != null && LocalDate.now().isAfter(fechaFin) && estadoTarea.equals(EstadoTarea.EN_PROCESO)) {
+        if (fechaFin == null) {
+            return;
+        }
+        if (LocalDate.now().isAfter(fechaFin) && estadoTarea == EstadoTarea.EN_PROCESO) {
             estadoTarea = EstadoTarea.CADUCADA;
+        } else if (LocalDate.now().isBefore(fechaFin) && estadoTarea == EstadoTarea.CADUCADA) {
+            estadoTarea=EstadoTarea.EN_PROCESO;
         }
     }
 //Comprueba si dos tareas son identicas

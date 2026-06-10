@@ -20,6 +20,7 @@ public class GestorTareas {
         return todasTareas;
     }
 
+    private List<Etiqueta> listaEtiquetas=new ArrayList<>();
     //PAra evitar repetir la llamada al metodo constantemente lo guardamos
     private GestionEnFicheros gestionEnFicheros= GestionEnFicheros.getGestionEnFicheros();
 
@@ -28,34 +29,41 @@ public class GestorTareas {
     public String mostrarTareasUrgentesHoy(){
 //Cogemos solo las tareas en proceso
         StringBuilder taresDevolver= new StringBuilder();
-
+        int numt=0;
         List<Tarea> tareasProcesar=todasTareas.stream().filter(a->a.getEstadoTarea()== EstadoTarea.EN_PROCESO).toList();
         for (Tarea todasTarea : tareasProcesar) {
             //Si su fecha fin es hoy la mostrara por pantalla
             if (Objects.equals(todasTarea.getFechaFin(), LocalDate.now())) {
-
-               taresDevolver.append(" ").append(todasTarea.getNombreTarea()).append(" a las: ").append(todasTarea.getHora());
+               taresDevolver.append(" ").append(todasTarea.getNombreTarea());
+               numt++;
+               if(todasTarea.getHora()!=null) taresDevolver.append(" a las: ").append(todasTarea.getHora());
             }
         }
-        return taresDevolver.toString();
+        if(numt==0) return "Hoy no tienes tareas pendientes";
+        else return "Hoy tienes "+numt+" tareas: "+ taresDevolver.toString();
     }
 
     public String mostrarTareasUrgentesMañana(){
-        StringBuilder taresDevolver= new StringBuilder();        List<Tarea> tareasProcesar=todasTareas.stream().filter(a->a.getEstadoTarea()== EstadoTarea.EN_PROCESO).toList();
-
+        StringBuilder taresDevolver= new StringBuilder();
+        List<Tarea> tareasProcesar=todasTareas.stream().filter(a->a.getEstadoTarea()== EstadoTarea.EN_PROCESO).toList();
+        int numT=0;
         for(Tarea todasTareaM : tareasProcesar){
             //Si su fecha fin es mañana la mostrara por pantalla
             if (Objects.equals(todasTareaM.getFechaFin(),LocalDate.now().plusDays(1))) {
-                taresDevolver.append(" ").append(todasTareaM.getNombreTarea()).append(" a las: ").append(todasTareaM.getHora());
+                taresDevolver.append(" ").append(todasTareaM.getNombreTarea());
+                numT++;
+                if(todasTareaM.getHora()!=null) taresDevolver.append(" a las: ").append(todasTareaM.getHora());
             }
         }
-        return taresDevolver.toString();
+        if(numT==0) return "Mañana no tienes tareas pendientes";
+        else return "Mañana tienes "+numT+" tareas: "+taresDevolver.toString();
     }
-
 
     //Metodo que inicia el gestor
     public void iniciarGestor() {
         //Se encarga de la primera carga y de mostrar tareas urgentes
+        gestionEnFicheros.leerEtiquetas();
+
         gestionEnFicheros.leerFichero("tareas.txt");
     }
 
@@ -67,8 +75,8 @@ public class GestorTareas {
         }
     }
 
-    public Tarea anadirTarea(String titulo,LocalDate fechaFin,String descripcion,String sitio,LocalTime time,Periodicidad frecuencia,String idFamilia){
-        Tarea tareaNueva=new Tarea(titulo, LocalDate.now(),fechaFin, EstadoTarea.EN_PROCESO,descripcion,sitio,time,frecuencia,idFamilia);
+    public Tarea anadirTarea(String titulo,LocalDate fechaFin,String descripcion,String sitio,LocalTime time,Periodicidad frecuencia,String idFamilia,Etiqueta etiqueta){
+        Tarea tareaNueva=new Tarea(titulo, LocalDate.now(),fechaFin, EstadoTarea.EN_PROCESO,descripcion,sitio,time,frecuencia,idFamilia,etiqueta);
         añadirTareaALista(tareaNueva);
         gestionEnFicheros.guardarEnFichero(todasTareas);
         return tareaNueva;
@@ -79,7 +87,7 @@ public class GestorTareas {
         gestionEnFicheros.guardarEnFichero(todasTareas);
     }
 
-    public void modificarTarea(Tarea tarea,String titulo,LocalDate fechaFin,String descripcion,String sitio,LocalTime time,Periodicidad frecuencia,EstadoTarea estadoTarea){
+    public void modificarTarea(Tarea tarea,String titulo,LocalDate fechaFin,String descripcion,String sitio,LocalTime time,Periodicidad frecuencia,EstadoTarea estadoTarea,Etiqueta etiqueta){
 
         tarea.setNombreTarea(titulo);
         tarea.setFechaFin(fechaFin);
@@ -88,8 +96,22 @@ public class GestorTareas {
         tarea.setHora(time);
         tarea.setFrecuencia(frecuencia);
         tarea.setEstadoTarea(estadoTarea);
+        tarea.setEtiqueta(etiqueta);
         gestionEnFicheros.guardarEnFichero(todasTareas);
     }
+
+    public void eliminarEtiqueta(Etiqueta etiqueta)
+    {
+        listaEtiquetas.remove(etiqueta);
+        gestionEnFicheros.guardarEtiquetas(listaEtiquetas);
+    }
+    public void nuevaEtiqueta(String color,String nombre){
+        Etiqueta etiqueta=new Etiqueta(color,nombre);
+        listaEtiquetas.add(etiqueta);
+        gestionEnFicheros.guardarEtiquetas(listaEtiquetas);
+    }
+
+    public List<Etiqueta> getListaEtiquetas(){return listaEtiquetas;}
 
     public void gestionarFicheros(){
 
