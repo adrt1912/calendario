@@ -50,4 +50,17 @@ public class view {
             stage1.showAndWait();
 
         }
+    public static void showConfirmacionEl(Tarea tarea)throws IOException{
+        FXMLLoader fxmlLoader=new FXMLLoader(view.class.getResource("/View/menuConfirmacionPer.fxml"));
+        Scene scene=new Scene(fxmlLoader.load(),600,222);
+
+        Controller.MenuConfirmacionBorrarController controlador = fxmlLoader.getController();
+        controlador.setTareaMos(tarea);
+
+        Stage stage1=new Stage();
+        stage1.setTitle("Eliminar Tarea ");
+        stage1.setScene(scene);
+        stage1.showAndWait();
+
+    }
     }

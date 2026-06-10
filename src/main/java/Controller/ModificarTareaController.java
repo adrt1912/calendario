@@ -4,9 +4,9 @@ import Model.EstadoTarea;
 import Model.GestorTareas;
 import Model.Periodicidad;
 import Model.Tarea;
+import View.view;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.time.LocalDate;
@@ -78,6 +78,13 @@ private void cerrarTodo(){
 
 @FXML
 private void eliminarTarea(){
+    if(tareaMos.getFrecuencia()!=Periodicidad.NUNCA){
+        try{
+            view.showConfirmacionEl(tareaMos);
+        } catch (Exception e) {
+            throw new RuntimeException(e) ;
+        }
+    }
     GestorTareas.getGestorTareas().eliminarTarea(tareaMos);
     cerrarTodo();
 }

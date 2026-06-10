@@ -110,6 +110,7 @@ public class Tarea {
         this.hora = hora;
         this.frecuencia = frecuencia;
         idTarea= UUID.randomUUID().toString();
+        this.idFamilia=idFamilia;
 
         comprobarEstado();
     }
