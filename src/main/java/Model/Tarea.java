@@ -3,6 +3,7 @@ package Model;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Objects;
+import java.util.UUID;
 
 public class Tarea {
 
@@ -13,8 +14,10 @@ public class Tarea {
     private String descripcion;
     private String sitio;
     private LocalTime hora;
-    private Integer frecuencia;
+    private Periodicidad frecuencia;
 
+    private String idTarea;
+    private String idFamilia;
     //Getters
     public EstadoTarea getEstadoTarea() {
         return estadoTarea;
@@ -44,8 +47,19 @@ public class Tarea {
         return sitio;
     }
 
-    public Integer getFrecuencia(){return frecuencia;}
+    public Periodicidad getFrecuencia() {
+        return frecuencia;
+    }
 
+    public String getIdTarea() {
+        return idTarea;
+    }
+
+    public String getIdFamilia() {
+        return idFamilia;
+    }
+
+    //Setters
     public void setEstadoTarea(EstadoTarea estadoTarea) {
         this.estadoTarea = estadoTarea;
     }
@@ -74,67 +88,66 @@ public class Tarea {
         this.fechaInicio = fechaInicio;
     }
 
-    public void setFrecuencia(int frecuencia){
-        this.frecuencia=frecuencia;
+    public void setFrecuencia(Periodicidad frecuencia) {this.frecuencia = frecuencia;
+    }
+    public void setIdTarea(String idTarea) {
+        this.idTarea = idTarea;
     }
 
+    public void setIdFamilia(String idFamilia) {
+        this.idFamilia = idFamilia;
+    }
 
-    public Tarea(String nombreTarea, LocalDate fechaInicio, LocalDate fechaFin, EstadoTarea estadoTarea, String descripcion, String sitio, LocalTime hora,String frecuencia){
-        this.nombreTarea=nombreTarea;
-        this.fechaInicio=fechaInicio;
-        this.fechaFin=fechaFin;
-        this.estadoTarea=estadoTarea;
-        this.descripcion=descripcion;
-        this.sitio=sitio;
-        this.hora=hora;
-        if(frecuencia != null && !frecuencia.isEmpty() && !frecuencia.equals("null")){
-        this.frecuencia=Integer.parseInt(frecuencia);}else{
-            this.frecuencia=null;
-        }
+    //Constructor
+    public Tarea(String nombreTarea, LocalDate fechaInicio, LocalDate fechaFin, EstadoTarea estadoTarea, String descripcion, String sitio, LocalTime hora, Periodicidad frecuencia,String idFamilia) {
+        this.nombreTarea = nombreTarea;
+        this.fechaInicio = fechaInicio;
+        if(fechaFin==null)this.fechaFin=LocalDate.now();
+        else this.fechaFin = fechaFin;
+        this.estadoTarea = estadoTarea;
+        this.descripcion = descripcion;
+        this.sitio = sitio;
+        this.hora = hora;
+        this.frecuencia = frecuencia;
+        idTarea= UUID.randomUUID().toString();
+
         comprobarEstado();
-
     }
 
-    public String mostrarTarea(){
-
-        if(fechaFin!=null && hora!=null){
+    //Devuelve el string de la tarea
+    public String mostrarTarea() {
+        if (fechaFin != null && hora != null) {
             comprobarEstado();
-
-            return(" "+nombreTarea + " termina el "+ fechaFin +" a las: "+ hora +"\n lugar: "+sitio
-        + " descripcion es:"+descripcion);}
-        else {
+            return (" " + nombreTarea + " termina el " + fechaFin + " a las: " + hora + "\n lugar: " + sitio
+                    + " descripcion es:" + descripcion);
+        } else {
             comprobarEstado();
-
-            return (" "+nombreTarea +" lugar: "+sitio
-                    + "cuya descripcion es:"+descripcion);
+            return (" " + nombreTarea + " lugar: " + sitio
+                    + "cuya descripcion es:" + descripcion);
         }
     }
 
-    public void completarTarea(){
-        estadoTarea=EstadoTarea.COMPLETADA;
-    }
-
-    private void comprobarEstado(){
-
-        if(fechaFin!=null && LocalDate.now().isAfter(fechaFin)&&estadoTarea.equals(EstadoTarea.EN_PROCESO)){
-            estadoTarea=EstadoTarea.CADUCADA;
+    //Compureba que no se ha caducado la tarea
+    private void comprobarEstado() {
+        if (fechaFin != null && LocalDate.now().isAfter(fechaFin) && estadoTarea.equals(EstadoTarea.EN_PROCESO)) {
+            estadoTarea = EstadoTarea.CADUCADA;
         }
-
     }
-
+//Comprueba si dos tareas son identicas
     @Override
     public boolean equals(Object tarea1) {
-        if(this==tarea1){return true;}
+        if (this == tarea1) {
+            return true;
+        }
         if (tarea1 instanceof Tarea tarea) {
-           return Objects.equals(tarea.getFechaFin(),fechaFin)&&
-                   Objects.equals(tarea.getFechaInicio(),fechaInicio)&&
-                   Objects.equals(tarea.getNombreTarea(),nombreTarea)&&
-                   tarea.getEstadoTarea()==estadoTarea&&
-                   Objects.equals(tarea.getDescripcion(),descripcion)&&
-                   Objects.equals(tarea.getSitio(),sitio)&&
-                   Objects.equals(tarea.getHora(),hora);
+            return Objects.equals(tarea.getFechaFin(), fechaFin) &&
+                    Objects.equals(tarea.getFechaInicio(), fechaInicio) &&
+                    Objects.equals(tarea.getNombreTarea(), nombreTarea) &&
+                    tarea.getEstadoTarea() == estadoTarea &&
+                    Objects.equals(tarea.getDescripcion(), descripcion) &&
+                    Objects.equals(tarea.getSitio(), sitio) &&
+                    Objects.equals(tarea.getHora(), hora);
         }
         return false;
-
     }
 }

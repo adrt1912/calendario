@@ -67,12 +67,11 @@ public class GestorTareas {
         }
     }
 
-    public void anadirTarea(String titulo,LocalDate fechaFin,String descripcion,String sitio,LocalTime time,String frecuencia){
-        Tarea tareaNueva=new Tarea(titulo, LocalDate.now(),fechaFin, EstadoTarea.EN_PROCESO,descripcion,sitio,time,frecuencia);
+    public Tarea anadirTarea(String titulo,LocalDate fechaFin,String descripcion,String sitio,LocalTime time,Periodicidad frecuencia,String idFamilia){
+        Tarea tareaNueva=new Tarea(titulo, LocalDate.now(),fechaFin, EstadoTarea.EN_PROCESO,descripcion,sitio,time,frecuencia,idFamilia);
         añadirTareaALista(tareaNueva);
         gestionEnFicheros.guardarEnFichero(todasTareas);
-        System.out.println("La tarea "+ titulo+"a sido añadida con exito");
-        iniciarGestor();
+        return tareaNueva;
     }
 
     public void eliminarTarea(Tarea tarea){
@@ -80,14 +79,14 @@ public class GestorTareas {
         gestionEnFicheros.guardarEnFichero(todasTareas);
     }
 
-    public void modificarTarea(Tarea tarea,String titulo,LocalDate fechaFin,String descripcion,String sitio,LocalTime time,String frecuencia,EstadoTarea estadoTarea){
+    public void modificarTarea(Tarea tarea,String titulo,LocalDate fechaFin,String descripcion,String sitio,LocalTime time,Periodicidad frecuencia,EstadoTarea estadoTarea){
 
         tarea.setNombreTarea(titulo);
         tarea.setFechaFin(fechaFin);
         tarea.setDescripcion(descripcion);
         tarea.setSitio(sitio);
         tarea.setHora(time);
-        tarea.setFrecuencia(Integer.parseInt(frecuencia));
+        tarea.setFrecuencia(frecuencia);
         tarea.setEstadoTarea(estadoTarea);
         gestionEnFicheros.guardarEnFichero(todasTareas);
     }

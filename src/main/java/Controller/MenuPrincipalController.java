@@ -1,12 +1,14 @@
 package Controller;
 
+import Model.EstadoTarea;
 import Model.GestorTareas;
+import Model.Periodicidad;
 import Model.Tarea;
 import View.view;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -68,15 +70,16 @@ public class MenuPrincipalController {
         }
     }
 
-
     private void mostrarTareas(){
         textFecha.setText(fechaSeleccionada.toString());
-        List<Tarea> listaTareasMostrar=gestorTareas.getTodasTareas().stream().filter(tarea -> tarea.getFechaFin().equals(fechaSeleccionada)).toList();
+        List<Tarea> listaTareasMostrar=gestorTareas.getTodasTareas().stream().filter(tarea -> fechaSeleccionada.equals(tarea.getFechaFin())).toList();
         VBox vBox=new VBox();
+        vBox.setSpacing(5);
         int i=1;
         for (Tarea tarea : listaTareasMostrar) {
-            Text text = new Text(i+": "+tarea.mostrarTarea());
+            Label text = new Label(i+": "+tarea.mostrarTarea());
             text.setFont(Font.font(12));
+            text.setCursor(Cursor.HAND);
            vBox.getChildren().add(text);
            i++;
 
@@ -85,7 +88,10 @@ public class MenuPrincipalController {
                    view.showTareaVentana(tarea);
                    mostrarCalendario();
                    mostrarTareas();
-               } catch (Exception ignored) {}
+               } catch (Exception ignored) {
+                   throw new RuntimeException(ignored);
+
+               }
            });
         }
         mostradorTareas.setContent(vBox);
@@ -110,8 +116,7 @@ public class MenuPrincipalController {
                 calendario.add(calendarioVBox[j][i], j, i);
 
                 if(i==0){
-                     calendarioVBox[j][i].getChildren().add(new Label(semana[j]));
-                }
+                     calendarioVBox[j][i].getChildren().add(new Label(semana[j]));}
                 else{
                     if(i==1){
                         if(j>=fechaPrimerDiaMes-1){
@@ -131,15 +136,23 @@ public class MenuPrincipalController {
     }
     private void mostrarEtiquetas(){
         List<Tarea> listaTareas=gestorTareas.getTodasTareas();
+        int primerDiaMes=LocalDate.of(fechaSeleccionada.getYear(),fechaSeleccionada.getMonthValue(), 1).getDayOfWeek().getValue();
         for (Tarea tarea : listaTareas) {
             LocalDate fecha = tarea.getFechaFin();
             if (fecha.getMonth().equals(fechaSeleccionada.getMonth())&&fecha.getYear()==fechaSeleccionada.getYear()) {
                 String titulo=tarea.getNombreTarea();
-                int primerDiaMes=LocalDate.of(fechaSeleccionada.getYear(),fechaSeleccionada.getMonthValue(), 1).getDayOfWeek().getValue();
-                int pos=(fecha.getDayOfMonth()-1)+primerDiaMes;
-                int columna=pos%7-1;
+                int pos=(fecha.getDayOfMonth()-2)+primerDiaMes;
+                int columna=pos%7;
                 int fila=(pos/7)+1;
-                calendarioVBox[columna][fila].getChildren().add(new Label(titulo));
+                if(tarea.getEstadoTarea()!= EstadoTarea.EN_PROCESO){
+                    Label label=new Label((titulo));
+                    label.setOpacity(0.2);
+                calendarioVBox[columna][fila].getChildren().add(label);
+                }else{
+                    Label label=new Label((titulo));
+                    label.setOpacity(1);
+                    calendarioVBox[columna][fila].getChildren().add(label);
+                }
             }
         }
     }
@@ -163,32 +176,11 @@ public class MenuPrincipalController {
             mostrarCalendario();
         } catch (Exception ignored) {}
     }
-    @FXML
-    private void modificarTarea(){
-        if(tareaSelec==null) 
-        try {
-            view.showTareaVentana(tareaSelec);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @FXML
-    private void guardarDatos(){}
-
-    @FXML
-    private void descargarDatos(){}
-
-    @FXML
-    private void limpiarFichero(){}
 
     @FXML
     private Text TareasPendientesHoy;
 
     @FXML
     private Text TareasPendientesMañana;
-
-    @FXML
-    private TextArea textoReceptor;
 
 }

@@ -37,7 +37,7 @@
             </VBox>
          </top>
          <center>
-            <GridPane fx:id="calendario" gridLinesVisible="true" BorderPane.alignment="CENTER">
+            <GridPane fx:id="calendario" gridLinesVisible="true" prefHeight="689.0" prefWidth="967.0" BorderPane.alignment="CENTER">
               <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -59,14 +59,14 @@
             </GridPane>
          </center>
          <bottom>
-            <HBox prefHeight="100.0" prefWidth="1274.0" BorderPane.alignment="CENTER">
+            <HBox prefHeight="91.0" prefWidth="1400.0" BorderPane.alignment="CENTER">
                <children>
                   <Button fx:id="botonRetrocederMes" mnemonicParsing="false" onAction="#retrocederMes" prefHeight="97.0" prefWidth="389.0" text="Retroceder Mes">
                      <font>
                         <Font size="32.0" />
                      </font>
                   </Button>
-                  <HBox prefHeight="100.0" prefWidth="200.0">
+                  <HBox prefHeight="87.0" prefWidth="465.0">
                      <children>
                         <Text fx:id="cartelMes" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" wrappingWidth="279.13000106811523">
                            <font>
@@ -98,7 +98,7 @@
             </VBox>
          </left>
          <right>
-            <VBox alignment="TOP_CENTER" prefHeight="596.0" prefWidth="321.0" BorderPane.alignment="CENTER">
+            <VBox alignment="TOP_CENTER" prefHeight="679.0" prefWidth="285.0" BorderPane.alignment="CENTER">
                <children>
                   <Text fx:id="textFecha" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
                   <ScrollPane fx:id="mostradorTareas" prefHeight="408.0" prefWidth="321.0" />

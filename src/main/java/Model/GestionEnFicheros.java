@@ -70,9 +70,12 @@ public class GestionEnFicheros {
                 if(!horaTexto.equals("null")&&!horaTexto.isEmpty()){
                  time = LocalTime.parse(horaTexto, formatoHora);}
 
-                String frecuencia=lectorFichero.nextLine();
+                Periodicidad frecuencia= Periodicidad.valueOf(lectorFichero.nextLine());
+                String idFamilia=lectorFichero.nextLine();
 
-                Tarea tarea = new Tarea(titulo,fechainic,fechaFin, estadoTarea,descripcion,sitio,time,frecuencia);
+
+
+                Tarea tarea = new Tarea(titulo,fechainic,fechaFin, estadoTarea,descripcion,sitio,time,frecuencia,idFamilia);
                 GestorTareas.getGestorTareas().añadirTareaALista(tarea);
 
             }
@@ -88,9 +91,8 @@ public class GestionEnFicheros {
             PrintWriter pw=new PrintWriter(printWriter){})
         {
             for (Tarea tarea : listaTareas){
-                pw.println(tarea.getNombreTarea() + "\n" + tarea.getFechaInicio() + "\n" + tarea.getFechaFin() + "\n" + tarea.getEstadoTarea() + "\n" + tarea.getDescripcion() + "\n" + tarea.getSitio() + "\n" + tarea.getHora() + "\n"+tarea.getFrecuencia() );
+                pw.println(tarea.getNombreTarea() + "\n" + tarea.getFechaInicio() + "\n" + tarea.getFechaFin() + "\n" + tarea.getEstadoTarea() + "\n" + tarea.getDescripcion() + "\n" + tarea.getSitio() + "\n" + tarea.getHora() + "\n"+tarea.getFrecuencia() +"\n"+tarea.getIdFamilia());
             }
-                System.out.println("Tareas guardadas correctamente");
 
         } catch (Exception e) {
             System.out.println("ALgo fallo");

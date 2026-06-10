@@ -2,15 +2,17 @@ package Controller;
 
 import Model.EstadoTarea;
 import Model.GestorTareas;
+import Model.Periodicidad;
 import Model.Tarea;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.chrono.Chronology;
 import java.time.format.DateTimeFormatter;
+
 
 public class ModificarTareaController {
     private Tarea tareaMos;
@@ -23,11 +25,15 @@ private TextField campoHora;
 @FXML
 private TextField campoSitio;
 @FXML
-private TextField campoPeriodicidad;
+private ComboBox campoPerioricidad;
 @FXML
 private TextArea campoDescripcion;
 @FXML
 private CheckBox checkCompletada;
+@FXML
+private Label textoTituloTop;
+
+
 
 public void setTareaMos(Tarea tareaMos) {
         this.tareaMos = tareaMos;
@@ -41,15 +47,15 @@ public void setTareaMos(Tarea tareaMos) {
         if(tareaMos.getSitio()!=null){
             campoHora.setText(tareaMos.getSitio());
         }
-        if(tareaMos.getFrecuencia()!=null){
-            campoPeriodicidad.setText(tareaMos.getFrecuencia().toString());
-        }
+
         if(tareaMos.getDescripcion()!=null){
             campoDescripcion.setText(tareaMos.getDescripcion());
         }
         if(tareaMos.getEstadoTarea().equals(EstadoTarea.COMPLETADA)){
             checkCompletada.setSelected(true);
         }
+    campoPerioricidad.getItems().addAll(Periodicidad.values());
+    textoTituloTop.setText(tareaMos.getNombreTarea());
 }
 @FXML
 private void cambiarEstado(){
@@ -68,8 +74,7 @@ private void cerrarTodo(){
     ventanaActual.close();
 }
 
-@FXML
-private Button botonEliminar;
+
 
 @FXML
 private void eliminarTarea(){
@@ -93,13 +98,15 @@ private void modificarTarea(){
     } catch (Exception e) {
         time=null;
     }
-    String frecuencia=campoPeriodicidad.getText();
-    if(frecuencia==null||frecuencia.isBlank()){
-        frecuencia="0";
+
+    Periodicidad frecuencia= (Periodicidad) campoPerioricidad.getValue();
+    if (frecuencia == null) {
+        frecuencia = Periodicidad.NUNCA; // Le damos un valor por defecto
     }
     EstadoTarea estado=tareaMos.getEstadoTarea();
 
     GestorTareas.getGestorTareas().modificarTarea(tareaMos,titulo,fechaFin,descripcion,sitio,time,frecuencia,estado);
     cerrarTodo();
 }
+
 }
