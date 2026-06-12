@@ -1,4 +1,0 @@
-nose.com
-#994d66
-prea
-#b3b3b3

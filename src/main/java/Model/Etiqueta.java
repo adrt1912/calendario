@@ -7,7 +7,7 @@ public class Etiqueta {
     private String nombreEtiqueta;
 
 
-    public Etiqueta(String codColor,String nombreEtiqueta){
+    public Etiqueta(String nombreEtiqueta,String codColor){
         this.codColor=codColor;
         this.nombreEtiqueta=nombreEtiqueta;
     }

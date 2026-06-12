@@ -20,7 +20,7 @@
    <children>
       <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
-            <Label alignment="CENTER_LEFT" prefHeight="60.0" prefWidth="600.0" style="-fx-background-color: #2196F3; -fx-padding: 0 0 0 20;" text="Crear nueva tarea" textFill="WHITE" BorderPane.alignment="CENTER">
+            <Label alignment="CENTER_LEFT" prefHeight="60.0" prefWidth="600.0" style="-fx-background-color: #2196F3; -fx-padding: 0 0 0 20;" text="%crearNuevaTarea.mensajeInicial" textFill="WHITE" BorderPane.alignment="CENTER">
                <font>
                   <Font name="System Bold" size="22.0" />
                </font>
@@ -43,22 +43,22 @@
                   <RowConstraints maxHeight="58.0" minHeight="10.0" prefHeight="46.0" vgrow="ALWAYS" />
                </rowConstraints>
                <children>
-                  <Label text="Título:">
+                  <Label text="%crearNuevaTarea.textoTitulo">
                      <font><Font size="14.0" /></font>
                   </Label>
-                  <Label text="Fecha:" GridPane.rowIndex="1">
+                  <Label text="%crearNuevaTarea.textoFecha" GridPane.rowIndex="1">
                      <font><Font size="14.0" /></font>
                   </Label>
-                  <Label text="Hora:" GridPane.rowIndex="2">
+                  <Label text="%crearNuevaTarea.textoHora" GridPane.rowIndex="1">
+                  <font><Font size="14.0" /></font>
+                  </Label>
+                  <Label text="%crearNuevaTarea.textoSitio" GridPane.rowIndex="3">
                      <font><Font size="14.0" /></font>
                   </Label>
-                  <Label text="Sitio:" GridPane.rowIndex="3">
+                  <Label text="%crearNuevaTarea.textoPeriodicidad" GridPane.rowIndex="4">
                      <font><Font size="14.0" /></font>
                   </Label>
-                  <Label text="Periodicidad:" GridPane.rowIndex="4">
-                     <font><Font size="14.0" /></font>
-                  </Label>
-                  <Label text="Descripción:" GridPane.rowIndex="5" GridPane.valignment="TOP">
+                  <Label text="%crearNuevaTarea.textoDescripcion" GridPane.rowIndex="5" GridPane.valignment="TOP">
                      <font><Font size="14.0" /></font>
                      <GridPane.margin><Insets top="5.0" /></GridPane.margin>
                   </Label>
@@ -68,8 +68,8 @@
                   <TextField fx:id="textoHora" prefHeight="30.0" prefWidth="200.0" promptText="HH:mm" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                   <TextField fx:id="textoSitio" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                   <TextArea fx:id="textoDescripcion" prefHeight="80.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                  <ComboBox fx:id="textoPeriodicidad" prefWidth="150.0" promptText="Periodicidad" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Etiqueta: " GridPane.rowIndex="6" />
+                  <ComboBox fx:id="textoPeriodicidad" prefWidth="150.0" promptText="%crearNuevaTarea.textoPeriodicidadComboBox" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%crearNuevaTarea.textoEtiqueta" GridPane.rowIndex="6" />
                   <ComboBox fx:id="boxEtiquetas" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                </children>
                <BorderPane.margin>
@@ -82,8 +82,8 @@
             <HBox alignment="CENTER_RIGHT" prefHeight="58.0" prefWidth="560.0" spacing="15.0" BorderPane.alignment="CENTER">
                <children>
                   <Text fx:id="textoError" fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="243.13000106811523" />
-                  <Button fx:id="botonCancelar" mnemonicParsing="false" onAction="#cancelarTodo" prefHeight="35.0" prefWidth="100.0" text="Cancelar" />
-                  <Button fx:id="botonGuardar" mnemonicParsing="false" onAction="#guardarTarea" prefHeight="35.0" prefWidth="100.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;" text="Guardar" />
+                  <Button fx:id="botonCancelar" mnemonicParsing="false" onAction="#cancelarTodo" prefHeight="35.0" prefWidth="100.0" text="%crearNuevaTarea.textoCancelar" />
+                  <Button fx:id="botonGuardar" mnemonicParsing="false" onAction="#guardarTarea" prefHeight="35.0" prefWidth="100.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;" text="%crearNuevaTarea.textoGuardar" />
                </children>
                <BorderPane.margin>
                   <Insets bottom="15.0" right="40.0" />

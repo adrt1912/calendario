@@ -24,7 +24,7 @@
          <top>
             <HBox alignment="CENTER" prefHeight="60.0" spacing="10.0" style="-fx-background-color: #f4f4f4; -fx-border-color: #dddddd; -fx-border-width: 0 0 1 0;" BorderPane.alignment="CENTER">
                <children>
-                  <Label text="Modificar Tarea:">
+                  <Label text="%modificarTarea.textoModificarTarea">
                      <font>
                         <Font name="System Bold" size="20.0" />
                      </font>
@@ -55,25 +55,25 @@
                   <RowConstraints maxHeight="69.0" minHeight="10.0" prefHeight="64.0" vgrow="ALWAYS" />
                </rowConstraints>
                <children>
-                  <Label text="Título:" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                  <Label text="%modificarTarea.textoTitulo" GridPane.columnIndex="0" GridPane.rowIndex="0">
                      <font><Font size="14.0" /></font>
                   </Label>
-                  <Label text="Fecha:" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                  <Label text="%modificarTarea.textoFecha" GridPane.columnIndex="0" GridPane.rowIndex="1">
                      <font><Font size="14.0" /></font>
                   </Label>
-                  <Label text="Hora:" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                  <Label text="%modificarTarea.textoHora" GridPane.columnIndex="0" GridPane.rowIndex="2">
                      <font><Font size="14.0" /></font>
                   </Label>
-                  <Label text="Sitio:" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                  <Label text="%modificarTarea.textoSitio" GridPane.columnIndex="0" GridPane.rowIndex="3">
                      <font><Font size="14.0" /></font>
                   </Label>
-                  <Label text="Periodicidad:" GridPane.columnIndex="0" GridPane.rowIndex="4">
+                  <Label text="%modificarTarea.textoPeriodicidad" GridPane.columnIndex="0" GridPane.rowIndex="4">
                      <font><Font size="14.0" /></font>
                   </Label>
-                  <Label text="Estado:" GridPane.rowIndex="5">
+                  <Label text="%modificarTarea.textoEstado" GridPane.rowIndex="5">
                      <font><Font size="14.0" /></font>
                   </Label>
-                  <Label text="Descripción:" GridPane.columnIndex="0" GridPane.rowIndex="6" GridPane.valignment="TOP">
+                  <Label text="%modificarTarea.textoDescripcion" GridPane.columnIndex="0" GridPane.rowIndex="6" GridPane.valignment="TOP">
                      <font><Font size="14.0" /></font>
                      <GridPane.margin><Insets top="5.0" /></GridPane.margin>
                   </Label>
@@ -82,12 +82,12 @@
                   <DatePicker fx:id="campoFecha" prefHeight="30.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   <TextField fx:id="campoHora" prefHeight="30.0" prefWidth="200.0" promptText="HH:mm" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                   <TextField fx:id="campoSitio" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                  <CheckBox fx:id="checkCompletada" mnemonicParsing="false" onAction="#cambiarEstado" text="Marcada como completada" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                  <CheckBox fx:id="checkCompletada" mnemonicParsing="false" onAction="#cambiarEstado" text="%modificarTarea.textoMarcadaComoCompletada" GridPane.columnIndex="1" GridPane.rowIndex="5">
                      <font><Font size="14.0" /></font>
                   </CheckBox>
                   <TextArea fx:id="campoDescripcion" prefHeight="101.0" prefWidth="405.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                  <ComboBox fx:id="campoPerioricidad" prefWidth="150.0" promptText="Periodicidad" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                  <Label text="Etiqueta: " GridPane.rowIndex="7">
+                  <ComboBox fx:id="campoPerioricidad" prefWidth="150.0" promptText="%modificarTarea.textoPeriodicidadComboBox" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                  <Label text="%modificarTarea.textoEtiqueta" GridPane.rowIndex="7">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -103,7 +103,7 @@
          <bottom>
             <HBox alignment="CENTER_LEFT" prefHeight="79.0" prefWidth="555.0" BorderPane.alignment="CENTER">
                <children>
-                  <Button fx:id="botonEliminar" mnemonicParsing="false" onAction="#eliminarTarea" prefHeight="35.0" style="-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;" text="🗑 Eliminar">
+                  <Button fx:id="botonEliminar" mnemonicParsing="false" onAction="#eliminarTarea" prefHeight="35.0" style="-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;" text="%modificarTarea.textoEliminar">
                      <font><Font size="14.0" /></font>
                   </Button>
                   <Text fx:id="textoError" fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="201.13000106811523">
@@ -114,10 +114,10 @@
 
                   <HBox alignment="CENTER" spacing="15.0">
                      <children>
-                        <Button fx:id="botonCancelar" mnemonicParsing="false" onAction="#cerrarTodo" prefHeight="35.0" text="Cancelar">
+                        <Button fx:id="botonCancelar" mnemonicParsing="false" onAction="#cerrarTodo" prefHeight="35.0" text="%modificarTarea.textoCancelar">
                            <font><Font size="14.0" /></font>
                         </Button>
-                        <Button fx:id="botonGuardar" mnemonicParsing="false" onAction="#modificarTarea" prefHeight="35.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;" text="Guardar Cambios">
+                        <Button fx:id="botonGuardar" mnemonicParsing="false" onAction="#modificarTarea" prefHeight="35.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;" text="%modificarTarea.textoGuardar">
                            <font><Font size="14.0" /></font>
                         </Button>
                      </children>

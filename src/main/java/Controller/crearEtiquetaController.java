@@ -33,7 +33,7 @@ public class crearEtiquetaController {
         String colorEtiqueta="#"+this.colorEtiqueta.getValue().toString().substring(2,8);
 
         if (nombreEtiqueta != null && !nombreEtiqueta.isBlank()) {
-            GestorTareas.getGestorTareas().nuevaEtiqueta(colorEtiqueta, nombreEtiqueta);
+            GestorTareas.getGestorTareas().nuevaEtiqueta(nombreEtiqueta, colorEtiqueta);
             cancelarEtiqueta();
         }else {
             textoError.setText("Error al crear etiqueta, hay campos sin rellenar");
