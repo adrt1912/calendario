@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="222.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.MenuConfirmacionBorrarController">
+   <children>
+      <VBox layoutY="-3.0" prefHeight="221.0" prefWidth="600.0">
+         <children>
+            <HBox alignment="CENTER" prefHeight="80.0" prefWidth="600.0" style="-fx-background-color: #2196F3;">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%confirmarEliminartareasPeriodicas.textoIntroductorioLaTarea" wrappingWidth="72.3290023803711">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Text>
+                  <Text fx:id="textTitulo" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" wrappingWidth="37.14999771118164">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Text>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%confirmarEliminartareasPeriodicas.textoIntroductorio2">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Text>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="134.0" prefWidth="600.0" spacing="20.0">
+               <children>
+                  <Button fx:id="botonCancelar" mnemonicParsing="false" onAction="#cancelarOp" prefHeight="49.0" prefWidth="79.0" style="-fx-background-radius: 7;" text="%confirmarEliminartareasPeriodicas.textoCancelar" />
+                  <Button fx:id="botonSoloUna" mnemonicParsing="false" onAction="#borrarSoloEsta" prefHeight="49.0" prefWidth="182.0" style="-fx-background-radius: 7; -fx-font-weight: bold; -fx-background-color: #2196F3;" text="%confirmarEliminartareasPeriodicas.textoEliminarSoloEstaTarea" textFill="WHITE" />
+                  <Button fx:id="botonEliminarTodas" mnemonicParsing="false" onAction="#borrarTodas" prefHeight="50.0" prefWidth="275.0" style="-fx-background-color: Red; -fx-background-radius: 7; -fx-font-weight: bold;" text="%confirmarEliminartareasPeriodicas.textoEliminarTodasLasTareas" textFill="WHITE" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>
