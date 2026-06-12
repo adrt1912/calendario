@@ -1,9 +1,12 @@
 package Model;
 
+import View.view;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.prefs.Preferences;
 
 public class GestorTareas {
 
@@ -39,7 +42,13 @@ public class GestorTareas {
         listaEtiquetas.add(etiquetaNeutra);
     }
 
+    private ResourceBundle obtenerDiccionario() {
+        Preferences prefs = Preferences.userNodeForPackage(View.view.class);
+        String codIdioma = prefs.get("idioma_actual", "es");
+        return ResourceBundle.getBundle("textos", new Locale(codIdioma));
+    }
     public String mostrarTareasUrgentesHoy(){
+       ResourceBundle resourceBundle=obtenerDiccionario();
 //Cogemos solo las tareas en proceso
         StringBuilder taresDevolver= new StringBuilder();
         int numt=0;
@@ -52,11 +61,12 @@ public class GestorTareas {
                if(todasTarea.getHora()!=null) taresDevolver.append(" a las: ").append(todasTarea.getHora());
             }
         }
-        if(numt==0) return "Hoy no tienes tareas pendientes";
-        else return "Hoy tienes "+numt+" tareas: "+ taresDevolver.toString();
+        if(numt==0) return resourceBundle.getString("gestor.hoySin");
+        else return resourceBundle.getString("gestor.hoyCon1")+" "+numt+resourceBundle.getString("gestor.hoyCon2")+" "+ taresDevolver.toString();
     }
 
     public String mostrarTareasUrgentesMañana(){
+        ResourceBundle resourceBundle=obtenerDiccionario();
         StringBuilder taresDevolver= new StringBuilder();
         List<Tarea> tareasProcesar=todasTareas.stream().filter(a->a.getEstadoTarea()== EstadoTarea.EN_PROCESO).toList();
         int numT=0;
@@ -68,8 +78,8 @@ public class GestorTareas {
                 if(todasTareaM.getHora()!=null) taresDevolver.append(" a las: ").append(todasTareaM.getHora());
             }
         }
-        if(numT==0) return "Mañana no tienes tareas pendientes";
-        else return "Mañana tienes "+numT+" tareas: "+taresDevolver.toString();
+        if(numT==0) return resourceBundle.getString("gestor.mananaSin");
+        else return resourceBundle.getString("gestor.mananaCon1")+" "+numT+resourceBundle.getString("gestor.hoyCon2")+" "+taresDevolver.toString();
     }
 
     //Metodo que inicia el gestor

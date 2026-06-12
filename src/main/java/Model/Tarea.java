@@ -2,8 +2,11 @@ package Model;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.ResourceBundle;
 import java.util.UUID;
+import java.util.prefs.Preferences;
 
 public class Tarea {
 
@@ -127,18 +130,21 @@ public class Tarea {
 
         comprobarEstado();
     }
+    private ResourceBundle obtenerDiccionario() {
+        Preferences prefs = Preferences.userNodeForPackage(View.view.class);
+        String codIdioma = prefs.get("idioma_actual", "es");
+        return ResourceBundle.getBundle("textos", new Locale(codIdioma));
+    }
 
     //Devuelve el string de la tarea
     public String mostrarTarea() {
-        if (fechaFin != null && hora != null) {
-            comprobarEstado();
-            return (" " + nombreTarea + " termina el " + fechaFin + " a las: " + hora + "\n lugar: " + sitio
-                    + " descripcion es:" + descripcion);
-        } else {
-            comprobarEstado();
-            return (" " + nombreTarea + " lugar: " + sitio
-                    + "cuya descripcion es:" + descripcion);
-        }
+        ResourceBundle resourceBundle=obtenerDiccionario();
+        String resultado=resourceBundle.getString("descripcionTareas.titulo")+" "+nombreTarea+" ";
+        if(fechaFin!=null){resultado=resultado+resourceBundle.getString("descripcionTareas.fechaFin")+" "+fechaFin+" ";}
+        if(hora!=null){resultado=resultado+resourceBundle.getString("descripcionTareas.hora")+" "+hora+" ";}
+        if(sitio!=null){resultado=resultado+resourceBundle.getString("descripcionTareas.sitio")+" "+sitio+" ";}
+        if(descripcion!=null){resultado=resultado+resourceBundle.getString("descripcionTareas.descripcion")+" "+descripcion;}
+      return resultado;
     }
 
     //Compureba que no se ha caducado la tarea
