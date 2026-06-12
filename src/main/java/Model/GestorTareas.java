@@ -1,7 +1,5 @@
 package Model;
 
-import View.view;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -23,6 +21,9 @@ public class GestorTareas {
         return todasTareas;
     }
 
+    private DateTimeFormatter formatoHora;
+
+    public DateTimeFormatter getFormatoHora(){return formatoHora;}
 
     private Idiomas idioma;
 
@@ -42,27 +43,46 @@ public class GestorTareas {
         listaEtiquetas.add(etiquetaNeutra);
     }
 
+    private void setFormatoHora() {
+        // 1. Leemos lo que hay guardado en el ordenador
+        Preferences prefs = Preferences.userNodeForPackage(View.view.class);
+        String opcionGuardada = prefs.get("formato_hora", "24h");
+
+        // 2. Creamos el formateador correcto dependiendo del texto que leímos
+        if (opcionGuardada.equals("12h")) {
+            formatoHora = DateTimeFormatter.ofPattern("hh:mm a"); // Ejemplo: 06:30 PM
+        } else {
+            formatoHora = DateTimeFormatter.ofPattern("HH:mm");   // Ejemplo: 18:30
+        }
+    }
+
+
     private ResourceBundle obtenerDiccionario() {
         Preferences prefs = Preferences.userNodeForPackage(View.view.class);
         String codIdioma = prefs.get("idioma_actual", "es");
         return ResourceBundle.getBundle("textos", new Locale(codIdioma));
     }
+
     public String mostrarTareasUrgentesHoy(){
        ResourceBundle resourceBundle=obtenerDiccionario();
 //Cogemos solo las tareas en proceso
         StringBuilder taresDevolver= new StringBuilder();
         int numt=0;
         List<Tarea> tareasProcesar=todasTareas.stream().filter(a->a.getEstadoTarea()== EstadoTarea.EN_PROCESO).toList();
-        for (Tarea todasTarea : tareasProcesar) {
+        List<Tarea> listTareaEscribir=tareasProcesar.stream().filter(tarea -> tarea.getFechaFin().equals(LocalDate.now())).toList();
+
+        for (Tarea todasTarea : listTareaEscribir) {
             //Si su fecha fin es hoy la mostrara por pantalla
-            if (Objects.equals(todasTarea.getFechaFin(), LocalDate.now())) {
                taresDevolver.append(" ").append(todasTarea.getNombreTarea());
                numt++;
                if(todasTarea.getHora()!=null) taresDevolver.append(" a las: ").append(todasTarea.getHora());
-            }
+                if(numt< listTareaEscribir.size()) taresDevolver.append(" y ");
+
+
         }
         if(numt==0) return resourceBundle.getString("gestor.hoySin");
-        else return resourceBundle.getString("gestor.hoyCon1")+" "+numt+resourceBundle.getString("gestor.hoyCon2")+" "+ taresDevolver.toString();
+        else if(numt==1) return resourceBundle.getString("gestor.hoyCon1")+" "+numt+" "+resourceBundle.getString("gestor.hoyCon2")+" "+ taresDevolver.toString();
+        else return resourceBundle.getString("gestor.hoyCon1")+" "+numt+" "+resourceBundle.getString("gestor.hoyCon2")+"s: "+ taresDevolver.toString();
     }
 
     public String mostrarTareasUrgentesMañana(){
@@ -70,16 +90,18 @@ public class GestorTareas {
         StringBuilder taresDevolver= new StringBuilder();
         List<Tarea> tareasProcesar=todasTareas.stream().filter(a->a.getEstadoTarea()== EstadoTarea.EN_PROCESO).toList();
         int numT=0;
-        for(Tarea todasTareaM : tareasProcesar){
             //Si su fecha fin es mañana la mostrara por pantalla
-            if (Objects.equals(todasTareaM.getFechaFin(),LocalDate.now().plusDays(1))) {
+            List<Tarea> listTareaEscribir=tareasProcesar.stream().filter(tarea -> tarea.getFechaFin().equals(LocalDate.now().plusDays(1))).toList();
+        for(Tarea todasTareaM : listTareaEscribir){
                 taresDevolver.append(" ").append(todasTareaM.getNombreTarea());
                 numT++;
                 if(todasTareaM.getHora()!=null) taresDevolver.append(" a las: ").append(todasTareaM.getHora());
+                if(numT< listTareaEscribir.size()) taresDevolver.append(" y ");
             }
-        }
+
         if(numT==0) return resourceBundle.getString("gestor.mananaSin");
-        else return resourceBundle.getString("gestor.mananaCon1")+" "+numT+resourceBundle.getString("gestor.hoyCon2")+" "+taresDevolver.toString();
+        else if(numT==1) return resourceBundle.getString("gestor.mananaCon1")+" "+numT+" "+resourceBundle.getString("gestor.hoyCon2")+" "+taresDevolver.toString();
+        else return resourceBundle.getString("gestor.mananaCon1")+" "+numT+" "+resourceBundle.getString("gestor.hoyCon2")+"s: "+taresDevolver.toString();
     }
 
     //Metodo que inicia el gestor
@@ -88,6 +110,7 @@ public class GestorTareas {
         gestionEnFicheros.leerEtiquetas();
 
         gestionEnFicheros.leerFichero("tareas.txt");
+
     }
 
 
@@ -148,6 +171,20 @@ public class GestorTareas {
         gestionEnFicheros.borrarFichero("tareas.txt");
         gestionEnFicheros.borrarFichero("etiquetas.txt");
         listaEtiquetas.add(etiquetaNeutra);
+    }
+
+    public String obtenerHoraFormateada(LocalTime hora) {
+        if (hora == null) return "";
+
+        String formatoElegido = Preferences.userNodeForPackage(View.view.class).get("formato_hora", "24h");
+
+        DateTimeFormatter formateador;
+        if (formatoElegido.equals("12h")) {
+            formateador = DateTimeFormatter.ofPattern("hh:mm a"); // 06:30 PM
+        } else {
+            formateador = DateTimeFormatter.ofPattern("HH:mm");   // 18:30
+        }
+        return hora.format(formateador);
     }
 
 }

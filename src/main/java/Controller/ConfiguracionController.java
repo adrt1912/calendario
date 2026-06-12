@@ -29,6 +29,14 @@ public class ConfiguracionController {
         Idiomas idiomas=GestorTareas.getGestorTareas().getIdioma();
         if(idiomas!=null)  boxIdioma.getSelectionModel().select(idiomas); // Para dejar uno marcado por defecto
         else boxIdioma.getSelectionModel().select(Idiomas.ESPAÑOL);
+
+        boxFormatoHora.setItems(FXCollections.observableArrayList("24h", "12h"));
+
+        Preferences prefs = Preferences.userNodeForPackage(View.view.class);
+        String formatoGuardado = prefs.get("formato_hora", "24h");
+        if (formatoGuardado != null) boxFormatoHora.getSelectionModel().select(formatoGuardado); // Selecciona el que toca (12h o 24h)
+        else boxFormatoHora.getSelectionModel().select("24h");
+
     }
 
     @FXML
@@ -49,11 +57,12 @@ public class ConfiguracionController {
         //Para guardar la configuracion en el ordenador, idea de internet
         Preferences prefs = Preferences.userNodeForPackage(View.view.class);
         Idiomas idiomaSeleccionado = (Idiomas) boxIdioma.getValue();
-        if (idiomaSeleccionado == Idiomas.INGLES) {
-            prefs.put("idioma_actual", "en");
-        } else {
-            prefs.put("idioma_actual", "es");
-        }
+        if (idiomaSeleccionado == Idiomas.INGLES) prefs.put("idioma_actual", "en");
+        else prefs.put("idioma_actual", "es");
+
+        if(boxFormatoHora.getValue().equals("24h")) prefs.put("formato_hora",boxFormatoHora.getValue().toString());
+        else prefs.put("formato_hora",boxFormatoHora.getValue().toString());
+
         GestorTareas.getGestorTareas().setIdioma(idiomaSeleccionado);
         cancelar();
 

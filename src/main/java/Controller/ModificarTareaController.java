@@ -42,7 +42,7 @@ public void setTareaMos(Tarea tareaMos) {
             campoFecha.setValue(tareaMos.getFechaFin());
         }
         if(tareaMos.getHora()!=null){
-            campoHora.setText(tareaMos.getHora().toString());
+            campoHora.setText(GestorTareas.getGestorTareas().obtenerHoraFormateada(tareaMos.getHora()));
         }
         if(tareaMos.getSitio()!=null){
             campoHora.setText(tareaMos.getSitio());

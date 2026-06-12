@@ -35,7 +35,7 @@ public class GestionEnFicheros {
 
         try (
                 Scanner lectorFichero=new Scanner(new File(nombreFichero))){
-            DateTimeFormatter formatoHora = DateTimeFormatter.ofPattern("HH:mm");
+            DateTimeFormatter formatoHora =GestorTareas.getGestorTareas().getFormatoHora();
 
             while(lectorFichero.hasNextLine()) {
 
@@ -134,5 +134,28 @@ public class GestionEnFicheros {
         }
     }
 
-    public void exportarACSV(){}
+    public void exportarACSV(){
+
+        List<Tarea> listaTareas=GestorTareas.getGestorTareas().getTodasTareas();
+        try (
+                FileWriter printWriter=new FileWriter("archivoCSVTareas.csv");
+                PrintWriter pw=new PrintWriter(printWriter){}){
+            pw.println("Titulo;Descripcion;Estado;FechaFin;Hora;Etiqueta");
+            for( Tarea tarea : listaTareas){
+                String titulo = tarea.getNombreTarea();
+                String desc = tarea.getDescripcion() != null ? tarea.getDescripcion() : "";
+                String estado = tarea.getEstadoTarea() != null ? tarea.getEstadoTarea().name() : "";
+                String fecha = tarea.getFechaFin() != null ? tarea.getFechaFin().toString() : "";
+                String hora = tarea.getHora() != null ? tarea.getHora().toString() : "";
+                String etiqueta = tarea.getEtiqueta() != null ? tarea.getEtiqueta().getNombreEtiqueta() : "";
+
+                pw.println(titulo + ";" + desc + ";" + estado + ";" + fecha + ";" + hora + ";" + etiqueta);
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
 }
