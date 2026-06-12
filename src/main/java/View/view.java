@@ -5,15 +5,26 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.prefs.Preferences;
 
 public class view {
         //Guardamos la ventana del juego, asi se puede cambiar como se necesite
         private static Stage stage ;
-
+    private static ResourceBundle obtenerBundleActual() {
+        Preferences prefs = Preferences.userNodeForPackage(view.class);
+        String codIdioma = prefs.get("idioma_actual", "es");
+        Locale locale = new Locale(codIdioma);
+        return ResourceBundle.getBundle("textos", locale);
+    }
         //Ventana inicial
         public static void showInitialView() throws IOException {
             //Abre la ventana inicial
-            FXMLLoader fxmlLoader = new FXMLLoader(view.class.getResource("/View/MenuPrincipal.fxml"));
+
+            ResourceBundle bundle=obtenerBundleActual();
+            FXMLLoader fxmlLoader = new FXMLLoader(view.class.getResource("/View/MenuPrincipal.fxml"),bundle);
             Scene scene= new Scene(fxmlLoader.load(), 1600,900);
 
             //Si no está abierta se hace una nueva ventana
@@ -27,9 +38,14 @@ public class view {
         }
 
 
-        public static void showCrearTArea() throws IOException {
-            FXMLLoader fxmlLoader=new FXMLLoader(view.class.getResource("/View/crearTarea.fxml"));
+        public static void showCrearTArea(LocalDate fecha) throws IOException {
+            ResourceBundle bundle=obtenerBundleActual();
+
+            FXMLLoader fxmlLoader=new FXMLLoader(view.class.getResource("/View/crearTarea.fxml"),bundle);
             Scene scene=new Scene(fxmlLoader.load(),600,500);
+
+            Controller.CrearTareaController controlador = fxmlLoader.getController();
+            controlador.initialize(fecha);
 
             Stage stage1=new Stage();
             stage1.setTitle("Crear Tarea Nueva");
@@ -38,7 +54,9 @@ public class view {
         }
 
         public static void showTareaVentana(Tarea tarea)throws IOException{
-            FXMLLoader fxmlLoader=new FXMLLoader(view.class.getResource("/View/modificarTarea.fxml"));
+            ResourceBundle bundle=obtenerBundleActual();
+
+            FXMLLoader fxmlLoader=new FXMLLoader(view.class.getResource("/View/modificarTarea.fxml"),bundle);
             Scene scene=new Scene(fxmlLoader.load(),600,500);
 
             Controller.ModificarTareaController controlador = fxmlLoader.getController();
@@ -51,7 +69,9 @@ public class view {
 
         }
     public static void showConfirmacionEl(Tarea tarea)throws IOException{
-        FXMLLoader fxmlLoader=new FXMLLoader(view.class.getResource("/View/menuConfirmacionPer.fxml"));
+        ResourceBundle bundle=obtenerBundleActual();
+
+        FXMLLoader fxmlLoader=new FXMLLoader(view.class.getResource("/View/menuConfirmacionPer.fxml"),bundle);
         Scene scene=new Scene(fxmlLoader.load(),600,222);
 
         Controller.MenuConfirmacionBorrarController controlador = fxmlLoader.getController();
@@ -63,7 +83,9 @@ public class view {
         stage1.showAndWait();
     }
     public static void showNuevaEtiqueta()throws IOException{
-        FXMLLoader fxmlLoader=new FXMLLoader(view.class.getResource("/View/crearEtiqueta.fxml"));
+        ResourceBundle bundle=obtenerBundleActual();
+
+        FXMLLoader fxmlLoader=new FXMLLoader(view.class.getResource("/View/crearEtiqueta.fxml"),bundle);
         Scene scene=new Scene(fxmlLoader.load(),600,232);
 
         Stage stage1=new Stage();
@@ -71,4 +93,15 @@ public class view {
         stage1.setScene(scene);
         stage1.showAndWait();
         }
+    public static void showConfiguracionMenu()throws IOException{
+        ResourceBundle bundle=obtenerBundleActual();
+
+        FXMLLoader fxmlLoader=new FXMLLoader(view.class.getResource("/View/menuConfiguracion.fxml"),bundle);
+        Scene scene=new Scene(fxmlLoader.load(),600,400);
+
+        Stage stage1=new Stage();
+        stage1.setTitle("Configuracion ");
+        stage1.setScene(scene);
+        stage1.showAndWait();
+    }
     }

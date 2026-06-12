@@ -30,6 +30,8 @@ public class GestionEnFicheros {
         2. Titulo...
         Si alguno va vacio se salta de linea
          */
+        File archivo = new File("tareas.txt");
+        if(archivo.exists()){
 
         try (
                 Scanner lectorFichero=new Scanner(new File(nombreFichero))){
@@ -84,6 +86,7 @@ public class GestionEnFicheros {
            System.out.println(e.getMessage());
         }
     }
+    }
 
     public void guardarEnFichero(List<Tarea> listaTareas){
 
@@ -102,10 +105,7 @@ public class GestionEnFicheros {
 
     public void borrarFichero(String nomF){
         File archivo=new File(nomF);
-
-        if(archivo.delete()){
-            System.out.println("Se borro correctamente");
-        }else{System.out.println("No se pudo borrar");}
+       archivo.delete();
     }
 
     public void guardarEtiquetas(List<Etiqueta> listaEtiquetas){
@@ -113,6 +113,9 @@ public class GestionEnFicheros {
                 FileWriter printWriter=new FileWriter("etiquetas.txt");
                 PrintWriter pw=new PrintWriter(printWriter){}){
             for(Etiqueta etiqueta : listaEtiquetas){
+                if ("Sin Etiqueta".equalsIgnoreCase(etiqueta.getNombreEtiqueta()) || "transparent".equalsIgnoreCase(etiqueta.getCodColor())) {
+                    continue;
+                }
                 pw.println(etiqueta.getNombreEtiqueta()+"\n"+etiqueta.getCodColor());
             }
         } catch (Exception e) {
@@ -125,9 +128,11 @@ public class GestionEnFicheros {
             while (lectorFichero.hasNext()) {
                 String nomE = lectorFichero.nextLine();
                 String color = lectorFichero.nextLine();
-                GestorTareas.getGestorTareas().nuevaEtiqueta(color,nomE);
+                GestorTareas.getGestorTareas().nuevaEtiqueta(nomE,color);
             }
         } catch (Exception e) {
         }
     }
+
+    public void exportarACSV(){}
 }

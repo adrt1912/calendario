@@ -15,14 +15,14 @@
    <children>
       <VBox alignment="TOP_CENTER" prefHeight="232.0" prefWidth="602.0">
          <children>
-            <Label prefHeight="29.0" prefWidth="605.0" style="-fx-background-color: #2196F3;" text="                                           Nueva Etiqueta" textAlignment="CENTER" textFill="WHITE">
+            <Label alignment="CENTER" prefHeight="29.0" prefWidth="605.0" style="-fx-background-color: #2196F3;" text="%crearEtiqueta.mensajeInicial" textAlignment="CENTER" textFill="WHITE">
                <font>
                   <Font size="20.0" />
                </font>
             </Label>
             <HBox alignment="CENTER_LEFT" prefHeight="146.0" prefWidth="602.0">
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Nombre :">
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%crearEtiqueta.textoNombre">
                      <font>
                         <Font size="16.0" />
                      </font>
@@ -31,7 +31,7 @@
                      </HBox.margin>
                   </Text>
                   <TextField fx:id="cuadroNombre" prefHeight="26.0" prefWidth="196.0" />
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Color:" wrappingWidth="59.15299987792969">
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%crearEtiqueta.textoColor" wrappingWidth="59.15299987792969">
                      <font>
                         <Font size="16.0" />
                      </font>
@@ -45,12 +45,12 @@
             <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
                <children>
                   <Text fx:id="textoError" fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" underline="true" wrappingWidth="231.13000106811523" />
-                  <Button fx:id="botonCancelar" mnemonicParsing="false" onAction="#cancelarEtiqueta" prefHeight="43.0" prefWidth="108.0" text="Cancelar">
+                  <Button fx:id="botonCancelar" mnemonicParsing="false" onAction="#cancelarEtiqueta" prefHeight="43.0" prefWidth="108.0" text="%crearEtiqueta.textoCancelar">
                      <font>
                         <Font size="15.0" />
                      </font>
                   </Button>
-                  <Button fx:id="botonConfirmar" mnemonicParsing="false" onAction="#crearEtiqueta" prefHeight="41.0" prefWidth="123.0" style="-fx-background-color: #2196F3;" text="Confirmar ">
+                  <Button fx:id="botonConfirmar" mnemonicParsing="false" onAction="#crearEtiqueta" prefHeight="41.0" prefWidth="123.0" style="-fx-background-color: #2196F3;" text="%crearEtiqueta.textoConfirmar" textFill="WHITE">
                      <font>
                         <Font size="16.0" />
                      </font>

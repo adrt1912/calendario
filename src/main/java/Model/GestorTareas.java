@@ -20,11 +20,24 @@ public class GestorTareas {
         return todasTareas;
     }
 
+
+    private Idiomas idioma;
+
+    public void setIdioma(Idiomas idioma){
+        this.idioma=idioma;
+    }
+
+    public Idiomas getIdioma() {
+        return idioma;
+    }
+
     private List<Etiqueta> listaEtiquetas=new ArrayList<>();
     //PAra evitar repetir la llamada al metodo constantemente lo guardamos
     private GestionEnFicheros gestionEnFicheros= GestionEnFicheros.getGestionEnFicheros();
 
-    private GestorTareas(){}
+    private GestorTareas(){
+        listaEtiquetas.add(etiquetaNeutra);
+    }
 
     public String mostrarTareasUrgentesHoy(){
 //Cogemos solo las tareas en proceso
@@ -113,52 +126,18 @@ public class GestorTareas {
 
     public List<Etiqueta> getListaEtiquetas(){return listaEtiquetas;}
 
-    public void gestionarFicheros(){
+    private Etiqueta etiquetaNeutra=new Etiqueta("Sin Etiqueta","transparent");
 
-        System.out.println("""
-                Sobre ficheros que desa
-                 1.Guardar tareas\s
-                 2.Descargar tareas\s
-                 3.Limpiar ficheros""");
-
-        Scanner scanner=new Scanner(System.in);
-        String accion=scanner.nextLine();
-        switch (accion) {
-            case "Guardar tareas","1" -> gestionEnFicheros.guardarEnFichero(todasTareas);
-            case "Descargar tareas" ,"2"-> {
-
-                System.out.println("Nombre del fichero, o por defecto(no escribir nada)");
-                String nomF= scanner.nextLine();
-                if(nomF.isEmpty())
-                {nomF="tareas.txt";}
-                else{
-                    nomF=nomF+".txt";
-                }
-                gestionEnFicheros.leerFichero(nomF);
-            }
-            case "Limpiar ficheros","3" -> {
-                System.out.println("Nombre del fichero, o por defecto(no escribir nada)");
-                String nomF= scanner.nextLine();
-                if(nomF.isEmpty())
-                {nomF="tareas.txt";}
-                else{
-                    nomF=nomF+".txt";
-                }
-                gestionEnFicheros.borrarFichero(nomF);
-            }
-        }
-        iniciarGestor();
+    public Etiqueta getEtiquetaNeutra(){
+        return etiquetaNeutra;
     }
 
-    private List<Tarea> buscadorInteligente (String palabraBuscar){
-        List<Tarea> listaTareaCoincidentes=new ArrayList<>();
-
-        for (Tarea todasTarea : todasTareas) {
-            if (todasTarea.getNombreTarea().toLowerCase().contains(palabraBuscar.toLowerCase())) {
-                listaTareaCoincidentes.add(todasTarea);
-            }
-        }
-        return listaTareaCoincidentes;
+    public void borrarContenido(){
+        listaEtiquetas.clear();
+        todasTareas.clear();
+        gestionEnFicheros.borrarFichero("tareas.txt");
+        gestionEnFicheros.borrarFichero("etiquetas.txt");
+        listaEtiquetas.add(etiquetaNeutra);
     }
 
 }

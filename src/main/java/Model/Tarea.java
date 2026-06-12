@@ -122,7 +122,8 @@ public class Tarea {
         idTarea= UUID.randomUUID().toString();
         this.idFamilia=idFamilia;
 
-        this.etiqueta=etiqueta;
+        if(etiqueta==null) this.etiqueta=GestorTareas.getGestorTareas().getEtiquetaNeutra();
+        else this.etiqueta=etiqueta;
 
         comprobarEstado();
     }

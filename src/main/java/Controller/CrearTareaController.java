@@ -22,9 +22,10 @@ public class CrearTareaController {
     @FXML
     private Button botonGuardar;
 
-    public void initialize(){
+    public void initialize(LocalDate fechaf){
         textoPeriodicidad.getItems().addAll(Periodicidad.values());
         boxEtiquetas.getItems().addAll(GestorTareas.getGestorTareas().getListaEtiquetas());
+        if(fechaf!=null) texFecha.setValue(fechaf);
     }
     @FXML
     private TextField textoTitulo;
