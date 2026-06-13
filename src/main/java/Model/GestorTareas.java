@@ -41,14 +41,16 @@ public class GestorTareas {
 
     private GestorTareas(){
         listaEtiquetas.add(etiquetaNeutra);
+        setFormatoHora();
+        Preferences prefs = Preferences.userNodeForPackage(View.view.class);
+        String codIdioma = prefs.get("idioma_actual", "es");
+        this.idioma = Idiomas.desdeCodigo(codIdioma);
     }
 
     private void setFormatoHora() {
-        // 1. Leemos lo que hay guardado en el ordenador
         Preferences prefs = Preferences.userNodeForPackage(View.view.class);
         String opcionGuardada = prefs.get("formato_hora", "24h");
 
-        // 2. Creamos el formateador correcto dependiendo del texto que leímos
         if (opcionGuardada.equals("12h")) {
             formatoHora = DateTimeFormatter.ofPattern("hh:mm a"); // Ejemplo: 06:30 PM
         } else {
@@ -60,6 +62,8 @@ public class GestorTareas {
     private ResourceBundle obtenerDiccionario() {
         Preferences prefs = Preferences.userNodeForPackage(View.view.class);
         String codIdioma = prefs.get("idioma_actual", "es");
+        Idiomas idiomaSeleccionado = Idiomas.desdeCodigo(codIdioma);
+        setIdioma(idiomaSeleccionado);
         return ResourceBundle.getBundle("textos", new Locale(codIdioma));
     }
 
@@ -77,7 +81,6 @@ public class GestorTareas {
                numt++;
                if(todasTarea.getHora()!=null) taresDevolver.append(" a las: ").append(todasTarea.getHora());
                 if(numt< listTareaEscribir.size()) taresDevolver.append(" y ");
-
 
         }
         if(numt==0) return resourceBundle.getString("gestor.hoySin");
@@ -107,12 +110,13 @@ public class GestorTareas {
     //Metodo que inicia el gestor
     public void iniciarGestor() {
         //Se encarga de la primera carga y de mostrar tareas urgentes
-        gestionEnFicheros.leerEtiquetas();
+        //gestionEnFicheros.leerEtiquetas();
+        listaEtiquetas.clear();
+        todasTareas.clear();
 
-        gestionEnFicheros.leerFichero("tareas.txt");
-
+        //gestionEnFicheros.leerFichero("tareas.txt");
+        conexionBD.getConexionBD().cargarDatosDeBD();
     }
-
 
     //Comprueba si la tarea esta ya creada, si no es asi la guarda
     public void añadirTareaALista(Tarea tarea){
@@ -124,17 +128,19 @@ public class GestorTareas {
     public Tarea anadirTarea(String titulo,LocalDate fechaFin,String descripcion,String sitio,LocalTime time,Periodicidad frecuencia,String idFamilia,Etiqueta etiqueta){
         Tarea tareaNueva=new Tarea(titulo, LocalDate.now(),fechaFin, EstadoTarea.EN_PROCESO,descripcion,sitio,time,frecuencia,idFamilia,etiqueta);
         añadirTareaALista(tareaNueva);
-        gestionEnFicheros.guardarEnFichero(todasTareas);
+        conexionBD.getConexionBD().guardarTarea(tareaNueva);
+        //gestionEnFicheros.guardarEnFichero(todasTareas);
         return tareaNueva;
     }
 
     public void eliminarTarea(Tarea tarea){
         todasTareas.remove(tarea);
-        gestionEnFicheros.guardarEnFichero(todasTareas);
+        conexionBD.getConexionBD().borrarTarea(tarea.getIdTarea());
+
+        //gestionEnFicheros.guardarEnFichero(todasTareas);
     }
 
     public void modificarTarea(Tarea tarea,String titulo,LocalDate fechaFin,String descripcion,String sitio,LocalTime time,Periodicidad frecuencia,EstadoTarea estadoTarea,Etiqueta etiqueta){
-
         tarea.setNombreTarea(titulo);
         tarea.setFechaFin(fechaFin);
         tarea.setDescripcion(descripcion);
@@ -143,18 +149,28 @@ public class GestorTareas {
         tarea.setFrecuencia(frecuencia);
         tarea.setEstadoTarea(estadoTarea);
         tarea.setEtiqueta(etiqueta);
-        gestionEnFicheros.guardarEnFichero(todasTareas);
+        conexionBD.getConexionBD().guardarEnBD();
+
+        //gestionEnFicheros.guardarEnFichero(todasTareas);
     }
 
     public void eliminarEtiqueta(Etiqueta etiqueta)
     {
+        for (Tarea t : todasTareas) {
+            if (t.getEtiqueta() != null && t.getEtiqueta().getNombreEtiqueta().equals(etiqueta.getNombreEtiqueta())) {
+                t.setEtiqueta(etiquetaNeutra);
+            }
+        }
         listaEtiquetas.remove(etiqueta);
-        gestionEnFicheros.guardarEtiquetas(listaEtiquetas);
+        conexionBD.getConexionBD().borrarEtiqueta(etiqueta.getNombreEtiqueta());
+        //gestionEnFicheros.guardarEtiquetas(listaEtiquetas);
     }
     public void nuevaEtiqueta(String color,String nombre){
         Etiqueta etiqueta=new Etiqueta(color,nombre);
         listaEtiquetas.add(etiqueta);
-        gestionEnFicheros.guardarEtiquetas(listaEtiquetas);
+        conexionBD.getConexionBD().guardarEtiqueta(etiqueta);
+
+        //gestionEnFicheros.guardarEtiquetas(listaEtiquetas);
     }
 
     public List<Etiqueta> getListaEtiquetas(){return listaEtiquetas;}

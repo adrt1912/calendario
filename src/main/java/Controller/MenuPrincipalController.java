@@ -16,8 +16,11 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.TextStyle;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import static javafx.scene.paint.Color.web;
@@ -50,20 +53,35 @@ public class MenuPrincipalController {
     private ComboBox comboFiltroEtiquetas;
 
     //Para escribir el titulo
-   private final String[] semana= {"Lunes","Martes","Miercoles","Jueves","Viernes","Sábado","Domingo"};
-   // private String[] mes={"Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"};
+   private String[] semana;
+
+   private String[] rellenarSemanaSegunIdioma(){
+        String[] semanas = new String[7];
+       Locale idioma=Locale.of(gestorTareas.getIdioma().getCodigo());
+       int i=0;
+       for(DayOfWeek dayOfWeek : DayOfWeek.values()){
+           semanas[i]= dayOfWeek.getDisplayName(TextStyle.FULL,idioma);
+           i++;
+       }
+       return semanas;
+   }
+
+
    @FXML
    public void initialize() {
        gestorTareas.iniciarGestor();
+
        comboFiltroEtiquetas.setItems(FXCollections.observableArrayList(gestorTareas.getListaEtiquetas()));
        iniciarMatrizVBox();
+       semana=rellenarSemanaSegunIdioma();
+
        mostrarCalendario();
        TareasPendientesHoy.setText(gestorTareas.mostrarTareasUrgentesHoy());
        TareasPendientesMañana.setText(gestorTareas.mostrarTareasUrgentesMañana());
        comboFiltroEtiquetas.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
            mostrarCalendario();
        });
-       
+
    }
 
     private void iniciarMatrizVBox(){
@@ -119,7 +137,9 @@ public class MenuPrincipalController {
         // Para ver qué día empieza el mes
         int fechaPrimerDiaMes = LocalDate.of(fechaSeleccionada.getYear(), fechaSeleccionada.getMonthValue(), 1).getDayOfWeek().getValue();
 
-        cartelMes.setText(" " + fechaSeleccionada.getMonth().name());
+        if(GestorTareas.getGestorTareas().getIdioma()!=null) cartelMes.setText(" " + fechaSeleccionada.getMonth().getDisplayName(TextStyle.FULL, new Locale(GestorTareas.getGestorTareas().getIdioma().getCodigo(), "ES")));
+        else cartelMes.setText(" "+fechaSeleccionada.getMonth().getDisplayName(TextStyle.FULL,new Locale("es","ES")));
+
         cartelAño.setText("" + fechaSeleccionada.getYear());
 
         int numMes = 1;
@@ -256,7 +276,7 @@ public class MenuPrincipalController {
 
     private void mostrarEtiquetasClasificaciones(){
         vBoxEtiquetas.getChildren().clear();
-        List<Etiqueta> listaEtiquetas=gestorTareas.getListaEtiquetas();
+        List<Etiqueta> listaEtiquetas=gestorTareas.getListaEtiquetas().stream().filter(etiqueta -> etiqueta.getNombreEtiqueta() != null).filter(etiqueta -> !etiqueta.getNombreEtiqueta().trim().equalsIgnoreCase(gestorTareas.getEtiquetaNeutra().getNombreEtiqueta().trim())).toList();
         int i=0;
         for(Etiqueta etiqueta : listaEtiquetas){
             if(etiqueta.getNombreEtiqueta()!="Sin Etiqueta"){
