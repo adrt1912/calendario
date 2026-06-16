@@ -12,4 +12,13 @@ public enum Idiomas {
     public String getCodigo() {
         return codigo;
     }
+
+    public static Idiomas desdeCodigo(String codigoBuscado) {
+        for (Idiomas idioma : Idiomas.values()) {
+            if (idioma.getCodigo().equalsIgnoreCase(codigoBuscado)) {
+                return idioma;
+            }
+        }
+        return ESPAÑOL;
+    }
 }

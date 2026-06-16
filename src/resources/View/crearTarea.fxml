@@ -49,7 +49,7 @@
                   <Label text="%crearNuevaTarea.textoFecha" GridPane.rowIndex="1">
                      <font><Font size="14.0" /></font>
                   </Label>
-                  <Label text="%crearNuevaTarea.textoHora" GridPane.rowIndex="1">
+                  <Label text="%crearNuevaTarea.textoHora" GridPane.rowIndex="2">
                   <font><Font size="14.0" /></font>
                   </Label>
                   <Label text="%crearNuevaTarea.textoSitio" GridPane.rowIndex="3">

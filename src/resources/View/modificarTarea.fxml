@@ -103,7 +103,7 @@
          <bottom>
             <HBox alignment="CENTER_LEFT" prefHeight="79.0" prefWidth="555.0" BorderPane.alignment="CENTER">
                <children>
-                  <Button fx:id="botonEliminar" mnemonicParsing="false" onAction="#eliminarTarea" prefHeight="35.0" style="-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;" text="%modificarTarea.textoEliminar">
+                  <Button fx:id="botonEliminar" mnemonicParsing="false" onAction="#eliminarTarea" prefHeight="35.0" prefWidth="150.0" style="-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;" text="%modificarTarea.textoEliminar">
                      <font><Font size="14.0" /></font>
                   </Button>
                   <Text fx:id="textoError" fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="201.13000106811523">

@@ -64,7 +64,6 @@ public class GestionEnFicheros {
                 }
                 String descripcion = lectorFichero.nextLine();
 
-
                 String sitio = lectorFichero.nextLine();
 
                 String horaTexto = lectorFichero.nextLine();
