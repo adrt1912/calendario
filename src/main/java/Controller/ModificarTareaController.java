@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Optional;
 
 //Menu para modificar tareas
 public class ModificarTareaController {
@@ -91,7 +92,14 @@ private void eliminarTarea(){//En caso de qeu sea periodica sale una pantalla em
         } catch (Exception e) {
             throw new RuntimeException(e) ;
         }
-    }else GestorTareas.getGestorTareas().eliminarTarea(tareaMos);
+    }else {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmar eliminación");
+        alert.setHeaderText("¿Estás seguro de borrar la Tarea: " + tareaMos.getNombreTarea() + "?");
+        alert.setContentText("Esta acción eliminará la tarea de forma definitiva");
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) GestorTareas.getGestorTareas().eliminarTarea(tareaMos);
+    }
     cerrarTodo();
 }
 
