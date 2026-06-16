@@ -5,10 +5,7 @@ import View.view;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -32,9 +29,14 @@ public class MenuPrincipalController {
     //Guardamos la fecha que se muestra por pantalla
     LocalDate fechaSeleccionada=LocalDate.now();
     @FXML
-    private GridPane calendario;
+    private GridPane calendarioMensual;
 
-    private VBox[][] calendarioVBox=new VBox[7][7];
+    @FXML
+    private GridPane calendarioSemanal;
+
+    private VBox[][] calendarioVBoxMensual =new VBox[7][7];
+
+    private VBox[][] calendarioVBoxSemanal =new VBox[7][2];
 
     @FXML
     private ScrollPane mostradorTareas;
@@ -47,7 +49,6 @@ public class MenuPrincipalController {
 
     @FXML
     private Text textFecha;
-
 
     @FXML
     private ComboBox comboFiltroEtiquetas;
@@ -65,14 +66,25 @@ public class MenuPrincipalController {
        }
        return semanas;
    }
+   private String modo="M";
 
+   @FXML
+   private ChoiceBox seleccionModo;
 
    @FXML
    public void initialize() {
+       seleccionModo.getItems().addAll("Mensual", "Semanal");
+       seleccionModo.setValue("Mensual");
+       seleccionModo.getSelectionModel().selectedItemProperty().addListener((observable, valorAntiguo, valorNuevo) -> {
+           if(valorNuevo.equals("Mensual")) modo="M";
+           else if(valorNuevo.equals("Semanal"))modo="S";
+       });
        gestorTareas.iniciarGestor();
 
        comboFiltroEtiquetas.setItems(FXCollections.observableArrayList(gestorTareas.getListaEtiquetas()));
-       iniciarMatrizVBox();
+       iniciarMatrizVBoxMensual();
+       iniciarMatrizVBoxSemanal();
+
        semana=rellenarSemanaSegunIdioma();
 
        mostrarCalendario();
@@ -81,14 +93,20 @@ public class MenuPrincipalController {
        comboFiltroEtiquetas.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
            mostrarCalendario();
        });
-
+   }
+   private void iniciarMatrizVBoxSemanal(){
+       for(int i=0;i<2;i++){
+           for(int j=0;j<7;j++){
+               calendarioVBoxSemanal[j][i]=new VBox();
+           }
+       }
    }
 
-    private void iniciarMatrizVBox(){
+    private void iniciarMatrizVBoxMensual(){
        //Simplemente crea un VBox en cada hueco del calendario, para poder añadir ahi todos los nombres de las tareas
         for(int i=0;i<7;i++){
             for (int j=0;j<7;j++){
-                calendarioVBox[j][i]=new VBox();
+                calendarioVBoxMensual[j][i]=new VBox();
             }
         }
     }
@@ -116,71 +134,103 @@ public class MenuPrincipalController {
                    view.showTareaVentana(tarea);
                    mostrarCalendario();
                    mostrarTareas();
-               } catch (Exception ignored) {
-                   throw new RuntimeException(ignored);
-
-               }
+               } catch (Exception ignored) {}
            });
         }
         mostradorTareas.setContent(vBox);
     }
+
     public void mostrarCalendario(){
 
         // Para borrar lo que hay escrito en el calendario
-        calendario.getChildren().clear();
-        iniciarMatrizVBox();
+        calendarioMensual.getChildren().clear();
+        calendarioSemanal.getChildren().clear();
+        iniciarMatrizVBoxMensual();
         TareasPendientesHoy.setText(gestorTareas.mostrarTareasUrgentesHoy());
         TareasPendientesMañana.setText(gestorTareas.mostrarTareasUrgentesMañana());
-
-        // Se obtiene la cantidad de días del mes
-        int numDiasMes = fechaSeleccionada.lengthOfMonth();
-        // Para ver qué día empieza el mes
-        int fechaPrimerDiaMes = LocalDate.of(fechaSeleccionada.getYear(), fechaSeleccionada.getMonthValue(), 1).getDayOfWeek().getValue();
 
         if(GestorTareas.getGestorTareas().getIdioma()!=null) cartelMes.setText(" " + fechaSeleccionada.getMonth().getDisplayName(TextStyle.FULL, new Locale(GestorTareas.getGestorTareas().getIdioma().getCodigo(), "ES")));
         else cartelMes.setText(" "+fechaSeleccionada.getMonth().getDisplayName(TextStyle.FULL,new Locale("es","ES")));
 
         cartelAño.setText("" + fechaSeleccionada.getYear());
 
-        int numMes = 1;
-        for(int i=0; i<calendario.getRowCount(); i++){
-            for (int j=0; j< calendario.getColumnCount(); j++){
-                VBox casillaActual = calendarioVBox[j][i];
-                calendario.add(casillaActual, j, i);
+        if(modo.equals("M")) mostrarCalendarioMensual();
+        else if (modo.equals("S")) mostrarCalendarioSemanal();
 
-                if(i == 0){
-                    // Fila de cabecera (Lunes, Martes...) -> No hace nada al hacer clic
-                    casillaActual.getChildren().add(new Label(semana[j]));
+        mostrarEtiquetasClasificaciones();
+    }
+    public void mostrarCalendarioSemanal(){
+        calendarioMensual.setVisible(false);
+        calendarioSemanal.getChildren().clear();
+        calendarioSemanal.setVisible(true);
+
+        int diaDeLaSemana = fechaSeleccionada.getDayOfWeek().getValue();
+        LocalDate lunesDeEstaSemana = fechaSeleccionada.minusDays(diaDeLaSemana - 1);
+
+        for(int i=0;i<calendarioSemanal.getRowCount();i++){
+            for (int j=0;j<calendarioSemanal.getColumnCount();j++){
+
+                VBox casillaActual=calendarioVBoxSemanal[j][i];
+                calendarioSemanal.add(casillaActual,j,i);
+                casillaActual.getChildren().clear();
+                if(i==0) casillaActual.getChildren().add(new Label(semana[j]));
+                else{
+                    LocalDate diaQueTocaDibujar = lunesDeEstaSemana.plusDays(j);
+                    casillaActual.getChildren().add(new Label(diaQueTocaDibujar.getDayOfMonth() + ""));
+                    int diaClicado = diaQueTocaDibujar.getDayOfMonth();
+                    casillaActual.setOnMouseClicked(event -> {
+                        tratarEventoClick(event,diaClicado);
+                    });
                 }
+            }
+        }
+        mostrarEtiquetasSemanales();
+    }
+
+    public void mostrarCalendarioMensual(){
+        if(calendarioSemanal!=null) calendarioSemanal.setVisible(false);
+        calendarioMensual.setVisible(true);
+        // Se obtiene la cantidad de días del mes
+        int numDiasMes = fechaSeleccionada.lengthOfMonth();
+        // Para ver qué día empieza el mes
+        int fechaPrimerDiaMes = LocalDate.of(fechaSeleccionada.getYear(), fechaSeleccionada.getMonthValue(), 1).getDayOfWeek().getValue();
+
+        LocalDate fechaHoy=LocalDate.now();
+        int numMes = 1;
+        for(int i=0; i<calendarioMensual.getRowCount(); i++){
+            for (int j=0; j< calendarioMensual.getColumnCount(); j++){
+                VBox casillaActual = calendarioVBoxMensual[j][i];
+                calendarioMensual.add(casillaActual, j, i);
+                if(i == 0)  casillaActual.getChildren().add(new Label(semana[j]));
                 else{
                     if(i == 1){
                         if(j >= fechaPrimerDiaMes - 1){
-                            casillaActual.getChildren().add(new Label(numMes + ""));
+                            Label label=new Label(numMes+"");
+                            casillaActual.getChildren().add(label);
 
-                            // ¡AQUÍ ESTÁ EL TRUCO SEGURO!: Guardamos el día real en una variable final
                             int diaClicado = numMes;
                             casillaActual.setOnMouseClicked(event -> {
                                 tratarEventoClick(event,diaClicado);
                             });
-
+                            if(numMes==fechaHoy.getDayOfMonth()&&fechaSeleccionada.getMonth()==fechaHoy.getMonth() && fechaSeleccionada.getYear()==fechaHoy.getYear()) label.setStyle("-fx-border-color: red; -fx-border-width: 2px; -fx-border-radius: 50em;");
                             numMes++;
                         }
                     }else{
                         if(numMes <= numDiasMes){
-                            casillaActual.getChildren().add(new Label(numMes + ""));
-
+                            Label label=new Label(numMes+"");
+                            casillaActual.getChildren().add(label);
                             int diaClicado = numMes;
                             casillaActual.setOnMouseClicked(event -> {
                                tratarEventoClick(event,diaClicado);
                             });
+                            if(numMes==fechaHoy.getDayOfMonth()&&fechaSeleccionada.getMonth()==fechaHoy.getMonth() && fechaSeleccionada.getYear()==fechaHoy.getYear())  label.setStyle("-fx-border-color: red; -fx-border-width: 2px; -fx-border-radius: 50em;");
                             numMes++;
                         }
                     }
                 }
             }
         }
-        mostrarEtiquetas();
-        mostrarEtiquetasClasificaciones();
+        mostrarEtiquetasMensuales();
     }
 
     private void tratarEventoClick(MouseEvent event,int diaClicado){
@@ -193,29 +243,35 @@ public class MenuPrincipalController {
         }
 
     }
-
-    private void mostrarEtiquetas(){
+    private void mostrarEtiquetasSemanales(){
         List<Tarea> listaTareas=gestorTareas.getTodasTareas();
         Etiqueta etiqueta=(Etiqueta) comboFiltroEtiquetas.getValue();
         if(etiqueta!=null) {
             listaTareas=listaTareas.stream().filter(tarea -> tarea.getEtiqueta() != null &&tarea.getEtiqueta().equals(etiqueta)).toList();
         }
-        int primerDiaMes=LocalDate.of(fechaSeleccionada.getYear(),fechaSeleccionada.getMonthValue(), 1).getDayOfWeek().getValue();
-        for (Tarea tarea : listaTareas) {
-            LocalDate fecha = tarea.getFechaFin();
-            if (fecha.getMonth().equals(fechaSeleccionada.getMonth())&&fecha.getYear()==fechaSeleccionada.getYear()) {
-                String titulo=tarea.getNombreTarea();
-                int pos=(fecha.getDayOfMonth()-2)+primerDiaMes;
-                int columna=pos%7;
-                int fila=(pos/7)+1;
-                Label label=new Label((titulo));
+        int [] maxEtiquetasCalendario=new int[8];
+        int diaDeLaSemana = fechaSeleccionada.getDayOfWeek().getValue();
+        LocalDate lunesDeEstaSemana = fechaSeleccionada.minusDays(diaDeLaSemana - 1);
 
-                if(tarea.getEstadoTarea()!= EstadoTarea.EN_PROCESO){
-                    label.setOpacity(0.2);
-                }else{
-                    label.setOpacity(1);}
-
-                    if(!Objects.equals(tarea.getEtiqueta().getNombreEtiqueta(), "Sin Etiqueta")) {
+        for(Tarea tarea:listaTareas){
+            //Obtenemos la tareas y sus posiciones de donde va
+            String titulo = tarea.getNombreTarea();
+            LocalDate fecha=tarea.getFechaFin();
+            int columna = fecha.getDayOfWeek().getValue() - 1;
+            //En caso de que ese dia tenga menos de dos etiquetas se pone una mas
+            if (maxEtiquetasCalendario[fecha.getDayOfWeek().getValue()] <= 9) {
+                //se comprueba que esta en el mismo mes y año que aparece en pantalla
+                LocalDate domingoDeEstaSemana = lunesDeEstaSemana.plusDays(6);
+                if (!fecha.isBefore(lunesDeEstaSemana) && !fecha.isAfter(domingoDeEstaSemana)) {
+                    Label label = new Label((titulo));
+                    //Dependiendo del estado se ve mas o menos la etiqueta
+                    if (tarea.getEstadoTarea() != EstadoTarea.EN_PROCESO) {
+                        label.setOpacity(0.2);
+                    } else {
+                        label.setOpacity(1);
+                    }
+                    //Se ven distintos wi tiene etiqueta o no
+                    if (!Objects.equals(tarea.getEtiqueta().getNombreEtiqueta(), "Sin Etiqueta")) {
                         String colorHex = tarea.getEtiqueta().getCodColor();
 
                         label.setStyle(
@@ -226,30 +282,100 @@ public class MenuPrincipalController {
                                         "-fx-background-radius: 5px;" +                        // Esquinas del fondo idénticas para que encajen
                                         "-fx-text-fill: white;" +                             // Texto blanco para que contraste con el fondo relleno
                                         "-fx-font-weight: bold;"                         // Texto en negrita para que se lea mejor
-                                           );
-                    }else{
+                        );
+                    } else {
                         label.setStyle(
                                 "-fx-background-color: #f4f4f4;" +
                                         "-fx-border-color: #444444;" +
                                         "-fx-border-width: 1.5px;" +
                                         "-fx-border-radius: 5px;" +
                                         "-fx-background-radius: 5px;" +
-                                        "-fx-text-fill: #333333;" );
+                                        "-fx-text-fill: #333333;");
                     }
-                calendarioVBox[columna][fila].getChildren().add(label);
+                    //Se pone en el calendario
+                    calendarioVBoxSemanal[columna][1].getChildren().add(label);
+                }
+                //Se mira si llega a las tres etiquetas, si es asi se ponen tres puntos indicando qeu hay mas
+            }else if (maxEtiquetasCalendario[fecha.getDayOfWeek().getValue()]==2&&fecha.getMonth().equals(fechaSeleccionada.getMonth()) && fecha.getYear() == fechaSeleccionada.getYear()) calendarioVBoxMensual[columna][1].getChildren().add(new Label("..."));
+            maxEtiquetasCalendario[fecha.getDayOfWeek().getValue()]++;
+        }
+    }
+
+    private void mostrarEtiquetasMensuales(){
+       //Obtenemos todas las tareas
+        List<Tarea> listaTareas=gestorTareas.getTodasTareas();
+        Etiqueta etiqueta=(Etiqueta) comboFiltroEtiquetas.getValue();
+        if(etiqueta!=null) {
+            listaTareas=listaTareas.stream().filter(tarea -> tarea.getEtiqueta() != null &&tarea.getEtiqueta().equals(etiqueta)).toList();
+        }
+        //Obtenemos el primer di del mes
+        int primerDiaMes=LocalDate.of(fechaSeleccionada.getYear(),fechaSeleccionada.getMonthValue(), 1).getDayOfWeek().getValue();
+        //Es para evitar que cada dia supere la cantidad maxima de etiquetas
+        int [] maxEtiquetasCalendario=new int[32];
+
+        //Un bucle que va poniendo todas las tareas
+        for(Tarea tarea:listaTareas){
+            //Obtenemos la tareas y sus posiciones de donde va
+            String titulo = tarea.getNombreTarea();
+            LocalDate fecha=tarea.getFechaFin();
+            int pos = (fecha.getDayOfMonth() - 2) + primerDiaMes;
+            int columna = pos % 7;
+            int fila = (pos / 7) + 1;
+            //En caso de que ese dia tenga menos de dos etiquetas se pone una mas
+            if (maxEtiquetasCalendario[fecha.getDayOfMonth()] <= 1) {
+                //se comprueba que esta en el mismo mes y año que aparece en pantalla
+                if (fecha.getMonth().equals(fechaSeleccionada.getMonth()) && fecha.getYear() == fechaSeleccionada.getYear()) {
+                    Label label = new Label((titulo));
+                    //Dependiendo del estado se ve mas o menos la etiqueta
+                    if (tarea.getEstadoTarea() != EstadoTarea.EN_PROCESO) {
+                        label.setOpacity(0.2);
+                    } else {
+                        label.setOpacity(1);
+                    }
+                    //Se ven distintos wi tiene etiqueta o no
+                    if (!Objects.equals(tarea.getEtiqueta().getNombreEtiqueta(), "Sin Etiqueta")) {
+                        String colorHex = tarea.getEtiqueta().getCodColor();
+
+                        label.setStyle(
+                                "-fx-background-color: " + colorHex + ";" +
+                                        "-fx-border-color: derive(" + colorHex + ", -60%);" +
+                                        "-fx-border-width: 2px;" +
+                                        "-fx-border-radius: 5px;" +                           // Esquinas del borde redondeadas
+                                        "-fx-background-radius: 5px;" +                        // Esquinas del fondo idénticas para que encajen
+                                        "-fx-text-fill: white;" +                             // Texto blanco para que contraste con el fondo relleno
+                                        "-fx-font-weight: bold;"                         // Texto en negrita para que se lea mejor
+                        );
+                    } else {
+                        label.setStyle(
+                                "-fx-background-color: #f4f4f4;" +
+                                        "-fx-border-color: #444444;" +
+                                        "-fx-border-width: 1.5px;" +
+                                        "-fx-border-radius: 5px;" +
+                                        "-fx-background-radius: 5px;" +
+                                        "-fx-text-fill: #333333;");
+                    }
+                    //Se pone en el calendario
+                    calendarioVBoxMensual[columna][fila].getChildren().add(label);
+                }
+                //Se mira si llega a las tres etiquetas, si es asi se ponen tres puntos indicando qeu hay mas
+            }else if (maxEtiquetasCalendario[fecha.getDayOfMonth()]==2&&fecha.getMonth().equals(fechaSeleccionada.getMonth()) && fecha.getYear() == fechaSeleccionada.getYear()) {
+                calendarioVBoxMensual[columna][fila].getChildren().add(new Label("..."));
             }
+            maxEtiquetasCalendario[fecha.getDayOfMonth()]++;
         }
     }
 
     @FXML
     private void retrocederMes(){
-        fechaSeleccionada=fechaSeleccionada.minusMonths(1);
+        if(modo=="M") fechaSeleccionada=fechaSeleccionada.minusMonths(1);
+        else if (modo=="S") fechaSeleccionada=fechaSeleccionada.minusWeeks(1);
         mostrarCalendario();
     }
 
     @FXML
     private void pasarMes(){
-        fechaSeleccionada=fechaSeleccionada.plusMonths(1);
+       if(modo=="M") fechaSeleccionada=fechaSeleccionada.plusMonths(1);
+       else if (modo=="S") fechaSeleccionada=fechaSeleccionada.plusWeeks(1);
         mostrarCalendario();
     }
 
@@ -329,6 +455,5 @@ public class MenuPrincipalController {
             throw new RuntimeException(e);
         }
     }
-
 
 }
