@@ -14,16 +14,18 @@ import java.util.prefs.Preferences;
 public class ConfiguracionController {
 
     @FXML
-    private ComboBox boxIdioma;
+    private ComboBox<Idiomas> boxIdioma;
 
     @FXML
-    private ComboBox boxFormatoHora;
+    private ComboBox<String> boxFormatoHora;
 
+    //Llama al metodo para crear un CSV
     @FXML
     private void exportarACSV(){
         GestionEnFicheros.getGestionEnFicheros().exportarACSV();
     }
 
+    //Rellena los huecos y los comboBox
     public void initialize(){
         boxIdioma.setItems(FXCollections.observableArrayList(Idiomas.values()));
         Idiomas idiomas=GestorTareas.getGestorTareas().getIdioma();
@@ -39,21 +41,24 @@ public class ConfiguracionController {
 
     }
 
+    //Llama al gestorTareas para eliminar  el contenido
     @FXML
     private void borrarTodo(){
         GestorTareas.getGestorTareas().borrarContenido();
     }
+
     @FXML
     private Button botonCancelar;
+    //Cierra la ventana como si nada hubiera pasado
     @FXML
     private void cancelar(){
         Stage ventanaActual = (Stage) botonCancelar.getScene().getWindow();
         ventanaActual.close();
     }
 
+    //Guarda la configuracion
     @FXML
     private void guardarYCerrar(){
-
         //Para guardar la configuracion en el ordenador, idea de internet
         Preferences prefs = Preferences.userNodeForPackage(View.view.class);
         Idiomas idiomaSeleccionado = (Idiomas) boxIdioma.getValue();
@@ -71,6 +76,5 @@ public class ConfiguracionController {
         } catch (Exception e) {
             System.out.println("Error al recargar el menú principal: " + e.getMessage());
         }
-        GestorTareas.getGestorTareas().setIdioma((Idiomas) boxIdioma.getValue());
     }
 }

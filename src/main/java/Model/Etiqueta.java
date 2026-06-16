@@ -2,10 +2,8 @@ package Model;
 
 public class Etiqueta {
 
-
     private String codColor;
     private String nombreEtiqueta;
-
 
     public Etiqueta(String nombreEtiqueta,String codColor){
         this.codColor=codColor;

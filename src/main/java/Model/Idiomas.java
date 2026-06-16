@@ -13,6 +13,7 @@ public enum Idiomas {
         return codigo;
     }
 
+    //Trasnforma el codigo "es" al idioma correspondiente
     public static Idiomas desdeCodigo(String codigoBuscado) {
         for (Idiomas idioma : Idiomas.values()) {
             if (idioma.getCodigo().equalsIgnoreCase(codigoBuscado)) {

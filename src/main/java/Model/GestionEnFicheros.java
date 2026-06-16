@@ -17,7 +17,7 @@ public class GestionEnFicheros {
         return gestionEnFicheros;
     }
 
-    public void leerFichero(String nombreFichero){
+    public void leerFicheroTareas(String nombreFichero){
 
         /*Los ficheros tienen la siguiente estructura
         1.Titulo
@@ -87,10 +87,12 @@ public class GestionEnFicheros {
     }
     }
 
-    public void guardarEnFichero(List<Tarea> listaTareas){
-
+    public void guardarCopiaSeguridadTareas(List<Tarea> listaTareas){
+        File carpeta = new File("backups");
+        if (!carpeta.exists()) carpeta.mkdir();
+        String nombreArchivo = "backups/tareas_backup_" + LocalDate.now() + ".txt";
         try (
-            FileWriter printWriter=new FileWriter("tareas.txt");
+            FileWriter printWriter=new FileWriter(nombreArchivo);
             PrintWriter pw=new PrintWriter(printWriter){})
         {
             for (Tarea tarea : listaTareas){
@@ -98,7 +100,7 @@ public class GestionEnFicheros {
             }
 
         } catch (Exception e) {
-            System.out.println("ALgo fallo");
+            System.out.println("Error en la copida de seguridad");
         }
     }
 
@@ -107,9 +109,12 @@ public class GestionEnFicheros {
        archivo.delete();
     }
 
-    public void guardarEtiquetas(List<Etiqueta> listaEtiquetas){
-        try (
-                FileWriter printWriter=new FileWriter("etiquetas.txt");
+    public void guardarEtiquetasCopiaSeguridadEtiquetas(List<Etiqueta> listaEtiquetas){
+        File carpeta = new File("backups");
+        if (!carpeta.exists()) carpeta.mkdir();
+
+        String nombreArchivo = "backups/etiquetas_backup_" + LocalDate.now() + ".txt";
+        try (FileWriter printWriter=new FileWriter(nombreArchivo);
                 PrintWriter pw=new PrintWriter(printWriter){}){
             for(Etiqueta etiqueta : listaEtiquetas){
                 if ("Sin Etiqueta".equalsIgnoreCase(etiqueta.getNombreEtiqueta()) || "transparent".equalsIgnoreCase(etiqueta.getCodColor())) {
@@ -121,6 +126,7 @@ public class GestionEnFicheros {
 
         }
     }
+
     public void leerEtiquetas(){
         try (
                 Scanner lectorFichero=new Scanner(new File("etiquetas.txt"))){
@@ -150,11 +156,8 @@ public class GestionEnFicheros {
 
                 pw.println(titulo + ";" + desc + ";" + estado + ";" + fecha + ";" + hora + ";" + etiqueta);
             }
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-
     }
 }

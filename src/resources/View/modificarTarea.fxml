@@ -103,18 +103,18 @@
          <bottom>
             <HBox alignment="CENTER_LEFT" prefHeight="79.0" prefWidth="555.0" BorderPane.alignment="CENTER">
                <children>
-                  <Button fx:id="botonEliminar" mnemonicParsing="false" onAction="#eliminarTarea" prefHeight="35.0" prefWidth="150.0" style="-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;" text="%modificarTarea.textoEliminar">
+                  <Button fx:id="botonEliminar" mnemonicParsing="false" onAction="#eliminarTarea" prefHeight="35.0" prefWidth="92.0" style="-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;" text="%modificarTarea.textoEliminar">
                      <font><Font size="14.0" /></font>
                   </Button>
-                  <Text fx:id="textoError" fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="201.13000106811523">
+                  <Text fx:id="textoError" fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="180.13000106811523">
                      <HBox.margin>
                         <Insets left="15.0" />
                      </HBox.margin>
                   </Text>
 
-                  <HBox alignment="CENTER" spacing="15.0">
+                  <HBox alignment="CENTER" prefHeight="79.0" prefWidth="464.0" spacing="15.0">
                      <children>
-                        <Button fx:id="botonCancelar" mnemonicParsing="false" onAction="#cerrarTodo" prefHeight="35.0" text="%modificarTarea.textoCancelar">
+                        <Button fx:id="botonCancelar" mnemonicParsing="false" onAction="#cerrarTodo" prefHeight="35.0" prefWidth="213.0" text="%modificarTarea.textoCancelar">
                            <font><Font size="14.0" /></font>
                         </Button>
                         <Button fx:id="botonGuardar" mnemonicParsing="false" onAction="#modificarTarea" prefHeight="35.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;" text="%modificarTarea.textoGuardar">

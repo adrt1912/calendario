@@ -19,6 +19,7 @@ public class crearEtiquetaController {
     @FXML
     private Button botonCancelar;
 
+    //Solo cierra la ventana
     @FXML
     private void cancelarEtiqueta(){
         Stage ventanaActual = (Stage) botonCancelar.getScene().getWindow();
@@ -27,16 +28,18 @@ public class crearEtiquetaController {
 
     @FXML
     private Text textoError;
+    //Crea la etiqueta
     @FXML
     private void crearEtiqueta(){
         String nombreEtiqueta=cuadroNombre.getText();
         String colorEtiqueta="#"+this.colorEtiqueta.getValue().toString().substring(2,8);
-
-        if (nombreEtiqueta != null && !nombreEtiqueta.isBlank()) {
-            GestorTareas.getGestorTareas().nuevaEtiqueta(nombreEtiqueta, colorEtiqueta);
-            cancelarEtiqueta();
-        }else {
-            textoError.setText("Error al crear etiqueta, hay campos sin rellenar");
-        }
+        //El nombre de la etiqueta no puede ser null ni estar en blanco
+        if (nombreEtiqueta == null || nombreEtiqueta.isBlank()) textoError.setText("Error al crear etiqueta, hay campos sin rellenar");
+            //El nombre de la etiqueta no puede ser "Sin Etiqueta" es el que se usa como neutra
+        else if (nombreEtiqueta.trim().equalsIgnoreCase("Sin Etiqueta")) textoError.setText("Error: Ese nombre está reservado por el sistema.");
+        else if( GestorTareas.getGestorTareas().getListaEtiquetas().stream() .anyMatch(e -> e.getNombreEtiqueta() != null && e.getNombreEtiqueta().equalsIgnoreCase(nombreEtiqueta))) textoError.setText("Error: Ya existe una etiqueta con este nombre.");
+        else{
+            GestorTareas.getGestorTareas().nuevaEtiqueta( nombreEtiqueta,colorEtiqueta);
+            cancelarEtiqueta();}
     }
 }
