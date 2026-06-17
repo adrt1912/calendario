@@ -5,10 +5,8 @@ import Model.GestorTareas;
 import Model.Idiomas;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.*;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -43,6 +41,16 @@ public class ConfiguracionController {
         String formatoGuardado = prefs.get("formato_hora", "24h");
         if (formatoGuardado != null) boxFormatoHora.getSelectionModel().select(formatoGuardado); // Selecciona el que toca (12h o 24h)
         else boxFormatoHora.getSelectionModel().select("24h");
+         prefs = Preferences.userNodeForPackage(this.getClass());
+        boolean isDark = prefs.getBoolean("modo_oscuro", false);
+
+        checkModoOscuro.setSelected(isDark);
+
+        // Si estaba guardado como oscuro, pintamos el rootPane
+        if (isDark) {
+            // Como a veces el rootPane tarda unos milisegundos en cargar su CSS, es buena práctica hacer esto:
+            rootPane.getStyleClass().add("dark-mode");
+        }
 
     }
 
@@ -102,8 +110,38 @@ public class ConfiguracionController {
             if (ultimasEtiquetas != null) {
                 gf.leerEtiquetas(ultimasEtiquetas);
             }
-
             View.view.showInitialView();
+        }
+    }
+    @FXML
+    private Pane rootPane;
+
+    @FXML
+    private CheckBox checkModoOscuro;
+    @FXML
+    private void cambiarModoVisual(){
+
+
+            boolean activado = checkModoOscuro.isSelected();
+
+            // 1. Guardamos la decisión en Preferences para el futuro
+            Preferences prefs = Preferences.userNodeForPackage(this.getClass());
+            prefs.putBoolean("modo_oscuro", activado);
+
+            // 2. ACTUALIZACIÓN GLOBAL: Recorremos TODAS las ventanas abiertas en tiempo real
+            for (javafx.stage.Window ventanaAbierta : javafx.stage.Window.getWindows()) {
+                if (ventanaAbierta.getScene() != null && ventanaAbierta.getScene().getRoot() != null) {
+
+                    // Aplicamos o quitamos la clase "dark-mode" a la raíz de cada ventana
+                    if (activado) {
+                        if (!ventanaAbierta.getScene().getRoot().getStyleClass().contains("dark-mode")) {
+                            ventanaAbierta.getScene().getRoot().getStyleClass().add("dark-mode");
+                        }
+                    } else {
+                        ventanaAbierta.getScene().getRoot().getStyleClass().remove("dark-mode");
+                    }
+                }
+
         }
     }
 }

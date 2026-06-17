@@ -3,6 +3,7 @@ package Controller;
 import Model.GestorTareas;
 import Model.Tarea;
 import javafx.fxml.FXML;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.scene.control.Button;
 
@@ -13,6 +14,16 @@ public class MenuConfirmacionBorrarController {
     private Tarea tarea;
     @FXML
     private Button botonCancelar;
+
+    @FXML
+    private AnchorPane rootPane;
+
+    public void initialize(){
+        java.util.prefs.Preferences prefs = java.util.prefs.Preferences.userNodeForPackage(ConfiguracionController.class);
+        if (prefs.getBoolean("modo_oscuro", false) && rootPane != null) {
+            rootPane.getStyleClass().add("dark-mode");
+        }
+    }
 
     //Solo cierra la ventana, como si nada hubiera pasado
     @FXML

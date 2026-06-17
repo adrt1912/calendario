@@ -6,6 +6,7 @@ import Model.Periodicidad;
 import Model.Tarea;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -20,6 +21,15 @@ public class CrearTareaController {
 
     @FXML
     private Text textoError;
+    @FXML
+    private AnchorPane rootPane;
+
+    public void initialize(){
+        java.util.prefs.Preferences prefs = java.util.prefs.Preferences.userNodeForPackage(ConfiguracionController.class);
+        if (prefs.getBoolean("modo_oscuro", false) && rootPane != null) {
+            rootPane.getStyleClass().add("dark-mode");
+        }
+    }
 
     public void initialize(LocalDate fechaf){
         //Se le pasa la fecha e inicia los objetos

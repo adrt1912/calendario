@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -24,6 +25,16 @@ public class crearEtiquetaController {
     private void cancelarEtiqueta(){
         Stage ventanaActual = (Stage) botonCancelar.getScene().getWindow();
         ventanaActual.close();
+    }
+
+    @FXML
+    private AnchorPane rootPane;
+
+    public void initialize(){
+        java.util.prefs.Preferences prefs = java.util.prefs.Preferences.userNodeForPackage(ConfiguracionController.class);
+        if (prefs.getBoolean("modo_oscuro", false) && rootPane != null) {
+            rootPane.getStyleClass().add("dark-mode");
+        }
     }
 
     @FXML

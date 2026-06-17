@@ -2,11 +2,13 @@ package Controller;
 
 import Model.*;
 import View.view;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
@@ -17,6 +19,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.*;
+import java.util.prefs.Preferences;
 
 import static javafx.scene.paint.Color.web;
 
@@ -55,6 +58,8 @@ public class MenuPrincipalController {
     //Para escribir el titulo
    private String[] semana;
 
+   @FXML
+   private AnchorPane rootPane;
    //Se encarga de guardar los nombres de la semana segun el idioma
    private String[] rellenarSemanaSegunIdioma(){
         String[] semanas = new String[7];
@@ -170,6 +175,17 @@ public class MenuPrincipalController {
 
     //Metodo que muestra el calendario
     public void mostrarCalendario(){
+        Preferences prefs = Preferences.userNodeForPackage(ConfiguracionController.class);
+        boolean isDark = prefs.getBoolean("modo_oscuro", false);
+
+        // --- CÓDIGO CORREGIDO PARA EVITAR DUPLICADOS ---
+        if (isDark) {
+            if (!rootPane.getStyleClass().contains("dark-mode")) {
+                rootPane.getStyleClass().add("dark-mode");
+            }
+        } else {
+            rootPane.getStyleClass().remove("dark-mode");
+        }
         // Para borrar lo que hay escrito en el calendario
         calendarioMensual.getChildren().clear();
         calendarioSemanal.getChildren().clear();

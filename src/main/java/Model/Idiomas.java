@@ -2,7 +2,8 @@ package Model;
 
 public enum Idiomas {
     ESPAÑOL("es"),
-    INGLES("en");
+    INGLES("en"),
+    FRANCES("fr");
 
     private Idiomas(String codigo){
         this.codigo=codigo;

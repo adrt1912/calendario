@@ -4,6 +4,7 @@ import Model.*;
 import View.view;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -38,6 +39,16 @@ private Label textoTituloTop;
 private ComboBox<Etiqueta> boxEtiquetas;
 @FXML
 private Text textoError;
+
+    @FXML
+    private AnchorPane rootPane;
+
+    public void initialize(){
+        java.util.prefs.Preferences prefs = java.util.prefs.Preferences.userNodeForPackage(ConfiguracionController.class);
+        if (prefs.getBoolean("modo_oscuro", false) && rootPane != null) {
+            rootPane.getStyleClass().add("dark-mode");
+        }
+    }
 
 //Una vez recibe la tarea establece los campos con los valores que tenemos
 public void setTareaMos(Tarea tareaMos) {
