@@ -76,6 +76,9 @@ public class ConfiguracionController {
         Preferences prefs = Preferences.userNodeForPackage(View.view.class);
         Idiomas idiomaSeleccionado = (Idiomas) boxIdioma.getValue();
         if (idiomaSeleccionado == Idiomas.INGLES) prefs.put("idioma_actual", "en");
+        else if(idiomaSeleccionado==Idiomas.FRANCES) prefs.put("idioma_actual","fr");
+        else if(idiomaSeleccionado==Idiomas.EUSKERA)prefs.put("idioma_actual","eu");
+        else if(idiomaSeleccionado==Idiomas.ALEMAN) prefs.put("idioma_actual","de");
         else prefs.put("idioma_actual", "es");
 
         if(boxFormatoHora.getValue().equals("24h")) prefs.put("formato_hora",boxFormatoHora.getValue().toString());
