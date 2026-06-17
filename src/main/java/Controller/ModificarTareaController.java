@@ -12,6 +12,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.ResourceBundle;
 
 //Menu para modificar tareas
 public class ModificarTareaController {
@@ -93,10 +94,11 @@ private void eliminarTarea(){//En caso de qeu sea periodica sale una pantalla em
             throw new RuntimeException(e) ;
         }
     }else {
+        ResourceBundle bundle = GestorTareas.getGestorTareas().obtenerDiccionario();
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmar eliminación");
-        alert.setHeaderText("¿Estás seguro de borrar la Tarea: " + tareaMos.getNombreTarea() + "?");
-        alert.setContentText("Esta acción eliminará la tarea de forma definitiva");
+        alert.setTitle(bundle.getString("modificarTarea.borrarTarea.confirmar.Titulo"));
+        alert.setHeaderText(bundle.getString("modificarTarea.borrarTarea.confirmar.text1") + tareaMos.getNombreTarea() + "?");
+        alert.setContentText(bundle.getString("modificarTarea.borrarTarea.confirmar.text2"));
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) GestorTareas.getGestorTareas().eliminarTarea(tareaMos);
     }

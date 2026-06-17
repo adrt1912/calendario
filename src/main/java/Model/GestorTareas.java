@@ -65,7 +65,7 @@ public class GestorTareas {
     }
 
     //obtiene el ResourceBundle del idioma guardado
-    private ResourceBundle obtenerDiccionario() {
+    public ResourceBundle obtenerDiccionario() {
         Preferences prefs = Preferences.userNodeForPackage(View.view.class);
         String codIdioma = prefs.get("idioma_actual", "es");
         Idiomas idiomaSeleccionado = Idiomas.desdeCodigo(codIdioma);

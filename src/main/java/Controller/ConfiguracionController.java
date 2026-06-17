@@ -5,10 +5,15 @@ import Model.GestorTareas;
 import Model.Idiomas;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
 public class ConfiguracionController {
@@ -75,6 +80,30 @@ public class ConfiguracionController {
             View.view.showInitialView();
         } catch (Exception e) {
             System.out.println("Error al recargar el menú principal: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void restaurarBackup() throws IOException {
+        GestionEnFicheros gf= GestionEnFicheros.getGestionEnFicheros();
+
+        File ultimoTareas = gf.obtenerUltimoBackup("tareas_backup_");
+        File ultimasEtiquetas = gf.obtenerUltimoBackup("etiquetas_backup_");
+
+        ResourceBundle bundle = GestorTareas.getGestorTareas().obtenerDiccionario();
+        Alert alert=new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(bundle.getString("configuracion.alert.titulo"));
+        alert.setContentText(bundle.getString("configuracion.alert.restaurar.mensaje"));
+        if (alert.showAndWait().get() == ButtonType.OK) {
+            // 3. Vaciar y cargar
+            GestorTareas.getGestorTareas().borrarContenido();
+            gf.leerFicheroTareas(ultimoTareas);
+
+            if (ultimasEtiquetas != null) {
+                gf.leerEtiquetas(ultimasEtiquetas);
+            }
+
+            View.view.showInitialView();
         }
     }
 }

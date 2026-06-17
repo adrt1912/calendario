@@ -16,10 +16,7 @@ import javafx.scene.text.Text;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static javafx.scene.paint.Color.web;
 
@@ -491,10 +488,10 @@ public class MenuPrincipalController {
     }
     //Se encarga de borrar la etiqeuta que se clica
     private void borrarEtiqueta(Etiqueta etiqueta){
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmar eliminación");
-        alert.setHeaderText("¿Estás seguro de borrar la etiqueta: " + etiqueta.getNombreEtiqueta() + "?");
-        alert.setContentText("Esta acción eliminará la etiqueta de todas las tareas asociadas.");
+        ResourceBundle bundle = GestorTareas.getGestorTareas().obtenerDiccionario();
+        Alert alert=new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(bundle.getString("borrarEtiqueta.Titulo"));
+        alert.setHeaderText(bundle.getString("borrarEtiqueta.Header1") + etiqueta.getNombreEtiqueta() + "?");
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK){

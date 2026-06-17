@@ -1,5 +1,6 @@
 package Model;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -59,7 +60,7 @@ public class ConexionBD {
                     //Si hay otra etiqueta ejecuta
                     String nomE = rs1.getString("nombreEtiqueta");
                     String color = rs1.getString("codColor");
-                    Etiqueta nuevaEtiqueta = new Etiqueta(color,nomE);
+                    Etiqueta nuevaEtiqueta = new Etiqueta(nomE,color);
                     GestorTareas.getGestorTareas().getListaEtiquetas().add(nuevaEtiqueta);
                 }
 
@@ -131,20 +132,21 @@ public class ConexionBD {
             }
         }
 
-        //Borra una etiqueta de la BD
-    public void borrarEtiqueta(String nombreEtiqueta){
-            String opDelete="delete from Etiqueta where nombreEtiqueta=?";
-            try (Connection c=DriverManager.getConnection(URL);
-            PreparedStatement ps=c.prepareStatement(opDelete)
-            ){
-                c.createStatement().execute("PRAGMA foreign_keys = ON;");
-                ps.setString(1,nombreEtiqueta);
-                ps.executeUpdate();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
+    public void borrarEtiqueta(String nombreEtiqueta) {
+        String opDelete = "DELETE FROM Etiqueta WHERE NombreEtiqueta=?";
 
+
+        try (Connection c = DriverManager.getConnection(URL);
+             PreparedStatement ps = c.prepareStatement(opDelete)
+        ) {
+            c.createStatement().execute("PRAGMA foreign_keys = ON;");
+            ps.setString(1, nombreEtiqueta); // Ahora el SQL se encarga de limpiar el dato
+
+            ps.executeUpdate();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
         //Guarda una tarea
     public void guardarTarea (Tarea tarea){
         String opTareas = "INSERT OR REPLACE INTO Tarea (Titulo, FechaInicio, FechaFin, EstadoTarea, Hora, Frecuencia, Descripcion, Sitio, idTarea, idFamilia, Etiqueta) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
@@ -175,8 +177,8 @@ public class ConexionBD {
         try (Connection c=DriverManager.getConnection(URL);
              PreparedStatement psEtiquetas=c.prepareStatement(opEtiquetas);
         ){
-            psEtiquetas.setString(1,etiqueta.getCodColor());
-            psEtiquetas.setString(2,etiqueta.getNombreEtiqueta());
+            psEtiquetas.setString(1,etiqueta.getNombreEtiqueta());
+            psEtiquetas.setString(2,etiqueta.getCodColor());
             psEtiquetas.executeUpdate();
     } catch (Exception e) {
             throw new RuntimeException(e);

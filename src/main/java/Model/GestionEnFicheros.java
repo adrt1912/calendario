@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -17,7 +18,21 @@ public class GestionEnFicheros {
         return gestionEnFicheros;
     }
 
-    public void leerFicheroTareas(String nombreFichero){
+    public File obtenerUltimoBackup(String prefijo) {
+        File dir = new File("backups");
+        // Filtramos solo los archivos que empiezan por el prefijo (ej: "tareas_backup_")
+        File[] files = dir.listFiles((d, name) -> name.startsWith(prefijo) && name.endsWith(".txt"));
+
+        if (files == null || files.length == 0) return null;
+
+        // Ordenamos alfabéticamente (como la fecha está en formato ISO YYYY-MM-DD, funciona perfecto)
+        Arrays.sort(files);
+
+        // Devolvemos el último (el más reciente)
+        return files[files.length - 1];
+    }
+
+    public void leerFicheroTareas(File ultimoTareas){
 
         /*Los ficheros tienen la siguiente estructura
         1.Titulo
@@ -30,11 +45,13 @@ public class GestionEnFicheros {
         2. Titulo...
         Si alguno va vacio se salta de linea
          */
-        File archivo = new File("tareas.txt");
+        String nombreArchivo = "backups/tareas_backup_" + LocalDate.now() + ".txt";
+
+        File archivo = new File(nombreArchivo);
         if(archivo.exists()){
 
         try (
-                Scanner lectorFichero=new Scanner(new File(nombreFichero))){
+                Scanner lectorFichero=new Scanner(new File(nombreArchivo))){
             DateTimeFormatter formatoHora =GestorTareas.getGestorTareas().getFormatoHora();
 
             while(lectorFichero.hasNextLine()) {
@@ -127,9 +144,11 @@ public class GestionEnFicheros {
         }
     }
 
-    public void leerEtiquetas(){
+    public void leerEtiquetas(File ultimasEtiquetas){
+        String nombreArchivo = "backups/etiquetas_backup_" + LocalDate.now() + ".txt";
+
         try (
-                Scanner lectorFichero=new Scanner(new File("etiquetas.txt"))){
+                Scanner lectorFichero=new Scanner(new File(nombreArchivo))){
             while (lectorFichero.hasNext()) {
                 String nomE = lectorFichero.nextLine();
                 String color = lectorFichero.nextLine();
