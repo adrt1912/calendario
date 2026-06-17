@@ -10,6 +10,7 @@ import java.util.prefs.Preferences;
 
 public class Tarea {
 
+    //Datos de la tarea
     private String nombreTarea;
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
@@ -23,7 +24,7 @@ public class Tarea {
     private String idFamilia;
 
     private Etiqueta etiqueta;
-    //Getters
+    //Getters de la tarea
     public EstadoTarea getEstadoTarea() {
         return estadoTarea;
     }
@@ -79,8 +80,8 @@ public class Tarea {
 
     public void setFechaFin(LocalDate fechaFin) {
         this.fechaFin = fechaFin;
+        comprobarEstado();
     }
-
     public void setHora(LocalTime hora) {
         this.hora = hora;
     }
@@ -130,6 +131,7 @@ public class Tarea {
 
         comprobarEstado();
     }
+    //Obtiene el diccionario y los textos que varian
     private ResourceBundle obtenerDiccionario() {
         Preferences prefs = Preferences.userNodeForPackage(View.view.class);
         String codIdioma = prefs.get("idioma_actual", "es");
@@ -174,5 +176,9 @@ public class Tarea {
                     Objects.equals(tarea.getHora(), hora);
         }
         return false;
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(fechaFin, fechaInicio, nombreTarea, estadoTarea, descripcion, sitio, hora);
     }
 }

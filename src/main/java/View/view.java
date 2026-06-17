@@ -97,7 +97,7 @@ public class view {
         ResourceBundle bundle=obtenerBundleActual();
 
         FXMLLoader fxmlLoader=new FXMLLoader(view.class.getResource("/View/menuConfiguracion.fxml"),bundle);
-        Scene scene=new Scene(fxmlLoader.load(),600,400);
+        Scene scene=new Scene(fxmlLoader.load(),600,600);
 
         Stage stage1=new Stage();
         stage1.setTitle("Configuracion ");

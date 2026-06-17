@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
@@ -9,9 +10,9 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.ConfiguracionController">
+<AnchorPane fx:id="rootPane" stylesheets="@style.css" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.ConfiguracionController">
    <children>
-      <VBox alignment="TOP_CENTER" layoutX="-1.0" prefHeight="428.0" prefWidth="600.0" spacing="20.0">
+      <VBox alignment="TOP_CENTER" prefHeight="480.0" prefWidth="600.0" spacing="20.0">
          <children>
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%configuracionMenuPrincipal.configuracion" textAlignment="CENTER">
                <font>
@@ -25,71 +26,58 @@
             <HBox alignment="CENTER" prefHeight="39.0" prefWidth="600.0">
                <children>
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%configuracionMenuPrincipal.idioma" wrappingWidth="110.0">
-                     <font>
-                        <Font size="16.0" />
-                     </font>
-                     <HBox.margin>
-                        <Insets right="10.0" />
-                     </HBox.margin>
+                     <font><Font size="16.0" /></font>
+                     <HBox.margin><Insets right="10.0" /></HBox.margin>
                   </Text>
                   <ComboBox fx:id="boxIdioma" prefHeight="30.0" prefWidth="180.0" />
                </children>
-               <VBox.margin>
-                  <Insets left="20.0" top="5.0" />
-               </VBox.margin>
+               <VBox.margin><Insets left="20.0" top="5.0" /></VBox.margin>
             </HBox>
 
             <HBox alignment="CENTER" prefHeight="39.0" prefWidth="600.0">
                <children>
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%configuracionMenuPrincipal.formatoHora" wrappingWidth="110.0">
-                     <font>
-                        <Font size="16.0" />
-                     </font>
-                     <HBox.margin>
-                        <Insets right="10.0" />
-                     </HBox.margin>
+                     <font><Font size="16.0" /></font>
+                     <HBox.margin><Insets right="10.0" /></HBox.margin>
                   </Text>
                   <ComboBox fx:id="boxFormatoHora" prefHeight="30.0" prefWidth="180.0" />
                </children>
-               <VBox.margin>
-                  <Insets left="20.0" />
-               </VBox.margin>
+               <VBox.margin><Insets left="20.0" /></VBox.margin>
+            </HBox>
+
+            <HBox alignment="CENTER" prefHeight="39.0" prefWidth="600.0">
+               <children>
+                  <CheckBox fx:id="checkModoOscuro" onAction="#cambiarModoVisual" mnemonicParsing="false" text="%configuracionMenuPrincipal.modoOscuro">
+                     <font><Font size="16.0" /></font>
+                  </CheckBox>
+               </children>
+               <VBox.margin><Insets left="20.0" /></VBox.margin>
             </HBox>
 
             <Button mnemonicParsing="false" onAction="#exportarACSV" prefHeight="35.0" prefWidth="180.0" style="-fx-cursor: hand;" text="%configuracionMenuPrincipal.exportarACSV">
-               <VBox.margin>
-                  <Insets top="10.0" />
-               </VBox.margin>
-               <font>
-                  <Font size="14.0" />
-               </font>
+               <VBox.margin><Insets top="10.0" /></VBox.margin>
+               <font><Font size="14.0" /></font>
             </Button>
+
+            <Button fx:id="botonRestaurar" mnemonicParsing="false" onAction="#restaurarBackup" prefHeight="35.0" prefWidth="180.0" style="-fx-cursor: hand;" text="Restaurar Backup">
+               <font><Font size="14.0" /></font>
+            </Button>
+
             <Button fx:id="botonBorrar" mnemonicParsing="false" onAction="#borrarTodo" prefHeight="35.0" prefWidth="180.0" style="-fx-background-color: #ff4444; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="%configuracionMenuPrincipal.borrarContenido">
-               <VBox.margin>
-                  <Insets top="10.0" />
-               </VBox.margin>
-               <font>
-                  <Font size="13.0" />
-               </font>
+               <VBox.margin><Insets top="5.0" /></VBox.margin>
+               <font><Font size="13.0" /></font>
             </Button>
-            <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
+
+            <HBox alignment="CENTER" prefHeight="60.0" prefWidth="600.0" spacing="20.0">
                <children>
-                  <Button fx:id="botonCancelar" mnemonicParsing="false" onAction="#cancelar" prefHeight="37.0" prefWidth="101.0" style="-fx-cursor: hand;" text="%configuracionMenuPrincipal.cancelar">
-                     <font>
-                        <Font size="14.0" />
-                     </font></Button>
-                  <Button fx:id="botonGuardar" mnemonicParsing="false" onAction="#guardarYCerrar" prefHeight="35.0" prefWidth="138.0" style="-fx-background-color: #2196F3; -fx-cursor: hand;" text="%configuracionMenuPrincipal.guardarYCerrar" textFill="WHITE">
-                     <HBox.margin>
-                        <Insets left="20.0" right="20.0" />
-                     </HBox.margin>
-                     <font>
-                        <Font name="System Bold" size="14.0" />
-                     </font>
+                  <Button fx:id="botonCancelar" mnemonicParsing="false" onAction="#cancelar" prefHeight="37.0" prefWidth="120.0" style="-fx-cursor: hand;" text="%configuracionMenuPrincipal.cancelar">
+                     <font><Font size="14.0" /></font>
+                  </Button>
+                  <Button fx:id="botonGuardar" mnemonicParsing="false" onAction="#guardarYCerrar" prefHeight="37.0" prefWidth="120.0" style="-fx-background-color: #2196F3; -fx-cursor: hand;" text="%configuracionMenuPrincipal.guardarYCerrar" textFill="WHITE">
+                     <font><Font name="System Bold" size="14.0" /></font>
                   </Button>
                </children>
-               <VBox.margin>
-                  <Insets top="20.0" />
-               </VBox.margin>
+               <VBox.margin><Insets top="20.0" /></VBox.margin>
             </HBox>
          </children>
       </VBox>
