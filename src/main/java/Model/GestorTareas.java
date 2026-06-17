@@ -217,4 +217,12 @@ public class GestorTareas {
         }
         return hora.format(formateador);
     }
+    public void verificarTareasHoy() {
+        LocalDate hoy = LocalDate.now();
+        for (Tarea t : todasTareas) { // Asegúrate de tener acceso a tu lista
+            if (t.getFechaFin() != null && t.getFechaFin().equals(hoy)) {
+                NotificadorDeTareas.mostrarNotificacion("Tarea para hoy", "Tienes pendiente: " + t.getNombreTarea(),t);
+            }
+        }
+    }
 }
