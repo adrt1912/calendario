@@ -11,7 +11,6 @@ public enum Periodicidad {
     CUATRIMESTRAL(0,4,0),
     ANUAL(0,0,1);
 
-
     private final int dias;
     private final int mes;
     private final int anios;
@@ -20,7 +19,7 @@ public enum Periodicidad {
         this.mes=mes;
         this.anios=anios;
     }
-
+//Devuelven el numero de tiempo de cada uno
     public int getAnios() {
         return anios;
     }

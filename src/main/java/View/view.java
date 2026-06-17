@@ -25,7 +25,7 @@ public class view {
 
             ResourceBundle bundle=obtenerBundleActual();
             FXMLLoader fxmlLoader = new FXMLLoader(view.class.getResource("/View/MenuPrincipal.fxml"),bundle);
-            Scene scene= new Scene(fxmlLoader.load(), 1600,900);
+            Scene scene= new Scene(fxmlLoader.load(), 1500,800);
 
             //Si no está abierta se hace una nueva ventana
             if(stage==null){
@@ -97,7 +97,7 @@ public class view {
         ResourceBundle bundle=obtenerBundleActual();
 
         FXMLLoader fxmlLoader=new FXMLLoader(view.class.getResource("/View/menuConfiguracion.fxml"),bundle);
-        Scene scene=new Scene(fxmlLoader.load(),600,400);
+        Scene scene=new Scene(fxmlLoader.load(),600,600);
 
         Stage stage1=new Stage();
         stage1.setTitle("Configuracion ");

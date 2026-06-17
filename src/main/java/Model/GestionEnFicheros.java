@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -17,7 +18,21 @@ public class GestionEnFicheros {
         return gestionEnFicheros;
     }
 
-    public void leerFichero(String nombreFichero){
+    public File obtenerUltimoBackup(String prefijo) {
+        File dir = new File("backups");
+        // Filtramos solo los archivos que empiezan por el prefijo (ej: "tareas_backup_")
+        File[] files = dir.listFiles((d, name) -> name.startsWith(prefijo) && name.endsWith(".txt"));
+
+        if (files == null || files.length == 0) return null;
+
+        // Ordenamos alfabéticamente (como la fecha está en formato ISO YYYY-MM-DD, funciona perfecto)
+        Arrays.sort(files);
+
+        // Devolvemos el último (el más reciente)
+        return files[files.length - 1];
+    }
+
+    public void leerFicheroTareas(File ultimoTareas){
 
         /*Los ficheros tienen la siguiente estructura
         1.Titulo
@@ -30,12 +45,14 @@ public class GestionEnFicheros {
         2. Titulo...
         Si alguno va vacio se salta de linea
          */
-        File archivo = new File("tareas.txt");
+        String nombreArchivo = "backups/tareas_backup_" + LocalDate.now() + ".txt";
+
+        File archivo = new File(nombreArchivo);
         if(archivo.exists()){
 
         try (
-                Scanner lectorFichero=new Scanner(new File(nombreFichero))){
-            DateTimeFormatter formatoHora = DateTimeFormatter.ofPattern("HH:mm");
+                Scanner lectorFichero=new Scanner(new File(nombreArchivo))){
+            DateTimeFormatter formatoHora =GestorTareas.getGestorTareas().getFormatoHora();
 
             while(lectorFichero.hasNextLine()) {
 
@@ -64,7 +81,6 @@ public class GestionEnFicheros {
                 }
                 String descripcion = lectorFichero.nextLine();
 
-
                 String sitio = lectorFichero.nextLine();
 
                 String horaTexto = lectorFichero.nextLine();
@@ -88,10 +104,12 @@ public class GestionEnFicheros {
     }
     }
 
-    public void guardarEnFichero(List<Tarea> listaTareas){
-
+    public void guardarCopiaSeguridadTareas(List<Tarea> listaTareas){
+        File carpeta = new File("backups");
+        if (!carpeta.exists()) carpeta.mkdir();
+        String nombreArchivo = "backups/tareas_backup_" + LocalDate.now() + ".txt";
         try (
-            FileWriter printWriter=new FileWriter("tareas.txt");
+            FileWriter printWriter=new FileWriter(nombreArchivo);
             PrintWriter pw=new PrintWriter(printWriter){})
         {
             for (Tarea tarea : listaTareas){
@@ -99,7 +117,7 @@ public class GestionEnFicheros {
             }
 
         } catch (Exception e) {
-            System.out.println("ALgo fallo");
+            System.out.println("Error en la copida de seguridad");
         }
     }
 
@@ -108,9 +126,12 @@ public class GestionEnFicheros {
        archivo.delete();
     }
 
-    public void guardarEtiquetas(List<Etiqueta> listaEtiquetas){
-        try (
-                FileWriter printWriter=new FileWriter("etiquetas.txt");
+    public void guardarEtiquetasCopiaSeguridadEtiquetas(List<Etiqueta> listaEtiquetas){
+        File carpeta = new File("backups");
+        if (!carpeta.exists()) carpeta.mkdir();
+
+        String nombreArchivo = "backups/etiquetas_backup_" + LocalDate.now() + ".txt";
+        try (FileWriter printWriter=new FileWriter(nombreArchivo);
                 PrintWriter pw=new PrintWriter(printWriter){}){
             for(Etiqueta etiqueta : listaEtiquetas){
                 if ("Sin Etiqueta".equalsIgnoreCase(etiqueta.getNombreEtiqueta()) || "transparent".equalsIgnoreCase(etiqueta.getCodColor())) {
@@ -122,9 +143,12 @@ public class GestionEnFicheros {
 
         }
     }
-    public void leerEtiquetas(){
+
+    public void leerEtiquetas(File ultimasEtiquetas){
+        String nombreArchivo = "backups/etiquetas_backup_" + LocalDate.now() + ".txt";
+
         try (
-                Scanner lectorFichero=new Scanner(new File("etiquetas.txt"))){
+                Scanner lectorFichero=new Scanner(new File(nombreArchivo))){
             while (lectorFichero.hasNext()) {
                 String nomE = lectorFichero.nextLine();
                 String color = lectorFichero.nextLine();
@@ -134,5 +158,25 @@ public class GestionEnFicheros {
         }
     }
 
-    public void exportarACSV(){}
+    public void exportarACSV(){
+
+        List<Tarea> listaTareas=GestorTareas.getGestorTareas().getTodasTareas();
+        try (
+                FileWriter printWriter=new FileWriter("archivoCSVTareas.csv");
+                PrintWriter pw=new PrintWriter(printWriter){}){
+            pw.println("Titulo;Descripcion;Estado;FechaFin;Hora;Etiqueta");
+            for( Tarea tarea : listaTareas){
+                String titulo = tarea.getNombreTarea();
+                String desc = tarea.getDescripcion() != null ? tarea.getDescripcion() : "";
+                String estado = tarea.getEstadoTarea() != null ? tarea.getEstadoTarea().name() : "";
+                String fecha = tarea.getFechaFin() != null ? tarea.getFechaFin().toString() : "";
+                String hora = tarea.getHora() != null ? tarea.getHora().toString() : "";
+                String etiqueta = tarea.getEtiqueta() != null ? tarea.getEtiqueta().getNombreEtiqueta() : "";
+
+                pw.println(titulo + ";" + desc + ";" + estado + ";" + fecha + ";" + hora + ";" + etiqueta);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

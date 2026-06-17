@@ -2,11 +2,15 @@ package Model;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.ResourceBundle;
 import java.util.UUID;
+import java.util.prefs.Preferences;
 
 public class Tarea {
 
+    //Datos de la tarea
     private String nombreTarea;
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
@@ -20,7 +24,7 @@ public class Tarea {
     private String idFamilia;
 
     private Etiqueta etiqueta;
-    //Getters
+    //Getters de la tarea
     public EstadoTarea getEstadoTarea() {
         return estadoTarea;
     }
@@ -76,8 +80,8 @@ public class Tarea {
 
     public void setFechaFin(LocalDate fechaFin) {
         this.fechaFin = fechaFin;
+        comprobarEstado();
     }
-
     public void setHora(LocalTime hora) {
         this.hora = hora;
     }
@@ -127,18 +131,22 @@ public class Tarea {
 
         comprobarEstado();
     }
+    //Obtiene el diccionario y los textos que varian
+    private ResourceBundle obtenerDiccionario() {
+        Preferences prefs = Preferences.userNodeForPackage(View.view.class);
+        String codIdioma = prefs.get("idioma_actual", "es");
+        return ResourceBundle.getBundle("textos", new Locale(codIdioma));
+    }
 
     //Devuelve el string de la tarea
     public String mostrarTarea() {
-        if (fechaFin != null && hora != null) {
-            comprobarEstado();
-            return (" " + nombreTarea + " termina el " + fechaFin + " a las: " + hora + "\n lugar: " + sitio
-                    + " descripcion es:" + descripcion);
-        } else {
-            comprobarEstado();
-            return (" " + nombreTarea + " lugar: " + sitio
-                    + "cuya descripcion es:" + descripcion);
-        }
+        ResourceBundle resourceBundle=obtenerDiccionario();
+        String resultado=resourceBundle.getString("descripcionTareas.titulo")+" "+nombreTarea+" ";
+        if(fechaFin!=null){resultado=resultado+resourceBundle.getString("descripcionTareas.fechaFin")+" "+fechaFin+" ";}
+        if(hora!=null){resultado=resultado+resourceBundle.getString("descripcionTareas.hora")+" "+GestorTareas.getGestorTareas().obtenerHoraFormateada(hora)+" ";}
+        if(sitio!=null){resultado=resultado+resourceBundle.getString("descripcionTareas.sitio")+" "+sitio+" ";}
+        if(descripcion!=null){resultado=resultado+resourceBundle.getString("descripcionTareas.descripcion")+" "+descripcion;}
+      return resultado;
     }
 
     //Compureba que no se ha caducado la tarea
@@ -168,5 +176,9 @@ public class Tarea {
                     Objects.equals(tarea.getHora(), hora);
         }
         return false;
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(fechaFin, fechaInicio, nombreTarea, estadoTarea, descripcion, sitio, hora);
     }
 }

@@ -1,0 +1,87 @@
+/* Color base para modo claro (opcional) */
+.root {
+    -fx-background-color: #f4f4f4;
+}
+
+/* --- MODO OSCURO GLOBAL --- */
+.dark-mode {
+    -fx-background-color: #2b2b2b;
+}
+
+/* Textos blancos */
+.dark-mode Text,
+.dark-mode .label,
+.dark-mode .check-box,
+.dark-mode .radio-button {
+    -fx-fill: white;
+    -fx-text-fill: white;
+}
+
+/* ScrollPane y sus fondos interiores */
+.dark-mode .scroll-pane,
+.dark-mode .scroll-pane .viewport {
+    -fx-background-color: transparent; /* Hace que coja el color gris oscuro del fondo */
+}
+.dark-mode .scroll-pane .content {
+    -fx-background-color: #2b2b2b;
+}
+
+/* Campos de texto y áreas de texto */
+.dark-mode .text-field,
+.dark-mode .text-area {
+    -fx-control-inner-background: #3c3f41;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #808080; /* Color del texto fantasma */
+}
+
+/* Botones genéricos (que no tengan un estilo rojo/azul ya forzado) */
+.dark-mode .button {
+    -fx-background-color: #4a4a4a;
+    -fx-text-fill: white;
+}
+.dark-mode .button:hover {
+    -fx-background-color: #5c5c5c;
+}
+
+/* ComboBox y ChoiceBox */
+.dark-mode .combo-box,
+.dark-mode .choice-box {
+    -fx-background-color: #3c3f41;
+}
+.dark-mode .combo-box .cell,
+.dark-mode .choice-box .label {
+    -fx-text-fill: white;
+}
+
+/* --- EXCEPCIONES DE COLOR --- */
+
+/* Obligamos a que el textoError siempre sea rojo */
+#textoError {
+    -fx-fill: #ff4444 !important;
+}
+
+/* Si tu texto azul es un Text (sustituye tuTextoAzul por su fx:id real) */
+#tuTextoAzul {
+    -fx-fill: #2196F3 !important;
+}
+
+/* Si tu texto azul es un Label (como textoTituloTop en ModificarTarea) */
+#textoTituloTop {
+    -fx-text-fill: #2196F3 !important;
+}
+
+/* Forzamos al cuadrado rebelde a volverse oscuro */
+#cabeceraModificar {
+    -fx-background-color: #2b2b2b !important;
+}
+
+/* --- Arreglo para el botón del DatePicker --- */
+.dark-mode .date-picker .arrow-button {
+    -fx-background-color: #4a4a4a;
+}
+.dark-mode .date-picker .arrow-button:hover {
+    -fx-background-color: #5c5c5c;
+}
+.dark-mode .date-picker .arrow-button .arrow {
+    -fx-background-color: white; /* Pinta el icono del calendario en blanco */
+}
