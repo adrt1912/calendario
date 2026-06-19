@@ -62,7 +62,7 @@
                   <Label text="%modificarTarea.textoFecha" GridPane.columnIndex="0" GridPane.rowIndex="1">
                      <font><Font size="14.0" /></font>
                   </Label>
-                  <Label text="%modificarTarea.textoHora" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                  <Label text="%modificarTarea.textoHoraInicio" GridPane.columnIndex="0" GridPane.rowIndex="2">
                      <font><Font size="14.0" /></font>
                   </Label>
                   <Label text="%modificarTarea.textoSitio" GridPane.columnIndex="0" GridPane.rowIndex="3">
@@ -81,7 +81,17 @@
 
                   <TextField fx:id="campoTitulo" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
                   <DatePicker fx:id="campoFecha" prefHeight="30.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <TextField fx:id="campoHora" prefHeight="30.0" prefWidth="200.0" promptText="HH:mm" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <HBox GridPane.columnIndex="1" GridPane.rowIndex="2">
+                     <children>
+                        <TextField fx:id="campoHoraInicio" prefHeight="26.0" prefWidth="139.0" promptText="HH:mm" />
+                        <Label prefHeight="18.0" prefWidth="114.0" text="%modificarTarea.textoHoraFin">
+                           <HBox.margin>
+                              <Insets left="10.0" right="5.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="campoHoraFin" layoutX="10.0" layoutY="10.0" prefHeight="26.0" prefWidth="133.0" promptText="HH:mm" />
+                     </children>
+                  </HBox>
                   <TextField fx:id="campoSitio" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                   <CheckBox fx:id="checkCompletada" mnemonicParsing="false" onAction="#cambiarEstado" text="%modificarTarea.textoMarcadaComoCompletada" GridPane.columnIndex="1" GridPane.rowIndex="5">
                      <font><Font size="14.0" /></font>

@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
@@ -38,14 +39,14 @@ public class view {
         }
 
 
-        public static void showCrearTArea(LocalDate fecha) throws IOException {
+        public static void showCrearTArea(LocalDate fecha, LocalTime hora) throws IOException {
             ResourceBundle bundle=obtenerBundleActual();
 
             FXMLLoader fxmlLoader=new FXMLLoader(view.class.getResource("/View/crearTarea.fxml"),bundle);
             Scene scene=new Scene(fxmlLoader.load(),600,500);
 
             Controller.CrearTareaController controlador = fxmlLoader.getController();
-            controlador.initialize(fecha);
+            controlador.initialize(fecha,hora);
 
             Stage stage1=new Stage();
             stage1.setTitle("Crear Tarea Nueva");

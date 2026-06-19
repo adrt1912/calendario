@@ -84,9 +84,13 @@ public class GestionEnFicheros {
                 String sitio = lectorFichero.nextLine();
 
                 String horaTexto = lectorFichero.nextLine();
-                LocalTime time=null;
+                LocalTime horaInicio=null;
                 if(!horaTexto.equals("null")&&!horaTexto.isEmpty()){
-                 time = LocalTime.parse(horaTexto, formatoHora);}
+                 horaInicio = LocalTime.parse(horaTexto, formatoHora);}
+
+                LocalTime horaFin=null;
+                if(!horaTexto.equals("null")&&!horaTexto.isEmpty()){
+                    horaFin = LocalTime.parse(horaTexto, formatoHora);}
 
                 Periodicidad frecuencia= Periodicidad.valueOf(lectorFichero.nextLine());
                 String idFamilia=lectorFichero.nextLine();
@@ -94,7 +98,7 @@ public class GestionEnFicheros {
                 String etiquetaText=lectorFichero.nextLine().trim();
                 Etiqueta etiquetaAsignada=GestorTareas.getGestorTareas().getListaEtiquetas().stream().filter(e ->e.getNombreEtiqueta()!=null && e.getNombreEtiqueta().equals(etiquetaText)).findFirst().orElse(null);
 
-                Tarea tarea = new Tarea(titulo,fechainic,fechaFin, estadoTarea,descripcion,sitio,time,frecuencia,idFamilia,etiquetaAsignada);
+                Tarea tarea = new Tarea(titulo,fechainic,fechaFin, estadoTarea,descripcion,sitio,horaInicio,horaFin,frecuencia,idFamilia,etiquetaAsignada);
                 GestorTareas.getGestorTareas().añadirTareaALista(tarea);
 
             }
@@ -113,7 +117,7 @@ public class GestionEnFicheros {
             PrintWriter pw=new PrintWriter(printWriter){})
         {
             for (Tarea tarea : listaTareas){
-                pw.println(tarea.getNombreTarea() + "\n" + tarea.getFechaInicio() + "\n" + tarea.getFechaFin() + "\n" + tarea.getEstadoTarea() + "\n" + tarea.getDescripcion() + "\n" + tarea.getSitio() + "\n" + tarea.getHora() + "\n"+tarea.getFrecuencia() +"\n"+tarea.getIdFamilia()+"\n"+tarea.getEtiqueta());
+                pw.println(tarea.getNombreTarea() + "\n" + tarea.getFechaInicio() + "\n" + tarea.getFechaFin() + "\n" + tarea.getEstadoTarea() + "\n" + tarea.getDescripcion() + "\n" + tarea.getSitio() + "\n" + tarea.getHoraInicio()+"\n"+tarea.getHoraFin() + "\n"+tarea.getFrecuencia() +"\n"+tarea.getIdFamilia()+"\n"+tarea.getEtiqueta());
             }
 
         } catch (Exception e) {
@@ -170,10 +174,11 @@ public class GestionEnFicheros {
                 String desc = tarea.getDescripcion() != null ? tarea.getDescripcion() : "";
                 String estado = tarea.getEstadoTarea() != null ? tarea.getEstadoTarea().name() : "";
                 String fecha = tarea.getFechaFin() != null ? tarea.getFechaFin().toString() : "";
-                String hora = tarea.getHora() != null ? tarea.getHora().toString() : "";
+                String horaInicio = tarea.getHoraInicio() != null ? tarea.getHoraInicio().toString() : "";
+                String horaFin =tarea.getHoraFin() !=null ? tarea.getHoraFin().toString() : "";
                 String etiqueta = tarea.getEtiqueta() != null ? tarea.getEtiqueta().getNombreEtiqueta() : "";
 
-                pw.println(titulo + ";" + desc + ";" + estado + ";" + fecha + ";" + hora + ";" + etiqueta);
+                pw.println(titulo + ";" + desc + ";" + estado + ";" + fecha + ";" + horaInicio +";"+ horaFin+ ";" + etiqueta);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
