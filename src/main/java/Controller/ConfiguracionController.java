@@ -123,10 +123,7 @@ public class ConfiguracionController {
     private CheckBox checkModoOscuro;
     @FXML
     private void cambiarModoVisual(){
-
-
             boolean activado = checkModoOscuro.isSelected();
-
             // 1. Guardamos la decisión en Preferences para el futuro
             Preferences prefs = Preferences.userNodeForPackage(this.getClass());
             prefs.putBoolean("modo_oscuro", activado);
@@ -134,17 +131,12 @@ public class ConfiguracionController {
             // 2. ACTUALIZACIÓN GLOBAL: Recorremos TODAS las ventanas abiertas en tiempo real
             for (javafx.stage.Window ventanaAbierta : javafx.stage.Window.getWindows()) {
                 if (ventanaAbierta.getScene() != null && ventanaAbierta.getScene().getRoot() != null) {
-
                     // Aplicamos o quitamos la clase "dark-mode" a la raíz de cada ventana
                     if (activado) {
-                        if (!ventanaAbierta.getScene().getRoot().getStyleClass().contains("dark-mode")) {
-                            ventanaAbierta.getScene().getRoot().getStyleClass().add("dark-mode");
-                        }
-                    } else {
-                        ventanaAbierta.getScene().getRoot().getStyleClass().remove("dark-mode");
-                    }
-                }
+                        if (!ventanaAbierta.getScene().getRoot().getStyleClass().contains("dark-mode")) ventanaAbierta.getScene().getRoot().getStyleClass().add("dark-mode");
+                    } else ventanaAbierta.getScene().getRoot().getStyleClass().remove("dark-mode");
 
+                }
         }
     }
 }

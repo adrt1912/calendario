@@ -20,13 +20,11 @@
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.45.3.0</version>
         </dependency>
-
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
             <version>21</version>
         </dependency>
-
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
@@ -34,4 +32,36 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <!-- 1. Plugin para compilar y empaquetar tu código en un JAR -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>Model.Main</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <!-- 2. El plugin de jpackage para crear el instalador -->
+            <plugin>
+                <groupId>org.panteleyev</groupId>
+                <artifactId>jpackage-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <configuration>
+                    <name>GestorDeTareas</name>
+                    <appVersion>1.0</appVersion>
+                    <destination>target/dist</destination>
+                    <input>target</input>
+                    <mainJar>${project.build.finalName}.jar</mainJar>
+                    <mainClass>Model.Main</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
