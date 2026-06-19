@@ -18,6 +18,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.*;
+import javafx.util.Duration;
 import java.util.prefs.Preferences;
 
 import static javafx.scene.paint.Color.web;
@@ -411,6 +412,9 @@ public class MenuPrincipalController {
                         label.setPrefWidth(offsetX==0 ? 120 :60);
                         label.setLayoutX(offsetX);
                         label.setWrapText(true);
+                        Tooltip infoFlotante = new Tooltip(tarea.mostrarTarea());
+                        infoFlotante.setShowDelay(Duration.millis(100));
+                        label.setTooltip(infoFlotante);
                         //Dependiendo del estado se ve mas o menos la etiqueta
                         if (tarea.getEstadoTarea() != EstadoTarea.EN_PROCESO) {
                             label.setOpacity(0.2);
@@ -447,6 +451,10 @@ public class MenuPrincipalController {
                         int columna=fecha.getDayOfWeek().getValue()-1;
 
                         Label labelTodoDia = new Label(tarea.getNombreTarea());
+                        Tooltip infoFlotante = new Tooltip(tarea.mostrarTarea());
+                        infoFlotante.setShowDelay(Duration.millis(100));
+                        labelTodoDia.setTooltip(infoFlotante);
+
                         labelTodoDia.setMaxWidth(Double.MAX_VALUE);
                         labelTodoDia.getStyleClass().add("tarea-todo-dia");
                         panelesTareasTodoDia[columna].getChildren().add(labelTodoDia);
@@ -489,6 +497,9 @@ public class MenuPrincipalController {
                     } else {
                         label.setOpacity(1);
                     }
+                    Tooltip infoFlotante = new Tooltip(tarea.mostrarTarea());
+                    infoFlotante.setShowDelay(Duration.millis(100));
+                    label.setTooltip(infoFlotante);
                     //Se ven distintos wi tiene etiqueta o no
                     if (!Objects.equals(tarea.getEtiqueta().getNombreEtiqueta(), "Sin Etiqueta")) {
                         String colorHex = tarea.getEtiqueta().getCodColor();
