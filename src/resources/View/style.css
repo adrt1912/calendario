@@ -139,3 +139,13 @@
     -fx-border-color: #555555;
     -fx-text-fill: #E0E0E0;
 }
+.tarea-todo-dia {
+    -fx-background-color: #e0e0e0;
+    -fx-padding: 5px;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+    -fx-cursor: hand;
+    -fx-font-size: 13px;
+    /* Esto evita que se encojan de forma rara */
+    -fx-min-height: 25px;
+}
