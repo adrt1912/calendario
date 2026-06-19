@@ -49,6 +49,9 @@ public class MenuPrincipalController {
     private Text cartelMes;
 
     @FXML
+    private TextField buscadorTareas;
+
+    @FXML
     private Text textFecha;
 
     @FXML
@@ -110,6 +113,11 @@ public class MenuPrincipalController {
        comboFiltroEtiquetas.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
            mostrarCalendario();
        });
+       buscadorTareas.textProperty().addListener((observable, oldValue, newValue) -> {
+           mostrarCalendario();
+           mostrarTareas();
+       });
+
    }
 
 
@@ -130,9 +138,11 @@ public class MenuPrincipalController {
         List<Tarea> listaTareasMostrar=gestorTareas.getTodasTareas().stream().filter(tarea -> fechaSeleccionada.equals(tarea.getFechaFin())).toList();
 
         //En caso de que no se escoga etiqueta
-        if(etiqueta != null && !etiqueta.getNombreEtiqueta().equals("Sin Etiqueta")) {
-            listaTareasMostrar=listaTareasMostrar.stream().filter(tarea -> tarea.getEtiqueta() != null &&tarea.getEtiqueta().equals(etiqueta)).toList();
-        }
+        if(etiqueta != null && !etiqueta.getNombreEtiqueta().equals("Sin Etiqueta")) listaTareasMostrar=listaTareasMostrar.stream().filter(tarea -> tarea.getEtiqueta() != null &&tarea.getEtiqueta().equals(etiqueta)).toList();
+
+        String textoBusqueda = buscadorTareas.getText() != null ? buscadorTareas.getText().toLowerCase() : "";
+        if(!textoBusqueda.isEmpty()) listaTareasMostrar = listaTareasMostrar.stream().filter(tarea -> tarea.getNombreTarea().toLowerCase().contains(textoBusqueda)).toList();
+
         VBox vBox=new VBox();
         vBox.setSpacing(5);
         int i=1;
@@ -172,7 +182,6 @@ public class MenuPrincipalController {
         Preferences prefs = Preferences.userNodeForPackage(ConfiguracionController.class);
         boolean isDark = prefs.getBoolean("modo_oscuro", false);
 
-        // --- CÓDIGO CORREGIDO PARA EVITAR DUPLICADOS ---
         if (isDark) {
             if (!rootPane.getStyleClass().contains("dark-mode")) {
                 rootPane.getStyleClass().add("dark-mode");
@@ -369,11 +378,13 @@ public class MenuPrincipalController {
         for (Pane panel : panelesDiasSemanales) {
             if (panel != null) panel.getChildren().clear();
         }
+
+        String textoBusqueda=buscadorTareas.getText();
         List<Tarea> listaTareas=gestorTareas.getTodasTareas();
-        Etiqueta etiqueta=(Etiqueta) comboFiltroEtiquetas.getValue();
-        if(etiqueta != null && !etiqueta.getNombreEtiqueta().equals("Sin Etiqueta")) {//Si tiene un filtro se filtra la lista a mostrar
-            listaTareas=listaTareas.stream().filter(tarea -> tarea.getEtiqueta() != null &&tarea.getEtiqueta().equals(etiqueta)).toList();
-        }
+        Etiqueta etiqueta= comboFiltroEtiquetas.getValue();
+        if(etiqueta != null && !etiqueta.getNombreEtiqueta().equals("Sin Etiqueta")) listaTareas=listaTareas.stream().filter(tarea -> tarea.getEtiqueta() != null &&tarea.getEtiqueta().equals(etiqueta)).toList();
+
+        if(textoBusqueda!=null && !textoBusqueda.isEmpty()) listaTareas=listaTareas.stream().filter(tarea -> tarea.getNombreTarea().toLowerCase().contains(textoBusqueda)).toList();
         //Se usa como limite de tareas a mostrar en un dia
         int diaDeLaSemana = fechaSeleccionada.getDayOfWeek().getValue();
         LocalDate lunesDeEstaSemana = fechaSeleccionada.minusDays(diaDeLaSemana - 1);
@@ -416,11 +427,8 @@ public class MenuPrincipalController {
                         infoFlotante.setShowDelay(Duration.millis(100));
                         label.setTooltip(infoFlotante);
                         //Dependiendo del estado se ve mas o menos la etiqueta
-                        if (tarea.getEstadoTarea() != EstadoTarea.EN_PROCESO) {
-                            label.setOpacity(0.2);
-                        } else {
-                            label.setOpacity(1);
-                        }
+                        if (tarea.getEstadoTarea() != EstadoTarea.EN_PROCESO) label.setOpacity(0.2);
+                        else label.setOpacity(1);
 
                         //Se ven distintos wi tiene etiqueta o no
                         if (tarea.getEtiqueta() != null && !Objects.equals(tarea.getEtiqueta().getNombreEtiqueta(), "Sin Etiqueta")){
@@ -470,9 +478,11 @@ public class MenuPrincipalController {
        //Obtenemos todas las tareas
         List<Tarea> listaTareas=gestorTareas.getTodasTareas();
         Etiqueta etiqueta=(Etiqueta) comboFiltroEtiquetas.getValue();
-        if(etiqueta != null && !etiqueta.getNombreEtiqueta().equals("Sin Etiqueta")) {
-            listaTareas=listaTareas.stream().filter(tarea -> tarea.getEtiqueta() != null &&tarea.getEtiqueta().equals(etiqueta)).toList();
-        }
+        if(etiqueta != null && !etiqueta.getNombreEtiqueta().equals("Sin Etiqueta")) listaTareas=listaTareas.stream().filter(tarea -> tarea.getEtiqueta() != null &&tarea.getEtiqueta().equals(etiqueta)).toList();
+
+        String textoBusqueda = buscadorTareas.getText() != null ? buscadorTareas.getText().toLowerCase() : "";
+        if(!textoBusqueda.isEmpty()) listaTareas=listaTareas.stream().filter(tarea -> tarea.getNombreTarea().toLowerCase().contains(textoBusqueda)).toList();
+
         //Obtenemos el primer di del mes
         int primerDiaMes=LocalDate.of(fechaSeleccionada.getYear(),fechaSeleccionada.getMonthValue(), 1).getDayOfWeek().getValue();
         //Es para evitar que cada dia supere la cantidad maxima de etiquetas
@@ -638,5 +648,15 @@ public class MenuPrincipalController {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @FXML
+    private void volverHoy(){
+        fechaSeleccionada=LocalDate.now();
+        mostrarCalendario();
+    }
+    @FXML
+    private void buscarTarea(){
+        mostrarCalendario();
     }
 }

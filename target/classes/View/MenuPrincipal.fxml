@@ -5,6 +5,7 @@
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -21,16 +22,33 @@
             <top>
                 <VBox alignment="CENTER" prefHeight="130.0" prefWidth="1500.0" spacing="5.0" BorderPane.alignment="CENTER">
                     <children>
-                        <Text fx:id="textoBienvenida" strokeType="OUTSIDE" strokeWidth="0.0" text="%principal.textoSaludoMenuPrincipal" textAlignment="CENTER" wrappingWidth="1400.0">
-                            <font>
-                                <Font size="34.0" />
-                            </font>
-                            <VBox.margin>
-                                <Insets top="10.0" />
-                            </VBox.margin>
-                        </Text>
+                  <HBox>
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
+                     <children>
+                              <Text fx:id="textoBienvenida" strokeType="OUTSIDE" strokeWidth="0.0" text="%principal.textoSaludoMenuPrincipal" textAlignment="CENTER" wrappingWidth="1263.0">
+                                  <font>
+                                      <Font size="34.0" />
+                                  </font>
+                           <HBox.margin>
+                              <Insets left="45.0" />
+                           </HBox.margin>
+                              </Text>
+                        <Button mnemonicParsing="false" onAction="#volverHoy" prefHeight="26.0" prefWidth="154.0" text="%principal.volverHoy">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                  </HBox>
                         <HBox alignment="CENTER_RIGHT" prefHeight="26.0" prefWidth="1500.0">
                             <children>
+                        <TextField fx:id="buscadorTareas" onAction="#buscarTarea" prefHeight="26.0" prefWidth="1099.0" promptText="%principal.buscador">
+                           <HBox.margin>
+                              <Insets right="70.0" />
+                           </HBox.margin>
+                        </TextField>
                                 <ChoiceBox fx:id="seleccionModo" prefWidth="150.0" />
                             </children>
                             <padding>
