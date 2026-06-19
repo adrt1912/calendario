@@ -24,7 +24,9 @@ private TextField campoTitulo;
 @FXML
 private DatePicker campoFecha;
 @FXML
-private TextField campoHora;
+private TextField campoHoraInicio;
+@FXML
+private TextField campoHoraFin;
 @FXML
 private TextField campoSitio;
 @FXML
@@ -57,8 +59,11 @@ public void setTareaMos(Tarea tareaMos) {
         if(tareaMos.getFechaFin()!=null){
             campoFecha.setValue(tareaMos.getFechaFin());
         }
-        if(tareaMos.getHora()!=null){
-            campoHora.setText(GestorTareas.getGestorTareas().obtenerHoraFormateada(tareaMos.getHora()));
+        if(tareaMos.getHoraInicio()!=null){
+            campoHoraInicio.setText(GestorTareas.getGestorTareas().obtenerHoraFormateada(tareaMos.getHoraInicio()));
+        }
+        if(tareaMos.getHoraInicio()!=null){
+        campoHoraFin.setText(GestorTareas.getGestorTareas().obtenerHoraFormateada(tareaMos.getHoraFin()));
         }
         if(tareaMos.getSitio()!=null){
             campoSitio.setText(tareaMos.getSitio());
@@ -128,27 +133,41 @@ private void modificarTarea() {
     String descripcion = campoDescripcion.getText();
     String sitio = campoSitio.getText();
     LocalTime time;
-    String horaText = campoHora.getText();
+    String horaInicio = campoHoraInicio.getText();
+    String horaFin = campoHoraFin.getText();
     try {
         // Primero intentamos leerlo normal (formato 24h, ej: "18:30")
-        time = LocalTime.parse(horaText);
+        time = LocalTime.parse(horaInicio);
     } catch (Exception e) {
         try {
             // Si falla, intentamos leerlo en formato 12h (ej: "06:30 PM")
             DateTimeFormatter formato12h = DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH);
-            time = LocalTime.parse(horaText, formato12h);
+            time = LocalTime.parse(horaInicio, formato12h);
         } catch (Exception ex) {
             // Si el usuario ha escrito "patata", entonces sí lo dejamos en null
             time = null;
         }
     }
-    Periodicidad frecuencia = (Periodicidad) campoPerioricidad.getValue();
+    try {
+        // Primero intentamos leerlo normal (formato 24h, ej: "18:30")
+        time = LocalTime.parse(horaFin);
+    } catch (Exception e) {
+        try {
+            // Si falla, intentamos leerlo en formato 12h (ej: "06:30 PM")
+            DateTimeFormatter formato12h = DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH);
+            time = LocalTime.parse(horaFin, formato12h);
+        } catch (Exception ex) {
+            // Si el usuario ha escrito "patata", entonces sí lo dejamos en null
+            time = null;
+        }
+    }
+    Periodicidad frecuencia = campoPerioricidad.getValue();
     if (frecuencia == null) {
         frecuencia = Periodicidad.NUNCA; // Le damos un valor por defecto
     }
     EstadoTarea estado = tareaMos.getEstadoTarea();
 
-    Etiqueta etiqueta = (Etiqueta) boxEtiquetas.getValue();
+    Etiqueta etiqueta = boxEtiquetas.getValue();
 
     if (titulo.isBlank()) {
         textoError.setText("Introduzca un titulo");

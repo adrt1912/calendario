@@ -32,11 +32,11 @@ public class CrearTareaController {
     }
 
     public void initialize(LocalDate fechaf){
-        //Se le pasa la fecha e inicia los objetos
         textoPeriodicidad.getItems().addAll(Periodicidad.values());
         boxEtiquetas.getItems().addAll(GestorTareas.getGestorTareas().getListaEtiquetas());
         if(fechaf!=null) texFecha.setValue(fechaf);
     }
+
     @FXML
     private TextField textoTitulo;
 
@@ -44,7 +44,10 @@ public class CrearTareaController {
     private DatePicker texFecha;
 
     @FXML
-    private TextField textoHora;
+    private TextField textoHoraInicio;
+
+    @FXML
+    private TextField textoHoraFin;
 
     @FXML
     private TextField textoSitio;
@@ -58,55 +61,71 @@ public class CrearTareaController {
     @FXML
     private ComboBox<Etiqueta> boxEtiquetas;
 
-    //Al ser creada lee los datos y los guarda
     @FXML
-    private void guardarTarea(){
-        LocalDate fecha=texFecha.getValue();
-        String titulo=textoTitulo.getText();
-        LocalTime time;
-        String hora=textoHora.getText();
+    private void guardarTarea() {
+        LocalDate fecha = texFecha.getValue();
+        String titulo = textoTitulo.getText();
+
+        // --- 1. PROCESAR HORA INICIO ---
+        LocalTime horaInicio;
+        String horaI = textoHoraInicio.getText(); // Capturamos el texto de inicio
 
         try {
-            time = LocalTime.parse(hora);
+            horaInicio = LocalTime.parse(horaI);
         } catch (Exception e) {
             try {
                 DateTimeFormatter formato12h = DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH);
-                time = LocalTime.parse(hora, formato12h);
+                horaInicio = LocalTime.parse(horaI, formato12h);
             } catch (Exception ex) {
-                time = null;
+                horaInicio = null;
             }
         }
-        String sitio=textoSitio.getText();
-        Periodicidad frecuencia= textoPeriodicidad.getValue();
+
+        // --- 2. PROCESAR HORA FIN ---
+        LocalTime horaFin;
+        String horaF = textoHoraFin.getText(); // Capturamos el texto de FIN (Aquí estaba el fallo)
+
+        try {
+            horaFin = LocalTime.parse(horaF);
+        } catch (Exception e) {
+            try {
+                DateTimeFormatter formato12h = DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH);
+                horaFin = LocalTime.parse(horaF, formato12h);
+            } catch (Exception ex) {
+                horaFin = null;
+            }
+        }
+
+        String sitio = textoSitio.getText();
+        Periodicidad frecuencia = textoPeriodicidad.getValue();
         if (frecuencia == null) {
-            frecuencia = Periodicidad.NUNCA; // Le damos un valor por defecto
+            frecuencia = Periodicidad.NUNCA;
         }
-        String descripcion=textoDescripcion.getText();
-        Etiqueta etiqueta= boxEtiquetas.getValue();
+        String descripcion = textoDescripcion.getText();
+        Etiqueta etiqueta = boxEtiquetas.getValue();
 
-        if(titulo.isBlank()){
+        if (titulo.isBlank()) {
             textoError.setText("Introduzca un titulo");
-        }else{
-            //Si es el unico de su familia, se crea uno nuevo
+        } else {
             String idFamiliaUnico = java.util.UUID.randomUUID().toString();
-        Tarea tarea=GestorTareas.getGestorTareas().anadirTarea(titulo,fecha,descripcion,sitio,time,frecuencia,idFamiliaUnico,etiqueta);
-        if(tarea!=null && frecuencia!=Periodicidad.NUNCA) tratarTareasPeriodicas(tarea);
-        Stage ventanaActual = (Stage) botonCancelar.getScene().getWindow();
-        ventanaActual.close();}
+            // Asegúrate de que este método anadirTarea de tu GestorTareas acepta horaInicio y horaFin en este orden
+            Tarea tarea = GestorTareas.getGestorTareas().anadirTarea(titulo, fecha, descripcion, sitio, horaInicio, horaFin, frecuencia, idFamiliaUnico, etiqueta);
+            if (tarea != null && frecuencia != Periodicidad.NUNCA) tratarTareasPeriodicas(tarea);
+            Stage ventanaActual = (Stage) botonCancelar.getScene().getWindow();
+            ventanaActual.close();
+        }
     }
 
-//Para tareas periodicas se crean 40, y se crea una nueva, sumando el plazo
     private void tratarTareasPeriodicas(Tarea tarea){
-            int dias=tarea.getFrecuencia().getDias();
-            int mes=tarea.getFrecuencia().getMes();
-            int anio=tarea.getFrecuencia().getAnios();
-            for(int i=1;i<40;i++){
-                LocalDate fecha=tarea.getFechaFin().plusDays((long) i *dias).plusMonths((long) i *mes).plusYears((long) i *anio);
-                GestorTareas.getGestorTareas().anadirTarea(tarea.getNombreTarea(),fecha,tarea.getDescripcion(),tarea.getSitio(),tarea.getHora(),tarea.getFrecuencia(), tarea.getIdTarea(),tarea.getEtiqueta());
-            }
+        int dias=tarea.getFrecuencia().getDias();
+        int mes=tarea.getFrecuencia().getMes();
+        int anio=tarea.getFrecuencia().getAnios();
+        for(int i=1;i<40;i++){
+            LocalDate fecha=tarea.getFechaFin().plusDays((long) i *dias).plusMonths((long) i *mes).plusYears((long) i *anio);
+            GestorTareas.getGestorTareas().anadirTarea(tarea.getNombreTarea(),fecha,tarea.getDescripcion(),tarea.getSitio(),tarea.getHoraInicio(),tarea.getHoraFin(),tarea.getFrecuencia(), tarea.getIdTarea(),tarea.getEtiqueta());
+        }
     }
 
-    //Para no guardar nada, solo cierra la pestaña
     @FXML
     private void cancelarTodo(){
         Stage ventanaActual = (Stage) botonCancelar.getScene().getWindow();

@@ -15,7 +15,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane fx:id="rootPane" stylesheets="@style.css" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="850.0" prefWidth="1500.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.MenuPrincipalController">
+<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="850.0" prefWidth="1500.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.MenuPrincipalController">
     <children>
         <BorderPane prefHeight="850.0" prefWidth="1500.0">
             <top>
@@ -37,15 +37,15 @@
                                 <Insets right="50.0" />
                             </padding>
                         </HBox>
-                        <Text fx:id="TareasPendientesHoy" strokeType="OUTSIDE" strokeWidth="0.0" text="%principal.textoTareasPendientesHoy" wrappingWidth="1450.0">
+                        <Text fx:id="TareasPendientesHoy" strokeType="OUTSIDE" strokeWidth="0.0" text="%principal.textoTareasPendientesHoy" wrappingWidth="1492.0">
                             <font>
                                 <Font size="18.0" />
                             </font>
                             <VBox.margin>
-                                <Insets left="20.0" />
+                                <Insets />
                             </VBox.margin>
                         </Text>
-                        <Text fx:id="TareasPendientesMañana" strokeType="OUTSIDE" strokeWidth="0.0" text="%principal.textoTareasPendientesMañana" wrappingWidth="1450.0">
+                        <Text fx:id="TareasPendientesMañana" strokeType="OUTSIDE" strokeWidth="0.0" text="%principal.textoTareasPendientesMañana" wrappingWidth="1516.0">
                             <font>
                                 <Font size="18.0" />
                             </font>
@@ -81,21 +81,9 @@
                                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                     </rowConstraints>
                                 </GridPane>
-                                <GridPane fx:id="calendarioSemanal" prefHeight="560.0" prefWidth="1020.0" visible="false">
-                                    <columnConstraints>
-                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                    </columnConstraints>
-                                    <rowConstraints>
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    </rowConstraints>
-                                </GridPane>
+
+                                <VBox fx:id="contenedorSemanal" prefHeight="560.0" prefWidth="1020.0" visible="false" />
+
                             </children>
                         </AnchorPane>
 
@@ -188,21 +176,27 @@
                             <font>
                                 <Font size="15.0" />
                             </font></Button>
-                        <GridPane fx:id="vBoxEtiquetas" hgap="10.0" prefWidth="210.0" vgap="14.0">
-                            <columnConstraints>
-                                <ColumnConstraints hgrow="NEVER" minWidth="30.0" prefWidth="30.0" />
-                                <ColumnConstraints hgrow="ALWAYS" minWidth="110.0" prefWidth="140.0" />
-                                <ColumnConstraints hgrow="NEVER" minWidth="40.0" prefWidth="40.0" />
-                            </columnConstraints>
+
+                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">
                             <VBox.margin>
-                                <Insets left="15.0" top="15.0" />
+                                <Insets bottom="15.0" left="15.0" right="5.0" top="15.0" />
                             </VBox.margin>
-                        </GridPane>
+                            <content>
+                                <GridPane fx:id="vBoxEtiquetas" hgap="10.0" vgap="14.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="NEVER" minWidth="30.0" prefWidth="30.0" />
+                                        <ColumnConstraints hgrow="ALWAYS" minWidth="110.0" prefWidth="140.0" />
+                                        <ColumnConstraints hgrow="NEVER" minWidth="40.0" prefWidth="40.0" />
+                                    </columnConstraints>
+                                </GridPane>
+                            </content>
+                        </ScrollPane>
+
                     </children>
                 </VBox>
             </left>
             <right>
-                <VBox alignment="TOP_CENTER" prefHeight="668.0" prefWidth="250.0" spacing="12.0" BorderPane.alignment="CENTER">
+                <VBox alignment="TOP_CENTER" prefHeight="724.0" prefWidth="268.0" spacing="12.0" BorderPane.alignment="CENTER">
                     <children>
                         <Text fx:id="textFecha" strokeType="OUTSIDE" strokeWidth="0.0" text="%principal.textFecha">
                             <font>
@@ -211,9 +205,9 @@
                             <VBox.margin>
                                 <Insets top="10.0" />
                             </VBox.margin></Text>
-                        <ScrollPane fx:id="mostradorTareas" prefHeight="500.0" prefWidth="230.0">
+                        <ScrollPane fx:id="mostradorTareas" prefHeight="500.0" prefWidth="246.0">
                             <VBox.margin>
-                                <Insets left="15.0" right="15.0" />
+                                <Insets left="15.0" right="20.0" />
                             </VBox.margin></ScrollPane>
                     </children>
                 </VBox>

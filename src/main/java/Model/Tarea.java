@@ -17,7 +17,8 @@ public class Tarea {
     private EstadoTarea estadoTarea;
     private String descripcion;
     private String sitio;
-    private LocalTime hora;
+    private LocalTime horaInicio;
+    private LocalTime horaFin;
     private Periodicidad frecuencia;
 
     private String idTarea;
@@ -37,8 +38,12 @@ public class Tarea {
         return fechaInicio;
     }
 
-    public LocalTime getHora() {
-        return hora;
+    public LocalTime getHoraFin() {
+        return horaFin;
+    }
+
+    public LocalTime getHoraInicio() {
+        return horaInicio;
     }
 
     public String getDescripcion() {
@@ -82,8 +87,12 @@ public class Tarea {
         this.fechaFin = fechaFin;
         comprobarEstado();
     }
-    public void setHora(LocalTime hora) {
-        this.hora = hora;
+    public void setHoraInicio(LocalTime hora) {
+        this.horaInicio = hora;
+    }
+
+    public void setHoraFin(LocalTime horaFin) {
+        this.horaFin = horaFin;
     }
 
     public void setSitio(String sitio) {
@@ -113,7 +122,7 @@ public class Tarea {
     }
 
     //Constructor
-    public Tarea(String nombreTarea, LocalDate fechaInicio, LocalDate fechaFin, EstadoTarea estadoTarea, String descripcion, String sitio, LocalTime hora, Periodicidad frecuencia,String idFamilia,Etiqueta etiqueta) {
+    public Tarea(String nombreTarea, LocalDate fechaInicio, LocalDate fechaFin, EstadoTarea estadoTarea, String descripcion, String sitio, LocalTime horaInicio, LocalTime horaFin, Periodicidad frecuencia,String idFamilia,Etiqueta etiqueta) {
         this.nombreTarea = nombreTarea;
         this.fechaInicio = fechaInicio;
         if(fechaFin==null)this.fechaFin=LocalDate.now();
@@ -121,7 +130,9 @@ public class Tarea {
         this.estadoTarea = estadoTarea;
         this.descripcion = descripcion;
         this.sitio = sitio;
-        this.hora = hora;
+        this.horaInicio = horaInicio;
+        if(horaInicio!=null&&horaFin==null) horaFin=horaInicio.plusHours(1);
+        this.horaFin=horaFin;
         this.frecuencia = frecuencia;
         idTarea= UUID.randomUUID().toString();
         this.idFamilia=idFamilia;
@@ -143,9 +154,10 @@ public class Tarea {
         ResourceBundle resourceBundle=obtenerDiccionario();
         String resultado=resourceBundle.getString("descripcionTareas.titulo")+" "+nombreTarea+" ";
         if(fechaFin!=null){resultado=resultado+resourceBundle.getString("descripcionTareas.fechaFin")+" "+fechaFin+" ";}
-        if(hora!=null){resultado=resultado+resourceBundle.getString("descripcionTareas.hora")+" "+GestorTareas.getGestorTareas().obtenerHoraFormateada(hora)+" ";}
-        if(sitio!=null){resultado=resultado+resourceBundle.getString("descripcionTareas.sitio")+" "+sitio+" ";}
-        if(descripcion!=null){resultado=resultado+resourceBundle.getString("descripcionTareas.descripcion")+" "+descripcion;}
+        if(horaInicio!=null){resultado=resultado+resourceBundle.getString("descripcionTareas.hora")+" "+GestorTareas.getGestorTareas().obtenerHoraFormateada(horaInicio)+" ";}
+        if(horaFin!=null){resultado = resultado + resourceBundle.getString("descripcionTareas.horaFin") +" "+ GestorTareas.getGestorTareas().obtenerHoraFormateada(horaFin) + " ";}
+        if (sitio != null && !sitio.isBlank()){resultado=resultado+resourceBundle.getString("descripcionTareas.sitio")+" "+sitio+" ";}
+        if(descripcion!=null&&!descripcion.isBlank()){resultado=resultado+resourceBundle.getString("descripcionTareas.descripcion")+" "+descripcion;}
       return resultado;
     }
 
@@ -173,12 +185,13 @@ public class Tarea {
                     tarea.getEstadoTarea() == estadoTarea &&
                     Objects.equals(tarea.getDescripcion(), descripcion) &&
                     Objects.equals(tarea.getSitio(), sitio) &&
-                    Objects.equals(tarea.getHora(), hora);
+                    Objects.equals(tarea.getHoraInicio(), horaInicio) &&
+                    Objects.equals(tarea.getHoraFin(),horaFin);
         }
         return false;
     }
     @Override
     public int hashCode() {
-        return Objects.hash(fechaFin, fechaInicio, nombreTarea, estadoTarea, descripcion, sitio, hora);
+        return Objects.hash(fechaFin, fechaInicio, nombreTarea, estadoTarea, descripcion, sitio, horaInicio,horaFin);
     }
 }

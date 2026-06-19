@@ -8,7 +8,7 @@ public class NotificadorDeTareas {
     public static void mostrarNotificacion(String titulo, String mensaje, Tarea tarea) {
         try {
             // Formateamos el mensaje incluyendo la hora de la tarea
-            if(tarea.getHora()!=null) mensaje = mensaje + " a las " + tarea.getHora().toString();
+            if(tarea.getHoraInicio()!=null) mensaje = mensaje + " a las " + tarea.getHoraInicio().toString();
 
             // Detectamos el sistema operativo de forma sencilla
             String os = System.getProperty("os.name").toLowerCase();

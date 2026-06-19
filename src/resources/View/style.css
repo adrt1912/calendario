@@ -85,3 +85,57 @@
 .dark-mode .date-picker .arrow-button .arrow {
     -fx-background-color: white; /* Pinta el icono del calendario en blanco */
 }
+/* Estilo general para el ComboBox */
+.combo-box {
+    -fx-background-color: #333333;
+    -fx-text-fill: white;
+}
+
+/* Estilo para el ChoiceBox */
+.choice-box {
+    -fx-background-color: #333333;
+    -fx-mark-color: white; /* Color de la flechita */
+}
+
+.choice-box .label {
+    -fx-text-fill: white;
+}
+
+/* Menú desplegable para ComboBox y ChoiceBox */
+.combo-box-popup .list-view,
+.choice-box .context-menu {
+    -fx-background-color: #333333;
+}
+
+/* Estilo para cada celda dentro de los menús */
+.combo-box-popup .list-view .list-cell,
+.choice-box .context-menu .menu-item {
+    -fx-text-fill: white;
+    -fx-background-color: #333333;
+}
+
+.tarea-todo-dia {
+    -fx-background-color: #e3f2fd;
+    -fx-padding: 2;
+    -fx-background-radius: 3;
+    -fx-text-fill: #000000;
+}
+
+.tarea-sin-etiqueta {
+    -fx-background-color: #f4f4f4;
+    -fx-border-color: #444444;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-text-fill: #333333;
+}
+.dark-mode .tarea-todo-dia {
+    -fx-background-color: #2A3B4C;
+    -fx-text-fill: #ffffff;
+}
+
+.dark-mode .tarea-sin-etiqueta {
+    -fx-background-color: #3A3A3A;
+    -fx-border-color: #555555;
+    -fx-text-fill: #E0E0E0;
+}

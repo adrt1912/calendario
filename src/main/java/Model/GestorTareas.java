@@ -87,8 +87,8 @@ public class GestorTareas {
             //Si su fecha fin es hoy la mostrara por pantalla
                taresDevolver.append(" ").append(todasTarea.getNombreTarea());
                numt++;
-               if(todasTarea.getHora()!=null) taresDevolver.append(" a las: ").append(todasTarea.getHora());
-                if(numt< listTareaEscribir.size()) taresDevolver.append(" y ");
+               if(todasTarea.getHoraInicio()!=null) taresDevolver.append(" a las: ").append(todasTarea.getHoraInicio());
+                if(numt< listTareaEscribir.size()) taresDevolver.append(" y");
 
         }
         if(numt==0) return resourceBundle.getString("gestor.hoySin");
@@ -107,7 +107,7 @@ public class GestorTareas {
         for(Tarea todasTareaM : listTareaEscribir){
                 taresDevolver.append(" ").append(todasTareaM.getNombreTarea());
                 numT++;
-                if(todasTareaM.getHora()!=null) taresDevolver.append(" a las: ").append(todasTareaM.getHora());
+                if(todasTareaM.getHoraInicio()!=null) taresDevolver.append(" a las: ").append(todasTareaM.getHoraInicio());
                 if(numT< listTareaEscribir.size()) taresDevolver.append(" y ");
             }
 
@@ -134,8 +134,8 @@ public class GestorTareas {
     }
 
     //Crea la nueva tarea con los datos recibidos
-    public Tarea anadirTarea(String titulo,LocalDate fechaFin,String descripcion,String sitio,LocalTime time,Periodicidad frecuencia,String idFamilia,Etiqueta etiqueta){
-        Tarea tareaNueva=new Tarea(titulo, LocalDate.now(),fechaFin, EstadoTarea.EN_PROCESO,descripcion,sitio,time,frecuencia,idFamilia,etiqueta);
+    public Tarea anadirTarea(String titulo,LocalDate fechaFin,String descripcion,String sitio,LocalTime timeInicial,LocalTime horaFin,Periodicidad frecuencia,String idFamilia,Etiqueta etiqueta){
+        Tarea tareaNueva=new Tarea(titulo, LocalDate.now(),fechaFin, EstadoTarea.EN_PROCESO,descripcion,sitio,timeInicial,horaFin,frecuencia,idFamilia,etiqueta);
         // Comprobamos cuántas tareas hay antes de intentar añadirla
         int tamañoAntes = todasTareas.size();
         añadirTareaALista(tareaNueva);
@@ -156,7 +156,7 @@ public class GestorTareas {
         tarea.setFechaFin(fechaFin);
         tarea.setDescripcion(descripcion);
         tarea.setSitio(sitio);
-        tarea.setHora(time);
+        tarea.setHoraInicio(time);
         tarea.setFrecuencia(frecuencia);
         tarea.setEstadoTarea(estadoTarea);
         tarea.setEtiqueta(etiqueta);
