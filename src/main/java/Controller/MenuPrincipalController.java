@@ -2,13 +2,17 @@ package Controller;
 
 import Model.*;
 import View.view;
+import javafx.animation.FadeTransition;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -16,6 +20,7 @@ import javafx.scene.text.TextAlignment;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.TextStyle;
 import java.util.*;
 import javafx.util.Duration;
@@ -117,7 +122,21 @@ public class MenuPrincipalController {
            mostrarCalendario();
            mostrarTareas();
        });
+       Platform.runLater(() -> {
+           rootPane.requestFocus();
 
+           if (rootPane.getScene() != null) {
+               rootPane.getScene().addEventFilter(javafx.scene.input.KeyEvent.KEY_PRESSED, event -> {
+                   if (event.getCode() == KeyCode.LEFT) {
+                       retrocederMes();
+                       event.consume();// Flecha izquierda = Atrás
+                   } else if (event.getCode() == KeyCode.RIGHT) {
+                       pasarMes();
+                       event.consume();// Flecha derecha = Adelante
+                   }
+               });
+           }
+       });
    }
 
 
@@ -177,18 +196,15 @@ public class MenuPrincipalController {
        else return frase.substring(0,1).toUpperCase()+frase.substring(1);
     }
 
+    private Preferences prefs; //Para guardar de forma global si esta en modo oscuro o no
     //Metodo que muestra el calendario
     public void mostrarCalendario(){
-        Preferences prefs = Preferences.userNodeForPackage(ConfiguracionController.class);
-        boolean isDark = prefs.getBoolean("modo_oscuro", false);
+         prefs = Preferences.userNodeForPackage(ConfiguracionController.class);
 
-        if (isDark) {
-            if (!rootPane.getStyleClass().contains("dark-mode")) {
-                rootPane.getStyleClass().add("dark-mode");
-            }
-        } else {
-            rootPane.getStyleClass().remove("dark-mode");
-        }
+        if (prefs.getBoolean("modo_oscuro", false)) {
+            if (!rootPane.getStyleClass().contains("dark-mode")) rootPane.getStyleClass().add("dark-mode");
+        } else rootPane.getStyleClass().remove("dark-mode");
+
         // Para borrar lo que hay escrito en el calendario
         calendarioMensual.getChildren().clear();
         contenedorSemanal.getChildren().clear();
@@ -206,6 +222,12 @@ public class MenuPrincipalController {
         if(modo.equals("M")) mostrarCalendarioMensual(); //Dependiendo del modo mensual o semanal
         else if (modo.equals("S")) mostrarCalendarioSemanal();
 
+        javafx.scene.Node panelAnimado = modo.equals("M") ? calendarioMensual : contenedorSemanal;
+        FadeTransition transicion = new FadeTransition(Duration.millis(200), panelAnimado);
+        transicion.setFromValue(0.3); // Empieza casi transparente
+        transicion.setToValue(1.0);   // Termina totalmente opaco
+        transicion.play();
+
         mostrarEtiquetasClasificaciones();
     }
 
@@ -218,8 +240,8 @@ public class MenuPrincipalController {
         //Se coge el dia de la semana de la fecha seleccionada, y el lunes de la semana
         int diaDeLaSemana = fechaSeleccionada.getDayOfWeek().getValue();
         LocalDate lunesDeEstaSemana = fechaSeleccionada.minusDays(diaDeLaSemana - 1);
-
         LocalDate fechaHoy=LocalDate.now();
+
         HBox cajaNombresSemana = new HBox();
         //Es para el hueco de las horas
         Pane huecoIzquierda = new Pane();
@@ -227,6 +249,7 @@ public class MenuPrincipalController {
         huecoIzquierda.setMinWidth(60);
         cajaNombresSemana.getChildren().add(huecoIzquierda);
 
+        Label[] cabecerasDia = new Label[7]; //Se guardan para alinearlas luego
         contenedorSemanal.getChildren().add(cajaNombresSemana);
 
         for(int i=0;i<7;i++) {
@@ -235,20 +258,26 @@ public class MenuPrincipalController {
             label.setText(semana[i]+"\n"+diaQueTocaDibujar);
             label.setAlignment(Pos.CENTER);
             label.setTextAlignment(TextAlignment.CENTER);
+
+            label.setMinWidth(0);
             label.setMaxWidth(Double.MAX_VALUE);
             label.setMinHeight(80);
             HBox.setHgrow(label, Priority.ALWAYS);
-            label.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
+
+            String colorFondo="transparent";
+            if(i==5 || i==6) colorFondo = prefs.getBoolean("modo_oscuro",false) ? "#333333" : "#e4e4e4";
+            String estiloBase = "-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: " + colorFondo + ";";
+
             cajaNombresSemana.getChildren().add(label);
+            cabecerasDia[i]=label;
             LocalDate fechaExactaDelDia = lunesDeEstaSemana.plusDays(i);
             label.setOnMouseClicked(event -> {
                 fechaSeleccionada = fechaExactaDelDia;
                 mostrarTareas();});
             //Para qeu se marque al clicar
-            if(diaQueTocaDibujar == fechaHoy.getDayOfMonth() && fechaSeleccionada.getMonth() == fechaHoy.getMonth() && fechaSeleccionada.getYear() == fechaHoy.getYear()) {
-                // Si es hoy: Letra grande + Borde rojo
-                label.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-border-color: red; -fx-border-width: 2px; -fx-border-radius: 50em; -fx-padding: 2 6 2 6;");
-            } else label.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");// Si no es hoy: Solo letra grande
+            if(diaQueTocaDibujar == fechaHoy.getDayOfMonth() && fechaSeleccionada.getMonth() == fechaHoy.getMonth() && fechaSeleccionada.getYear() == fechaHoy.getYear()) {// Si es hoy: Letra grande + Borde rojo
+                label.setStyle(estiloBase+"-fx-font-size: 15px; -fx-font-weight: bold; -fx-border-color: red; -fx-border-width: 2px; -fx-border-radius: 50em; -fx-padding: 2 6 2 6;");
+            } else label.setStyle(estiloBase);// Si no es hoy: Solo letra grande
         }
 
         HBox filaTodoElDia = new HBox();
@@ -262,15 +291,17 @@ public class MenuPrincipalController {
             VBox vBoxTareasTodoDia = new VBox();
             vBoxTareasTodoDia.setSpacing(2);
 
+            vBoxTareasTodoDia.setMinWidth(0);
+            vBoxTareasTodoDia.setMaxWidth(Double.MAX_VALUE);
             HBox.setHgrow(vBoxTareasTodoDia, Priority.ALWAYS); // Hacemos que se estiren a lo ancho
             vBoxTareasTodoDia.setStyle("-fx-border-color: #d0d0d0; -fx-border-width: 0 1 1 0;"); // Borde abajo y a la derecha
 
             panelesTareasTodoDia[i] = vBoxTareasTodoDia;
             filaTodoElDia.getChildren().add(vBoxTareasTodoDia);
-
         }
 
         contenedorSemanal.getChildren().add(filaTodoElDia);
+
         ScrollPane scrollReal = new ScrollPane();
         scrollReal.setFitToWidth(true); // Para que no haya scroll horizontal feo
         scrollReal.setStyle("-fx-background-color: transparent;");
@@ -296,14 +327,43 @@ public class MenuPrincipalController {
             LocalDate fechaExactaDelDia = lunesDeEstaSemana.plusDays(i);
             Pane panelDia=new Pane();
             panelDia.setPrefHeight(24*60);
+
+            panelDia.setMinWidth(0);
+            panelDia.setMaxWidth(Double.MAX_VALUE);
             HBox.setHgrow(panelDia,Priority.ALWAYS);
             panelDia.setStyle("-fx-border-color: #e0e0e0; -fx-border-width: 0 1 0 0;"); // Línea separadora
-            panelDia.setOnMouseClicked(event -> {tratarEventoClick(event, fechaExactaDelDia);});
+
+            for(int j=0;j<24;j++){
+                Line linea =new Line();
+                linea.setStartX(0);
+                linea.setStartY(j*60);
+                linea.setEndY(j*60);
+                linea.endXProperty().bind(panelDia.widthProperty());
+
+                linea.setStyle("-fx-stroke: #e0e0e0; -fx-stroke-width: 2px; -fx-opacity: 0.5;");
+                linea.setMouseTransparent(true);
+
+                panelDia.getChildren().add(linea);
+            }
+
+
+            panelDia.setOnMouseClicked(event -> {tratarEventoClick(event, fechaExactaDelDia,LocalTime.of((int) (event.getY()/60),(int) (event.getY() % 60)));});
             panelesDiasSemanales[i]=panelDia;
             cajaDeTareas.getChildren().add(panelDia);
         }
         scrollReal.setContent(cajaDeTareas);
         contenedorSemanal.getChildren().add(scrollReal);
+
+        for(int i=0;i<7;i++){
+            // Obligamos a la cabecera a medir exactamente igual que su columna de horas
+            cabecerasDia[i].minWidthProperty().bind(panelesDiasSemanales[i].widthProperty());
+            cabecerasDia[i].maxWidthProperty().bind(panelesDiasSemanales[i].widthProperty());
+
+            // Obligamos a la caja del día entero a medir exactamente igual que su columna de horas
+            panelesTareasTodoDia[i].minWidthProperty().bind(panelesDiasSemanales[i].widthProperty());
+            panelesTareasTodoDia[i].maxWidthProperty().bind(panelesDiasSemanales[i].widthProperty());
+        }
+
         mostrarEtiquetasSemanales();
     }
 
@@ -324,6 +384,10 @@ public class MenuPrincipalController {
                 VBox casillaActual = calendarioVBoxMensual[j][i];
                 calendarioMensual.add(casillaActual, j, i);
                 casillaActual.getChildren().clear();
+
+                String colorFondo="transparent";
+                if(j==6||j==5) colorFondo = prefs.getBoolean("modo_oscuro",false) ? "#333333" : "#e4e4e4";
+                casillaActual.setStyle("-fx-background-color: "+colorFondo+";");
                 //Si es la fila de arriba solo se pone le nombre del dia de la semana
                 if(i == 0)  casillaActual.getChildren().add(new Label(semana[j]));
                 else{
@@ -334,7 +398,7 @@ public class MenuPrincipalController {
                             casillaActual.getChildren().add(label);
                             int diaClicado = numMes;
                             casillaActual.setOnMouseClicked(event -> {
-                                tratarEventoClick(event,LocalDate.of(fechaSeleccionada.getYear(),fechaSeleccionada.getMonth(),diaClicado));
+                                tratarEventoClick(event,LocalDate.of(fechaSeleccionada.getYear(),fechaSeleccionada.getMonth(),diaClicado), null);
                             });
                             //Si coincide con el dia de hoy se marca
                             if(numMes==fechaHoy.getDayOfMonth()&&fechaSeleccionada.getMonth()==fechaHoy.getMonth() && fechaSeleccionada.getYear()==fechaHoy.getYear()) label.setStyle("-fx-border-color: red; -fx-border-width: 2px; -fx-border-radius: 50em; -fx-padding: 2 6 2 6");
@@ -347,11 +411,13 @@ public class MenuPrincipalController {
                             casillaActual.getChildren().add(label);
                             int diaClicado = numMes;
                             casillaActual.setOnMouseClicked(event -> {
-                               tratarEventoClick(event,LocalDate.of(fechaSeleccionada.getYear(),fechaSeleccionada.getMonth(),diaClicado));
+                               tratarEventoClick(event,LocalDate.of(fechaSeleccionada.getYear(),fechaSeleccionada.getMonth(),diaClicado),null);
                             });
                             //Se mira si coincide con el dia de hoy
                             if(numMes==fechaHoy.getDayOfMonth()&&fechaSeleccionada.getMonth()==fechaHoy.getMonth() && fechaSeleccionada.getYear()==fechaHoy.getYear())  label.setStyle("-fx-border-color: red; -fx-border-width: 2px; -fx-border-radius: 50em; -fx-padding: 2 6 2 6");
+
                             numMes++;
+
                         }
                     }
                 }
@@ -361,14 +427,14 @@ public class MenuPrincipalController {
     }
 
     //Se encarga de tratar si se clica en un dia
-    private void tratarEventoClick(MouseEvent event,LocalDate fechaSeleccionada){
+    private void tratarEventoClick(MouseEvent event,LocalDate fechaSeleccionada,LocalTime horaClick){
        //Un click mustra las tareas
         if(event.getClickCount()==1){
             this.fechaSeleccionada = fechaSeleccionada;
             mostrarTareas();
             //Dos clicks crea una nueva tarea con la fecha de ese dia
         }else if(event.getClickCount()==2){
-            añadirEvento(fechaSeleccionada);
+            añadirEvento(fechaSeleccionada,horaClick);
         }
     }
 
@@ -376,7 +442,7 @@ public class MenuPrincipalController {
     private void mostrarEtiquetasSemanales(){
        //Se cogen todas las tareas
         for (Pane panel : panelesDiasSemanales) {
-            if (panel != null) panel.getChildren().clear();
+            if (panel != null) panel.getChildren().removeIf(nodo -> nodo instanceof Label);//Solo se borran las etiqeuta de tareas, no el resto (lineas)
         }
 
         String textoBusqueda=buscadorTareas.getText();
@@ -467,7 +533,7 @@ public class MenuPrincipalController {
                         labelTodoDia.getStyleClass().add("tarea-todo-dia");
                         panelesTareasTodoDia[columna].getChildren().add(labelTodoDia);
                         labelTodoDia.setOnMouseClicked(event -> {
-                           tratarEventoClick(event,tarea.getFechaFin());
+                           tratarEventoClick(event,tarea.getFechaFin(),null);
                         });
                     }
                 }
@@ -556,14 +622,14 @@ public class MenuPrincipalController {
     //Es el metodo de fxml, al dar al boton, como no hay fecha establecida se pone anull y ya se asignara
     @FXML
     public void añadirEvento(){
-        añadirEvento(null);
+        añadirEvento(null,null);
     }
 
     //La fecha se pasa por si se inicia con doble click, se ponga automaticamente
     @FXML
-    private void añadirEvento(LocalDate fecha) {
+    private void añadirEvento(LocalDate fecha, LocalTime horaInicio) {
         try {
-            view.showCrearTArea(fecha);
+            view.showCrearTArea(fecha,horaInicio);
             mostrarCalendario();
             mostrarTareas();
         } catch (Exception e) {

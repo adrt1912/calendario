@@ -31,10 +31,11 @@ public class CrearTareaController {
         }
     }
 
-    public void initialize(LocalDate fechaf){
+    public void initialize(LocalDate fechaf,LocalTime hora){
         textoPeriodicidad.getItems().addAll(Periodicidad.values());
         boxEtiquetas.getItems().addAll(GestorTareas.getGestorTareas().getListaEtiquetas());
         if(fechaf!=null) texFecha.setValue(fechaf);
+        if(hora!=null) textoHoraInicio.setText(hora.toString());
     }
 
     @FXML
