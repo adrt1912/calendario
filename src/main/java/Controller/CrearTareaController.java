@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.prefs.Preferences;
 
 public class CrearTareaController {
     @FXML
@@ -23,20 +24,6 @@ public class CrearTareaController {
     private Text textoError;
     @FXML
     private AnchorPane rootPane;
-
-    public void initialize(){
-        java.util.prefs.Preferences prefs = java.util.prefs.Preferences.userNodeForPackage(ConfiguracionController.class);
-        if (prefs.getBoolean("modo_oscuro", false) && rootPane != null) {
-            rootPane.getStyleClass().add("dark-mode");
-        }
-    }
-
-    public void initialize(LocalDate fechaf,LocalTime hora){
-        textoPeriodicidad.getItems().addAll(Periodicidad.values());
-        boxEtiquetas.getItems().addAll(GestorTareas.getGestorTareas().getListaEtiquetas());
-        if(fechaf!=null) texFecha.setValue(fechaf);
-        if(hora!=null) textoHoraInicio.setText(hora.toString());
-    }
 
     @FXML
     private TextField textoTitulo;
@@ -61,6 +48,20 @@ public class CrearTareaController {
 
     @FXML
     private ComboBox<Etiqueta> boxEtiquetas;
+
+    public void initialize(){
+        Preferences prefs = Preferences.userNodeForPackage(ConfiguracionController.class);
+        if (prefs.getBoolean("modo_oscuro", false) && rootPane != null) {
+            rootPane.getStyleClass().add("dark-mode");
+        }
+    }
+
+    public void initialize(LocalDate fechaf,LocalTime hora){
+        textoPeriodicidad.getItems().addAll(Periodicidad.values());
+        boxEtiquetas.getItems().addAll(GestorTareas.getGestorTareas().getListaEtiquetas());
+        if(fechaf!=null) texFecha.setValue(fechaf);
+        if(hora!=null) textoHoraInicio.setText(hora.toString());
+    }
 
     @FXML
     private void guardarTarea() {

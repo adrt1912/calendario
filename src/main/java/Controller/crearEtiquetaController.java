@@ -9,6 +9,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.util.prefs.Preferences;
+
 public class crearEtiquetaController {
 
     @FXML
@@ -20,6 +22,12 @@ public class crearEtiquetaController {
     @FXML
     private Button botonCancelar;
 
+    @FXML
+    private Text textoError;
+
+    @FXML
+    private AnchorPane rootPane;
+
     //Solo cierra la ventana
     @FXML
     private void cancelarEtiqueta(){
@@ -27,18 +35,15 @@ public class crearEtiquetaController {
         ventanaActual.close();
     }
 
-    @FXML
-    private AnchorPane rootPane;
+
 
     public void initialize(){
-        java.util.prefs.Preferences prefs = java.util.prefs.Preferences.userNodeForPackage(ConfiguracionController.class);
+       Preferences prefs = java.util.prefs.Preferences.userNodeForPackage(ConfiguracionController.class);
         if (prefs.getBoolean("modo_oscuro", false) && rootPane != null) {
             rootPane.getStyleClass().add("dark-mode");
         }
     }
 
-    @FXML
-    private Text textoError;
     //Crea la etiqueta
     @FXML
     private void crearEtiqueta(){

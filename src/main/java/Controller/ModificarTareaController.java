@@ -2,6 +2,7 @@ package Controller;
 
 import Model.*;
 import View.view;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
@@ -41,6 +42,8 @@ private Label textoTituloTop;
 private ComboBox<Etiqueta> boxEtiquetas;
 @FXML
 private Text textoError;
+    @FXML
+    private Button botonCancelar;
 
     @FXML
     private AnchorPane rootPane;
@@ -62,7 +65,7 @@ public void setTareaMos(Tarea tareaMos) {
         if(tareaMos.getHoraInicio()!=null){
             campoHoraInicio.setText(GestorTareas.getGestorTareas().obtenerHoraFormateada(tareaMos.getHoraInicio()));
         }
-        if(tareaMos.getHoraInicio()!=null){
+        if(tareaMos.getHoraFin()!=null){
         campoHoraFin.setText(GestorTareas.getGestorTareas().obtenerHoraFormateada(tareaMos.getHoraFin()));
         }
         if(tareaMos.getSitio()!=null){
@@ -75,10 +78,11 @@ public void setTareaMos(Tarea tareaMos) {
             checkCompletada.setSelected(true);
         }
         //Establece el valor en los combobox ademas de rellenarlos
-    campoPerioricidad.getItems().addAll(Periodicidad.values());
-    boxEtiquetas.getItems().addAll(GestorTareas.getGestorTareas().getListaEtiquetas());
-    textoTituloTop.setText(tareaMos.getNombreTarea());
+    campoPerioricidad.setItems(FXCollections.observableArrayList(Periodicidad.values()));
     campoPerioricidad.setValue(tareaMos.getFrecuencia());
+
+    boxEtiquetas.setItems(FXCollections.observableArrayList(GestorTareas.getGestorTareas().getListaEtiquetas()));
+    textoTituloTop.setText(tareaMos.getNombreTarea());
     boxEtiquetas.setValue(tareaMos.getEtiqueta());
 }
 //Si se elige completado cambia su estado
@@ -90,9 +94,6 @@ private void cambiarEstado(){
         tareaMos.setEstadoTarea(EstadoTarea.EN_PROCESO);}
 }
 
-@FXML
-private Button botonCancelar;
-
 //Boton para cerrar sin guardar
 @FXML
 private void cerrarTodo(){
@@ -103,6 +104,7 @@ private void cerrarTodo(){
 //Si se pulsa en eliminar tarea se borra
 @FXML
 private void eliminarTarea(){//En caso de qeu sea periodica sale una pantalla emergente
+
     if(tareaMos.getFrecuencia()!=Periodicidad.NUNCA){
         try{
             view.showConfirmacionEl(tareaMos);
