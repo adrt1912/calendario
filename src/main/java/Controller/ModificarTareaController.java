@@ -42,6 +42,8 @@ private Label textoTituloTop;
 private ComboBox<Etiqueta> boxEtiquetas;
 @FXML
 private Text textoError;
+@FXML
+private DatePicker campoFechaFin;
     @FXML
     private Button botonCancelar;
 
@@ -60,7 +62,10 @@ public void setTareaMos(Tarea tareaMos) {
         this.tareaMos = tareaMos;
         campoTitulo.setText(tareaMos.getNombreTarea());
         if(tareaMos.getFechaFin()!=null){
-            campoFecha.setValue(tareaMos.getFechaFin());
+            campoFechaFin.setValue(tareaMos.getFechaFin());
+        }
+        if(tareaMos.getFechaInicio()!=null){
+            campoFecha.setValue(tareaMos.getFechaInicio());
         }
         if(tareaMos.getHoraInicio()!=null){
             campoHoraInicio.setText(GestorTareas.getGestorTareas().obtenerHoraFormateada(tareaMos.getHoraInicio()));
@@ -104,7 +109,6 @@ private void cerrarTodo(){
 //Si se pulsa en eliminar tarea se borra
 @FXML
 private void eliminarTarea(){//En caso de qeu sea periodica sale una pantalla emergente
-
     if(tareaMos.getFrecuencia()!=Periodicidad.NUNCA){
         try{
             view.showConfirmacionEl(tareaMos);
@@ -128,10 +132,13 @@ private void eliminarTarea(){//En caso de qeu sea periodica sale una pantalla em
 private void modificarTarea() {
 
     String titulo = campoTitulo.getText();
-    LocalDate fechaFin = campoFecha.getValue();
-    if (fechaFin == null) {
-        fechaFin = LocalDate.now();
-    }
+    LocalDate fechaInic = campoFecha.getValue();
+    if (fechaInic == null) fechaInic = LocalDate.now();
+
+
+    LocalDate fechaFin=campoFechaFin.getValue();
+    if(fechaFin==null) fechaFin=LocalDate.now();
+
     String descripcion = campoDescripcion.getText();
     String sitio = campoSitio.getText();
     LocalTime time;
@@ -174,7 +181,7 @@ private void modificarTarea() {
     if (titulo.isBlank()) {
         textoError.setText("Introduzca un titulo");
     } else {
-        GestorTareas.getGestorTareas().modificarTarea(tareaMos, titulo, fechaFin, descripcion, sitio, time, frecuencia, estado, etiqueta);
+        GestorTareas.getGestorTareas().modificarTarea(tareaMos, titulo,fechaInic, fechaFin, descripcion, sitio, time, frecuencia, estado, etiqueta);
         cerrarTodo();
     }
 }

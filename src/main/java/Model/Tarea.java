@@ -124,10 +124,8 @@ public class Tarea {
     //Constructor
     public Tarea(String nombreTarea, LocalDate fechaInicio, LocalDate fechaFin, EstadoTarea estadoTarea, String descripcion, String sitio, LocalTime horaInicio, LocalTime horaFin, Periodicidad frecuencia,String idFamilia,Etiqueta etiqueta) {
         this.nombreTarea = nombreTarea;
-        this.fechaInicio = fechaInicio;
-        if(fechaFin==null)this.fechaFin=LocalDate.now();
-        else this.fechaFin = fechaFin;
-        this.estadoTarea = estadoTarea;
+        this.fechaInicio = (fechaInicio != null) ? fechaInicio : LocalDate.now();   if(fechaFin==null)this.fechaFin=fechaInicio;
+        this.fechaFin = (fechaFin != null) ? fechaFin : this.fechaInicio;        this.estadoTarea = estadoTarea;
         this.descripcion = descripcion;
         this.sitio = sitio;
         this.horaInicio = horaInicio;
@@ -152,42 +150,29 @@ public class Tarea {
     //Devuelve el string de la tarea
     public String mostrarTarea() {
         ResourceBundle resourceBundle=obtenerDiccionario();
-        String resultado=resourceBundle.getString("descripcionTareas.titulo")+" "+nombreTarea+" ";
-        if(fechaFin!=null){resultado=resultado+resourceBundle.getString("descripcionTareas.fechaFin")+" "+fechaFin+" ";}
-        if(horaInicio!=null){resultado=resultado+resourceBundle.getString("descripcionTareas.hora")+" "+GestorTareas.getGestorTareas().obtenerHoraFormateada(horaInicio)+" ";}
-        if(horaFin!=null){resultado = resultado + resourceBundle.getString("descripcionTareas.horaFin") +" "+ GestorTareas.getGestorTareas().obtenerHoraFormateada(horaFin) + " ";}
-        if (sitio != null && !sitio.isBlank()){resultado=resultado+resourceBundle.getString("descripcionTareas.sitio")+" "+sitio+" ";}
-        if(descripcion!=null&&!descripcion.isBlank()){resultado=resultado+resourceBundle.getString("descripcionTareas.descripcion")+" "+descripcion;}
-      return resultado;
+        StringBuilder resultado=new StringBuilder();
+        resultado.append(resourceBundle.getString("descripcionTareas.titulo")).append(" ").append(nombreTarea).append(" ");
+        if(fechaInicio!=null){resultado.append(resourceBundle.getString("descripcionTareas.fechaInicio")).append(" ").append(fechaInicio).append(" \n");
+        }
+        if(fechaFin!=null){resultado.append(resourceBundle.getString("descripcionTareas.fechaFin")).append(" ").append(fechaFin).append(" \n");}
+        if(horaInicio!=null){resultado.append(resourceBundle.getString("descripcionTareas.hora")).append(" ").append(GestorTareas.getGestorTareas().obtenerHoraFormateada(horaInicio)).append(" \n");}
+        if(horaFin!=null){resultado.append(resourceBundle.getString("descripcionTareas.horaFin")).append(" ").append(GestorTareas.getGestorTareas().obtenerHoraFormateada(horaFin)).append(" \n");}
+        if (sitio != null && !sitio.isBlank()){resultado.append(resourceBundle.getString("descripcionTareas.sitio")).append(" ").append(sitio).append(" \n");}
+        if(descripcion!=null&&!descripcion.isBlank()){resultado.append(resourceBundle.getString("descripcionTareas.descripcion")).append(" ").append(descripcion);}
+      return resultado.toString();
     }
 
     //Compureba que no se ha caducado la tarea
     private void comprobarEstado() {
-        if (fechaFin == null) {
-            return;
-        }
-        if (LocalDate.now().isAfter(fechaFin) && estadoTarea == EstadoTarea.EN_PROCESO) {
-            estadoTarea = EstadoTarea.CADUCADA;
-        } else if (LocalDate.now().isBefore(fechaFin) && estadoTarea == EstadoTarea.CADUCADA) {
-            estadoTarea=EstadoTarea.EN_PROCESO;
-        }
+        if (fechaFin == null) return;
+        if (LocalDate.now().isAfter(fechaFin) && estadoTarea == EstadoTarea.EN_PROCESO) estadoTarea = EstadoTarea.CADUCADA;
+        else if (LocalDate.now().isBefore(fechaFin) && estadoTarea == EstadoTarea.CADUCADA) estadoTarea=EstadoTarea.EN_PROCESO;
     }
 //Comprueba si dos tareas son identicas
     @Override
     public boolean equals(Object tarea1) {
-        if (this == tarea1) {
-            return true;
-        }
-        if (tarea1 instanceof Tarea tarea) {
-            return Objects.equals(tarea.getFechaFin(), fechaFin) &&
-                    Objects.equals(tarea.getFechaInicio(), fechaInicio) &&
-                    Objects.equals(tarea.getNombreTarea(), nombreTarea) &&
-                    tarea.getEstadoTarea() == estadoTarea &&
-                    Objects.equals(tarea.getDescripcion(), descripcion) &&
-                    Objects.equals(tarea.getSitio(), sitio) &&
-                    Objects.equals(tarea.getHoraInicio(), horaInicio) &&
-                    Objects.equals(tarea.getHoraFin(),horaFin);
-        }
+        if (this == tarea1) return true;
+        if (tarea1 instanceof Tarea tarea) return  Objects.equals(idTarea, tarea.getIdTarea());
         return false;
     }
     @Override

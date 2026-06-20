@@ -128,14 +128,12 @@ public class GestorTareas {
 
     //Comprueba si la tarea esta ya creada, si no es asi la guarda
     public void añadirTareaALista(Tarea tarea){
-        if(todasTareas.stream().noneMatch(t->t.equals(tarea))){
-          todasTareas.add(tarea);
-        }
+        if(todasTareas.stream().noneMatch(t->t.equals(tarea)))todasTareas.add(tarea);
     }
 
     //Crea la nueva tarea con los datos recibidos
-    public Tarea anadirTarea(String titulo,LocalDate fechaFin,String descripcion,String sitio,LocalTime timeInicial,LocalTime horaFin,Periodicidad frecuencia,String idFamilia,Etiqueta etiqueta){
-        Tarea tareaNueva=new Tarea(titulo, LocalDate.now(),fechaFin, EstadoTarea.EN_PROCESO,descripcion,sitio,timeInicial,horaFin,frecuencia,idFamilia,etiqueta);
+    public Tarea anadirTarea(String titulo,LocalDate fechaInicio,LocalDate fechaFin,String descripcion,String sitio,LocalTime timeInicial,LocalTime horaFin,Periodicidad frecuencia,String idFamilia,Etiqueta etiqueta){
+        Tarea tareaNueva=new Tarea(titulo, fechaInicio,fechaFin, EstadoTarea.EN_PROCESO,descripcion,sitio,timeInicial,horaFin,frecuencia,idFamilia,etiqueta);
         // Comprobamos cuántas tareas hay antes de intentar añadirla
         int tamañoAntes = todasTareas.size();
         añadirTareaALista(tareaNueva);
@@ -151,8 +149,9 @@ public class GestorTareas {
     }
 
     //Modifica la teare por medio de setters
-    public void modificarTarea(Tarea tarea,String titulo,LocalDate fechaFin,String descripcion,String sitio,LocalTime time,Periodicidad frecuencia,EstadoTarea estadoTarea,Etiqueta etiqueta){
+    public void modificarTarea(Tarea tarea,String titulo,LocalDate fechaInicio,LocalDate fechaFin,String descripcion,String sitio,LocalTime time,Periodicidad frecuencia,EstadoTarea estadoTarea,Etiqueta etiqueta){
         tarea.setNombreTarea(titulo);
+        tarea.setFechaInicio(fechaInicio);
         tarea.setFechaFin(fechaFin);
         tarea.setDescripcion(descripcion);
         tarea.setSitio(sitio);
@@ -161,7 +160,6 @@ public class GestorTareas {
         tarea.setEstadoTarea(estadoTarea);
         tarea.setEtiqueta(etiqueta);
         ConexionBD.getConexionBD().guardarTarea(tarea);
-        //gestionEnFicheros.guardarEnFichero(todasTareas);
     }
 
     //Borra la etiqueta
@@ -175,14 +173,12 @@ public class GestorTareas {
         }
         listaEtiquetas.remove(etiqueta);
         ConexionBD.getConexionBD().borrarEtiqueta(etiqueta.getNombreEtiqueta());
-        //gestionEnFicheros.guardarEtiquetas(listaEtiquetas);
     }
     //Crea una nueva etiqueta
     public void nuevaEtiqueta(String nombre,String color){
         Etiqueta etiqueta=new Etiqueta(nombre,color);
         listaEtiquetas.add(etiqueta);
         ConexionBD.getConexionBD().guardarEtiqueta(etiqueta);
-        //gestionEnFicheros.guardarEtiquetas(listaEtiquetas);
     }
 
     public List<Etiqueta> getListaEtiquetas(){return listaEtiquetas;}
@@ -210,11 +206,8 @@ public class GestorTareas {
         if (hora == null) return "";
         String formatoElegido = Preferences.userNodeForPackage(View.view.class).get("formato_hora", "24h");
         DateTimeFormatter formateador;
-        if (formatoElegido.equals("12h")) {
-            formateador = DateTimeFormatter.ofPattern("hh:mm a"); // 06:30 PM
-        } else {
-            formateador = DateTimeFormatter.ofPattern("HH:mm");   // 18:30
-        }
+        if (formatoElegido.equals("12h")) formateador = DateTimeFormatter.ofPattern("hh:mm a"); // 06:30 PM
+        else formateador = DateTimeFormatter.ofPattern("HH:mm");   // 18:30
         return hora.format(formateador);
     }
     public void verificarTareasHoy() {
