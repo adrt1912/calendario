@@ -64,19 +64,18 @@ public class CalendarioRender {
         semana=semanas;
     }
 
-    public void mostrarCalendarioMensual(GridPane calendarioMensual, VBox contenedorSemanal, VBox contenedorDiario, LocalDate fechaSeleccionada, MenuPrincipalController jefe,VBox[][] calendarioVBoxMensual){
+    public void mostrarCalendarioMensual(GridPane calendarioMensual, VBox contenedorSemanal, VBox contenedorDiario, LocalDate fechaSeleccionada, MenuPrincipalController jefe, VBox[][] calendarioVBoxMensual){
         //Se pone invisible el semanal y visible el mensual
         contenedorSemanal.setVisible(false);
         calendarioMensual.setVisible(true);
         contenedorDiario.setVisible(false);
-        // Se obtiene la cantidad de días del mes
+
         int numDiasMes = fechaSeleccionada.lengthOfMonth();
-        // Para ver qué día empieza el mes
         int fechaPrimerDiaMes = LocalDate.of(fechaSeleccionada.getYear(), fechaSeleccionada.getMonthValue(), 1).getDayOfWeek().getValue();
 
-        LocalDate fechaHoy=LocalDate.now();
+        LocalDate fechaHoy = LocalDate.now();
         int numMes = 1;
-        //Se recorren todas las posiciones, metiendo el VBox de la matriz creado
+
         for(int i=0; i<calendarioMensual.getRowCount(); i++){
             for (int j=0; j< calendarioMensual.getColumnCount(); j++){
                 VBox casillaActual = calendarioVBoxMensual[j][i];
@@ -84,44 +83,80 @@ public class CalendarioRender {
 
                 casillaActual.getChildren().clear();
 
+                // Limpiamos eventos residuales de meses anteriores por si esta casilla ahora está vacía
+                casillaActual.setOnMouseClicked(null);
+                casillaActual.setOnDragOver(null);
+                casillaActual.setOnDragEntered(null);
+                casillaActual.setOnDragExited(null);
+                casillaActual.setOnDragDropped(null);
+
                 String colorFondo="transparent";
                 if(j==6||j==5) colorFondo = prefs.getBoolean("modo_oscuro",false) ? "#333333" : "#e4e4e4";
                 casillaActual.setStyle("-fx-background-color: "+colorFondo+";");
-                //Si es la fila de arriba solo se pone le nombre del dia de la semana
-                if(i == 0)  casillaActual.getChildren().add(new Label(semana[j]));
-                else{
-                    if(i == 1){
-                        if(j >= fechaPrimerDiaMes - 1){
-                            //Si es la segunda fila, hay que tener en cuenta que dia comienza el mes
-                            Label label=new Label(numMes+"");
-                            casillaActual.getChildren().add(label);
-                            int diaClicado = numMes;
-                            casillaActual.setOnMouseClicked(event -> {
-                                jefe.tratarEventoClick(event,LocalDate.of(fechaSeleccionada.getYear(),fechaSeleccionada.getMonth(),diaClicado), null);
-                            });
-                            //Si coincide con el dia de hoy se marca
-                            if(numMes==fechaHoy.getDayOfMonth()&&fechaSeleccionada.getMonth()==fechaHoy.getMonth() && fechaSeleccionada.getYear()==fechaHoy.getYear()) label.setStyle("-fx-border-color: red; -fx-border-width: 2px; -fx-border-radius: 50em; -fx-padding: 2 6 2 6");
-                            numMes++;
+
+                // Fila 0: Nombres de los días de la semana
+                if(i == 0) {
+                    casillaActual.getChildren().add(new Label(semana[j]));
+                }
+                else {
+                    // Calculamos si la casilla actual corresponde a un día real del mes
+                    boolean esDiaValido = false;
+                    if(i == 1 && j >= fechaPrimerDiaMes - 1) esDiaValido = true; // Primera semana
+                    else if (i > 1 && numMes <= numDiasMes) esDiaValido = true;  // Resto del mes
+
+                    if (esDiaValido) {
+                        Label label = new Label(numMes+"");
+                        casillaActual.getChildren().add(label);
+
+                        int diaClicado = numMes;
+                        LocalDate fechaDeEstaCasilla = LocalDate.of(fechaSeleccionada.getYear(), fechaSeleccionada.getMonthValue(), diaClicado);
+
+                        casillaActual.setOnMouseClicked(event -> {
+                            jefe.tratarEventoClick(event, fechaDeEstaCasilla, null);
+                        });
+
+                        // --- DRAG & DROP: DESTINO (Buzón) ---
+                        casillaActual.setOnDragOver(event -> {
+                            if (event.getGestureSource() != casillaActual && event.getDragboard().hasString()) {
+                                event.acceptTransferModes(javafx.scene.input.TransferMode.MOVE);
+                            }
+                            event.consume();
+                        });
+
+                        casillaActual.setOnDragEntered(event -> {
+                            if (event.getGestureSource() != casillaActual && event.getDragboard().hasString()) {
+                                casillaActual.setStyle("-fx-background-color: #d0e8f2; -fx-border-color: #0078D7; -fx-border-width: 2px;");
+                            }
+                        });
+
+                        int finalJ = j;
+                        casillaActual.setOnDragExited(event -> {
+                            String colorOriginal = (finalJ == 5 || finalJ == 6) ? (prefs.getBoolean("modo_oscuro", false) ? "#333333" : "#e4e4e4") : "transparent";
+                            casillaActual.setStyle("-fx-background-color: " + colorOriginal + ";");
+                        });
+
+                        casillaActual.setOnDragDropped(event -> {
+                            javafx.scene.input.Dragboard db = event.getDragboard();
+                            boolean exito = false;
+                            if (db.hasString()) {
+                                String idTareaArrastrada = db.getString();
+                                jefe.moverTareaA(idTareaArrastrada, fechaDeEstaCasilla);
+                                exito = true;
+                            }
+                            event.setDropCompleted(exito);
+                            event.consume();
+                        });
+
+                        // Marcar el día de hoy
+                        if(numMes == fechaHoy.getDayOfMonth() && fechaSeleccionada.getMonth() == fechaHoy.getMonth() && fechaSeleccionada.getYear() == fechaHoy.getYear()) {
+                            label.setStyle("-fx-border-color: red; -fx-border-width: 2px; -fx-border-radius: 50em; -fx-padding: 2 6 2 6");
                         }
-                    }else{
-                        //El resto de dias, mientras no se pasen del mes se ponen
-                        if(numMes <= numDiasMes){
-                            Label label=new Label(numMes+"");
-                            casillaActual.getChildren().add(label);
-                            int diaClicado = numMes;
-                            casillaActual.setOnMouseClicked(event -> {
-                                jefe.tratarEventoClick(event,LocalDate.of(fechaSeleccionada.getYear(),fechaSeleccionada.getMonth(),diaClicado),null);
-                            });
-                            //Se mira si coincide con el dia de hoy
-                            if(numMes==fechaHoy.getDayOfMonth()&&fechaSeleccionada.getMonth()==fechaHoy.getMonth() && fechaSeleccionada.getYear()==fechaHoy.getYear())  label.setStyle("-fx-border-color: red; -fx-border-width: 2px; -fx-border-radius: 50em; -fx-padding: 2 6 2 6");
-                            numMes++;
-                        }
+                        numMes++;
                     }
                 }
             }
         }
     }
-
     public void mostrarCalendarioSemanal(GridPane calendarioMensual, VBox contenedorSemanal, VBox contenedorDiario, LocalDate fechaSeleccionada, MenuPrincipalController jefe,Pane[] panelesDiasSemanales, VBox[] panelesTareasTodoDia){
         //En caso de la semana se hace invisible el mensual y visible el semanal
         calendarioMensual.setVisible(false);

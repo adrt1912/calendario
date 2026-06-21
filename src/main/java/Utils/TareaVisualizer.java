@@ -61,68 +61,85 @@ public class TareaVisualizer {
         }
     }
 
-
-
-    public void mostrarEtiquetasMensuales(Etiqueta etiqueta, String buscadorTareas, LocalDate fechaSeleccionada,VBox[][] calendarioVBoxMensual,MenuPrincipalController jefe){
+    public void mostrarEtiquetasMensuales(Etiqueta etiqueta, String buscadorTareas, LocalDate fechaSeleccionada,VBox[][] calendarioVBoxMensual,MenuPrincipalController jefe) {
         //Obtenemos todas las tareas
-        List<Tarea> listaTareas=gestorTareas.getTodasTareas();
-        if(etiqueta != null && !etiqueta.getNombreEtiqueta().equals("Sin Etiqueta")) listaTareas=listaTareas.stream().filter(tarea -> tarea.getEtiqueta() != null &&tarea.getEtiqueta().equals(etiqueta)).toList();
+        List<Tarea> listaTareas = gestorTareas.getTodasTareas();
+        if (etiqueta != null && !etiqueta.getNombreEtiqueta().equals("Sin Etiqueta"))
+            listaTareas = listaTareas.stream().filter(tarea -> tarea.getEtiqueta() != null && tarea.getEtiqueta().equals(etiqueta)).toList();
 
         String textoBusqueda = buscadorTareas != null ? buscadorTareas.toLowerCase() : "";
-        if(!textoBusqueda.isEmpty()) listaTareas=listaTareas.stream().filter(tarea -> tarea.getNombreTarea().toLowerCase().contains(textoBusqueda)).toList();
+        if (!textoBusqueda.isEmpty())
+            listaTareas = listaTareas.stream().filter(tarea -> tarea.getNombreTarea().toLowerCase().contains(textoBusqueda)).toList();
 
         //Obtenemos el primer di del mes
-        int primerDiaMes= LocalDate.of(fechaSeleccionada.getYear(),fechaSeleccionada.getMonthValue(), 1).getDayOfWeek().getValue();
+        int primerDiaMes = LocalDate.of(fechaSeleccionada.getYear(), fechaSeleccionada.getMonthValue(), 1).getDayOfWeek().getValue();
         //Es para evitar que cada dia supere la cantidad maxima de etiquetas
-        int [] maxEtiquetasCalendario=new int[32];
+        int[] maxEtiquetasCalendario = new int[32];
+
+        LocalDate inicioMes = LocalDate.of(fechaSeleccionada.getYear(), fechaSeleccionada.getMonthValue(), 1);
+        LocalDate finMes = inicioMes.withDayOfMonth(inicioMes.lengthOfMonth());
 
         //Un bucle que va poniendo todas las tareas
-        for(Tarea tarea:listaTareas){
+        for (Tarea tarea : listaTareas) {
             //Obtenemos la tareas y sus posiciones de donde va
             String titulo = tarea.getNombreTarea();
-            LocalDate fecha=tarea.getFechaFin();
-            int pos = (fecha.getDayOfMonth() - 2) + primerDiaMes;
-            int columna = pos % 7;
-            int fila = (pos / 7) + 1;
-            //En caso de que ese dia tenga menos de dos etiquetas se pone una mas
-            if (maxEtiquetasCalendario[fecha.getDayOfMonth()] <= 1) {
-                //se comprueba que esta en el mismo mes y año que aparece en pantalla
-                if (fecha.getMonth().equals(fechaSeleccionada.getMonth()) && fecha.getYear() == fechaSeleccionada.getYear()) {
-                    Label label = new Label((titulo));
-                    //Dependiendo del estado se ve mas o menos la etiqueta
-                    if (tarea.getEstadoTarea() != EstadoTarea.EN_PROCESO) {
-                        label.setOpacity(0.2);
-                    } else {
-                        label.setOpacity(1);
-                    }
-                    Tooltip infoFlotante = new Tooltip(tarea.mostrarTarea());
-                    infoFlotante.setShowDelay(Duration.millis(100));
-                    label.setTooltip(infoFlotante);
-                    //Se ven distintos wi tiene etiqueta o no
-                    if (!Objects.equals(tarea.getEtiqueta().getNombreEtiqueta(), "Sin Etiqueta")) {
-                        String colorHex = tarea.getEtiqueta().getCodColor();
+            LocalDate inicioTarea = tarea.getFechaInicio();
+            LocalDate finTarea = tarea.getFechaFin();
 
-                        label.setStyle(
-                                "-fx-background-color: " + colorHex + ";" +
-                                        "-fx-border-color: derive(" + colorHex + ", -60%);" +
-                                        "-fx-border-width: 2px;" +
-                                        "-fx-border-radius: 5px;" +                           // Esquinas del borde redondeadas
-                                        "-fx-background-radius: 5px;" +                        // Esquinas del fondo idénticas para que encajen
-                                        "-fx-text-fill: white;" +                             // Texto blanco para que contraste con el fondo relleno
-                                        "-fx-font-weight: bold;"                         // Texto en negrita para que se lea mejor
-                        );
-                    } else {
-                        label.getStyleClass().add("tarea-sin-etiqueta");
+            if (inicioTarea != null && finTarea != null && !inicioTarea.isAfter(finMes) && !finTarea.isBefore(inicioMes)) {
+                LocalDate pintarDesde = inicioTarea.isBefore(inicioMes) ? inicioMes : inicioTarea;
+                LocalDate pintarHasta = finTarea.isAfter(finMes) ? finMes : finTarea;
+
+                for (LocalDate fecha = pintarDesde; !fecha.isAfter(pintarHasta); fecha = fecha.plusDays(1)) {
+                    int pos = (fecha.getDayOfMonth() - 2) + primerDiaMes;
+                    int columna = pos % 7;
+                    int fila = (pos / 7) + 1;
+                    //En caso de que ese dia tenga menos de dos etiquetas se pone una mas
+                    if (maxEtiquetasCalendario[fecha.getDayOfMonth()] <= 1) {
+                        //se comprueba que esta en el mismo mes y año que aparece en pantalla
+                        if (fecha.getMonth().equals(fechaSeleccionada.getMonth()) && fecha.getYear() == fechaSeleccionada.getYear()) {
+                            Label label = new Label((titulo));
+                            //Dependiendo del estado se ve mas o menos la etiqueta
+                            if (tarea.getEstadoTarea() != EstadoTarea.EN_PROCESO) label.setOpacity(0.2);
+                            else label.setOpacity(1);
+                            Tooltip infoFlotante = new Tooltip(tarea.mostrarTarea());
+                            infoFlotante.setShowDelay(Duration.millis(100));
+                            label.setTooltip(infoFlotante);
+                            //Se ven distintos wi tiene etiqueta o no
+                            if (!Objects.equals(tarea.getEtiqueta().getNombreEtiqueta(), "Sin Etiqueta")) {
+                                String colorHex = tarea.getEtiqueta().getCodColor();
+
+                                label.setStyle(
+                                        "-fx-background-color: " + colorHex + ";" +
+                                                "-fx-border-color: derive(" + colorHex + ", -60%);" +
+                                                "-fx-border-width: 2px;" +
+                                                "-fx-border-radius: 5px;" +                           // Esquinas del borde redondeadas
+                                                "-fx-background-radius: 5px;" +                        // Esquinas del fondo idénticas para que encajen
+                                                "-fx-text-fill: white;" +                             // Texto blanco para que contraste con el fondo relleno
+                                                "-fx-font-weight: bold;"                         // Texto en negrita para que se lea mejor
+                                );
+                            } else {
+                                label.getStyleClass().add("tarea-sin-etiqueta");
+                            }
+                            label.setContextMenu(crearMenuContextual(tarea, jefe));
+                            label.setOnDragDetected(event -> {
+                                javafx.scene.input.Dragboard db = label.startDragAndDrop(javafx.scene.input.TransferMode.MOVE);
+                                javafx.scene.input.ClipboardContent content = new javafx.scene.input.ClipboardContent();
+                                content.putString(tarea.getIdTarea()); // Metemos el ID de la tarea en la mochila
+                                db.setContent(content);
+                                event.consume();
+                            });
+
+                            calendarioVBoxMensual[columna][fila].getChildren().add(label);
+                            //Se pone en el calendario
+                        }
+                        //Se mira si llega a las tres etiquetas, si es asi se ponen tres puntos indicando qeu hay mas
+                    } else if (maxEtiquetasCalendario[fecha.getDayOfMonth()] == 2 && fecha.getMonth().equals(fechaSeleccionada.getMonth()) && fecha.getYear() == fechaSeleccionada.getYear()) {
+                        calendarioVBoxMensual[columna][fila].getChildren().add(new Label("..."));
                     }
-                    label.setContextMenu(crearMenuContextual(tarea,jefe));
-                    //Se pone en el calendario
-                    calendarioVBoxMensual[columna][fila].getChildren().add(label);
+                    maxEtiquetasCalendario[fecha.getDayOfMonth()]++;
                 }
-                //Se mira si llega a las tres etiquetas, si es asi se ponen tres puntos indicando qeu hay mas
-            }else if (maxEtiquetasCalendario[fecha.getDayOfMonth()]==2&&fecha.getMonth().equals(fechaSeleccionada.getMonth()) && fecha.getYear() == fechaSeleccionada.getYear()) {
-                calendarioVBoxMensual[columna][fila].getChildren().add(new Label("..."));
             }
-            maxEtiquetasCalendario[fecha.getDayOfMonth()]++;
         }
     }
 
@@ -143,10 +160,11 @@ public class TareaVisualizer {
                         .thenComparing(Tarea::getNombreTarea))
                 .toList();
         for (Tarea tarea : listaTareas) {
-            if (fechaSeleccionada.isEqual(tarea.getFechaFin())) {
+            if (tarea.getFechaInicio() != null && tarea.getFechaFin() != null &&
+                    !fechaSeleccionada.isBefore(tarea.getFechaInicio()) && !fechaSeleccionada.isAfter(tarea.getFechaFin())) {
 
                 // --- A) TAREAS CON HORA (Uso del bucle while para evitar solapamiento) ---
-                if (tarea.getHoraInicio() != null) {
+                if (tarea.getHoraInicio() != null&& tarea.getFechaInicio().isEqual(tarea.getFechaFin())) {
                     int minutosInicio = (tarea.getHoraInicio().getHour() * 60) + tarea.getHoraInicio().getMinute();
                     int duracion = (tarea.getHoraFin().getHour() * 60) + tarea.getHoraFin().getMinute() - minutosInicio;
 
@@ -224,6 +242,9 @@ public class TareaVisualizer {
         for (Pane panel : panelesDiasSemanales) {
             if (panel != null) panel.getChildren().removeIf(nodo -> nodo instanceof Label);//Solo se borran las etiqeuta de tareas, no el resto (lineas)
         }
+        for (VBox panelTodoDia : panelesTareasTodoDia) {
+            if (panelTodoDia != null) panelTodoDia.getChildren().clear();
+        }
 
         List<Tarea> listaTareas=gestorTareas.getTodasTareas();
         if(etiqueta != null && !etiqueta.getNombreEtiqueta().equals("Sin Etiqueta")) listaTareas=listaTareas.stream().filter(tarea -> tarea.getEtiqueta() != null &&tarea.getEtiqueta().equals(etiqueta)).toList();
@@ -235,86 +256,88 @@ public class TareaVisualizer {
         LocalDate domingoDeEstaSemana = lunesDeEstaSemana.plusDays(6);
 
         for(Tarea tarea:listaTareas){
-            //Obtenemos la tareas y sus posiciones de donde va
-            LocalDate fecha=tarea.getFechaFin();
-            //se comprueba que esta en el mismo mes y año que aparece en pantalla
-            if (!fecha.isBefore(lunesDeEstaSemana) && !fecha.isAfter(domingoDeEstaSemana)) {
-                if (tarea.getHoraInicio() != null) {
 
-                    int columna=fecha.getDayOfWeek().getValue()-1;
-                    Pane panelDestino=panelesDiasSemanales[columna];
-                    int minutosInicio=(tarea.getHoraInicio().getHour()*60)+tarea.getHoraInicio().getMinute();
-                    int duracion=(tarea.getHoraFin().getHour()*60)+tarea.getHoraFin().getMinute()-minutosInicio;
-                    Label label = new Label(tarea.getNombreTarea());
-                    double offsetX = 0; // Desplazamiento horizontal inicial
-                    for (javafx.scene.Node node : panelDestino.getChildren()) {
-                        if (node instanceof Label) {
-                            Label existente = (Label) node;
+            for (int i = 0; i < 7; i++) {
+                LocalDate diaEvaluado = lunesDeEstaSemana.plusDays(i);
+                if (tarea.getFechaInicio() != null && tarea.getFechaFin() != null &&
+                        !diaEvaluado.isBefore(tarea.getFechaInicio()) && !diaEvaluado.isAfter(tarea.getFechaFin())) {
 
-                            // Comparamos los rangos de tiempo (Y y altura)
-                            double existenteY = existente.getLayoutY();
-                            double existenteAlto = existente.getPrefHeight();
+                    // CASO 1: Un solo día y con hora de inicio -> Va al panel de horas
+                    if (tarea.getHoraInicio() != null && tarea.getFechaInicio().equals(tarea.getFechaFin())) {
+                        Pane panelDestino = panelesDiasSemanales[i];
+                        int minutosInicio = (tarea.getHoraInicio().getHour() * 60) + tarea.getHoraInicio().getMinute();
+                        int duracion = (tarea.getHoraFin().getHour() * 60) + tarea.getHoraFin().getMinute() - minutosInicio;
 
-                            // Si la nueva tarea empieza antes de que la existente termine
-                            if (minutosInicio < (existenteY + existenteAlto) && (minutosInicio + duracion) > existenteY) {
-                                offsetX = 60; // Desplazamos 60px a la derecha si colisionan
-                                break; // Solo necesitamos detectar un choque para desplazarla
+                        Label label = new Label(tarea.getNombreTarea());
+                        double offsetX = 0;
+                        for (javafx.scene.Node node : panelDestino.getChildren()) {
+                            if (node instanceof Label) {
+                                Label existente = (Label) node;
+                                double existenteY = existente.getLayoutY();
+                                double existenteAlto = existente.getPrefHeight();
+                                if (minutosInicio < (existenteY + existenteAlto) && (minutosInicio + duracion) > existenteY) {
+                                    offsetX = 60;
+                                    break;
+                                }
                             }
                         }
-                    }
-                    label.setLayoutY(minutosInicio);
-                    label.setPrefHeight(Math.max(duracion,20));
-                    label.setPrefWidth(offsetX==0 ? 120 :60);
-                    label.setLayoutX(offsetX);
-                    label.setWrapText(true);
-                    Tooltip infoFlotante = new Tooltip(tarea.mostrarTarea());
-                    infoFlotante.setShowDelay(Duration.millis(100));
-                    label.setTooltip(infoFlotante);
-                    //Dependiendo del estado se ve mas o menos la etiqueta
-                    if (tarea.getEstadoTarea() != EstadoTarea.EN_PROCESO) label.setOpacity(0.2);
-                    else label.setOpacity(1);
+                        label.setLayoutY(minutosInicio);
+                        label.setPrefHeight(Math.max(duracion, 20));
+                        label.setPrefWidth(offsetX == 0 ? 120 : 60);
+                        label.setLayoutX(offsetX);
+                        label.setWrapText(true);
 
-                    //Se ven distintos wi tiene etiqueta o no
-                    if (tarea.getEtiqueta() != null && !Objects.equals(tarea.getEtiqueta().getNombreEtiqueta(), "Sin Etiqueta")){
-                        String colorHex = tarea.getEtiqueta().getCodColor();
+                        Tooltip infoFlotante = new Tooltip(tarea.mostrarTarea());
+                        infoFlotante.setShowDelay(Duration.millis(100));
+                        label.setTooltip(infoFlotante);
 
-                        label.setStyle(
-                                "-fx-background-color: " + colorHex + ";" +
-                                        "-fx-border-color: derive(" + colorHex + ", -60%);" +
-                                        "-fx-border-width: 2px;" +
-                                        "-fx-border-radius: 5px;" +                           // Esquinas del borde redondeadas
-                                        "-fx-background-radius: 5px;" +                        // Esquinas del fondo idénticas para que encajen
-                                        "-fx-text-fill: white;" +                             // Texto blanco para que contraste con el fondo relleno
-                                        "-fx-font-weight: bold;"                         // Texto en negrita para que se lea mejor
-                        );
-                    } else {
-                        label.getStyleClass().add("tarea-sin-etiqueta");
-                    }
-                    label.setContextMenu(crearMenuContextual(tarea,jefe));
-                    label.setOnMouseClicked(event -> {
-                        try {
-                            view.showTareaVentana(tarea);
-                            jefe.mostrarCalendario();
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                        label.setOpacity(tarea.getEstadoTarea() != EstadoTarea.EN_PROCESO ? 0.2 : 1);
+
+                        if (tarea.getEtiqueta() != null && !Objects.equals(tarea.getEtiqueta().getNombreEtiqueta(), "Sin Etiqueta")) {
+                            label.setStyle("-fx-background-color: " + tarea.getEtiqueta().getCodColor() + "; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5px; -fx-background-radius: 5px;");
+                        } else {
+                            label.getStyleClass().add("tarea-sin-etiqueta");
                         }
-                    });
-                    panelDestino.getChildren().add(label);
-                }else{
-                    int columna=fecha.getDayOfWeek().getValue()-1;
 
-                    Label labelTodoDia = new Label(tarea.getNombreTarea());
-                    Tooltip infoFlotante = new Tooltip(tarea.mostrarTarea());
-                    infoFlotante.setShowDelay(Duration.millis(100));
-                    labelTodoDia.setTooltip(infoFlotante);
-                    labelTodoDia.setContextMenu(crearMenuContextual(tarea,jefe));
+                        label.setContextMenu(crearMenuContextual(tarea, jefe));
+                        label.setOnMouseClicked(event -> {
+                            try {
+                                view.showTareaVentana(tarea);
+                                jefe.mostrarCalendario();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        });
+                        panelDestino.getChildren().add(label);
 
-                    labelTodoDia.setMaxWidth(Double.MAX_VALUE);
-                    labelTodoDia.getStyleClass().add("tarea-todo-dia");
-                    panelesTareasTodoDia[columna].getChildren().add(labelTodoDia);
-                    labelTodoDia.setOnMouseClicked(event -> {
-                        jefe.tratarEventoClick(event,tarea.getFechaFin(),null);
-                    });
+                    } else {
+                        // CASO 2: Varios días o "Todo el día" -> Va a la cabecera del día correspondiente
+                        Label labelTodoDia = new Label(tarea.getNombreTarea());
+                        Tooltip infoFlotante = new Tooltip(tarea.mostrarTarea());
+                        infoFlotante.setShowDelay(Duration.millis(100));
+                        labelTodoDia.setTooltip(infoFlotante);
+                        labelTodoDia.setContextMenu(crearMenuContextual(tarea, jefe));
+
+                        labelTodoDia.setMaxWidth(Double.MAX_VALUE);
+
+                        if (tarea.getEtiqueta() != null && !Objects.equals(tarea.getEtiqueta().getNombreEtiqueta(), "Sin Etiqueta")) {
+                            labelTodoDia.setStyle("-fx-background-color: " + tarea.getEtiqueta().getCodColor() + "; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 2;");
+                        } else {
+                            labelTodoDia.getStyleClass().add("tarea-todo-dia");
+                        }
+
+                        // Usamos la 'i' del bucle para ponerlo en la columna exacta que estamos evaluando
+                        panelesTareasTodoDia[i].getChildren().add(labelTodoDia);
+
+                        labelTodoDia.setOnMouseClicked(event -> {
+                            try {
+                                view.showTareaVentana(tarea);
+                                jefe.mostrarCalendario();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        });
+                    }
                 }
             }
         }

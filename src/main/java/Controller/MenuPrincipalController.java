@@ -319,4 +319,15 @@ public class MenuPrincipalController {
     private void buscarTarea(){
         mostrarCalendario();
     }
+
+    public void moverTareaA(String idTarea, LocalDate fechaDestino){
+
+       Tarea tarea=gestorTareas.getTodasTareas().stream().filter(tarea1 -> tarea1.getIdTarea().equals(idTarea)).findFirst().orElse(null);
+       if(tarea!=null){
+           long diasDuracion = java.time.temporal.ChronoUnit.DAYS.between(tarea.getFechaInicio(), tarea.getFechaFin());
+           LocalDate fechafin=fechaDestino.plusDays(diasDuracion);
+           gestorTareas.modificarTarea(tarea,tarea.getNombreTarea(),fechaDestino,fechafin,tarea.getDescripcion(),tarea.getSitio(),tarea.getHoraInicio(),tarea.getHoraFin(),tarea.getFrecuencia(),tarea.getEstadoTarea(),tarea.getEtiqueta());
+       }
+       mostrarCalendario();
+    }
 }

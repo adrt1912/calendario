@@ -19,7 +19,7 @@
 
 <AnchorPane fx:id="rootPane" prefHeight="559.0" prefWidth="600.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.ModificarTareaController">
    <children>
-      <BorderPane prefHeight="560.0" prefWidth="600.0" AnchorPane.bottomAnchor="-30.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <BorderPane prefHeight="560.0" prefWidth="645.0" AnchorPane.bottomAnchor="-30.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 
          <top>
             <!-- ¡AQUÍ ESTABA EL ERROR! He borrado el style="-fx-background-color: #f4f4f4; ..." -->
@@ -80,7 +80,17 @@
                   </Label>
 
                   <TextField fx:id="campoTitulo" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                  <DatePicker fx:id="campoFecha" prefHeight="30.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
+                     <children>
+                        <DatePicker fx:id="campoFechaInicio" prefHeight="26.0" prefWidth="159.0" />
+                        <Label prefHeight="20.0" prefWidth="121.0" text="%modificarTarea.textoFechaFin">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <DatePicker fx:id="campoFechaFin" layoutX="10.0" layoutY="10.0" prefHeight="26.0" prefWidth="147.0" />
+                     </children>
+                  </HBox>
                   <HBox GridPane.columnIndex="1" GridPane.rowIndex="2">
                      <children>
                         <TextField fx:id="campoHoraInicio" prefHeight="26.0" prefWidth="139.0" promptText="HH:mm" />

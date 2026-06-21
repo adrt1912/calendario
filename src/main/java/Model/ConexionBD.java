@@ -17,9 +17,7 @@ public class ConexionBD {
     }
 
     public static ConexionBD getConexionBD() {
-        if (conexionBD == null) {
-            conexionBD = new ConexionBD();
-        }
+        if (conexionBD == null) conexionBD = new ConexionBD();
         return conexionBD;
     }
 
