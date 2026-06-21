@@ -157,17 +157,18 @@ private void modificarTarea() {
             time = null;
         }
     }
+    LocalTime horaFin1;
     try {
         // Primero intentamos leerlo normal (formato 24h, ej: "18:30")
-        time = LocalTime.parse(horaFin);
+        horaFin1 = LocalTime.parse(horaFin);
     } catch (Exception e) {
         try {
             // Si falla, intentamos leerlo en formato 12h (ej: "06:30 PM")
             DateTimeFormatter formato12h = DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH);
-            time = LocalTime.parse(horaFin, formato12h);
+            horaFin1 = LocalTime.parse(horaFin, formato12h);
         } catch (Exception ex) {
             // Si el usuario ha escrito "patata", entonces sí lo dejamos en null
-            time = null;
+            horaFin1 = null;
         }
     }
     Periodicidad frecuencia = campoPerioricidad.getValue();
@@ -181,7 +182,7 @@ private void modificarTarea() {
     if (titulo.isBlank()) {
         textoError.setText("Introduzca un titulo");
     } else {
-        GestorTareas.getGestorTareas().modificarTarea(tareaMos, titulo,fechaInic, fechaFin, descripcion, sitio, time, frecuencia, estado, etiqueta);
+        GestorTareas.getGestorTareas().modificarTarea(tareaMos, titulo,fechaInic, fechaFin, descripcion, sitio, time, horaFin1,frecuencia, estado, etiqueta);
         cerrarTodo();
     }
 }

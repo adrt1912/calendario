@@ -149,13 +149,14 @@ public class GestorTareas {
     }
 
     //Modifica la teare por medio de setters
-    public void modificarTarea(Tarea tarea,String titulo,LocalDate fechaInicio,LocalDate fechaFin,String descripcion,String sitio,LocalTime time,Periodicidad frecuencia,EstadoTarea estadoTarea,Etiqueta etiqueta){
+    public void modificarTarea(Tarea tarea,String titulo,LocalDate fechaInicio,LocalDate fechaFin,String descripcion,String sitio,LocalTime time,LocalTime horaFin,Periodicidad frecuencia,EstadoTarea estadoTarea,Etiqueta etiqueta){
         tarea.setNombreTarea(titulo);
         tarea.setFechaInicio(fechaInicio);
         tarea.setFechaFin(fechaFin);
         tarea.setDescripcion(descripcion);
         tarea.setSitio(sitio);
         tarea.setHoraInicio(time);
+        tarea.setHoraFin(horaFin);
         tarea.setFrecuencia(frecuencia);
         tarea.setEstadoTarea(estadoTarea);
         tarea.setEtiqueta(etiqueta);

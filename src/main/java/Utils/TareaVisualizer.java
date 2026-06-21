@@ -61,8 +61,6 @@ public class TareaVisualizer {
         }
     }
 
-
-
     public void mostrarEtiquetasMensuales(Etiqueta etiqueta, String buscadorTareas, LocalDate fechaSeleccionada,VBox[][] calendarioVBoxMensual,MenuPrincipalController jefe) {
         //Obtenemos todas las tareas
         List<Tarea> listaTareas = gestorTareas.getTodasTareas();
@@ -124,8 +122,16 @@ public class TareaVisualizer {
                                 label.getStyleClass().add("tarea-sin-etiqueta");
                             }
                             label.setContextMenu(crearMenuContextual(tarea, jefe));
-                            //Se pone en el calendario
+                            label.setOnDragDetected(event -> {
+                                javafx.scene.input.Dragboard db = label.startDragAndDrop(javafx.scene.input.TransferMode.MOVE);
+                                javafx.scene.input.ClipboardContent content = new javafx.scene.input.ClipboardContent();
+                                content.putString(tarea.getIdTarea()); // Metemos el ID de la tarea en la mochila
+                                db.setContent(content);
+                                event.consume();
+                            });
+
                             calendarioVBoxMensual[columna][fila].getChildren().add(label);
+                            //Se pone en el calendario
                         }
                         //Se mira si llega a las tres etiquetas, si es asi se ponen tres puntos indicando qeu hay mas
                     } else if (maxEtiquetasCalendario[fecha.getDayOfMonth()] == 2 && fecha.getMonth().equals(fechaSeleccionada.getMonth()) && fecha.getYear() == fechaSeleccionada.getYear()) {
