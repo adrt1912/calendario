@@ -66,9 +66,7 @@ public class ConfiguracionController {
 
     //Llama al gestorTareas para eliminar  el contenido
     @FXML
-    private void borrarTodo(){
-        borrar=true;
-    }
+    private void borrarTodo(){borrar=true;}
 
     private void borrarSeguroSI(){GestorTareas.getGestorTareas().borrarContenido();}
     //Cierra la ventana como si nada hubiera pasado
@@ -126,9 +124,7 @@ public class ConfiguracionController {
     }
 
     @FXML
-    private void cambiarModoVisual(){
-        cambiarMdooVisual=true;
-    }
+    private void cambiarModoVisual(){cambiarMdooVisual=true;}
 
     private void cambiarModoVisualSeguro(){
             boolean activado = checkModoOscuro.isSelected();
@@ -153,10 +149,7 @@ public class ConfiguracionController {
     }
 
     @FXML
-    private void descargarICS(){
-        descargarICS=true;
-    }
-
+    private void descargarICS(){descargarICS=true;}
 
     private void descargarICSSeguro(){
         Stage ventanaPrincipal = (Stage) rootPane.getScene().getWindow();
