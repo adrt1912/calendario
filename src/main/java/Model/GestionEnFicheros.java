@@ -291,7 +291,7 @@ public class GestionEnFicheros {
                         nuevaTarea.setFechaInicio(fechaInicio.toLocalDate());
                         nuevaTarea.setDescripcion(descripcion);
                         nuevaTarea.setEstadoTarea(EstadoTarea.EN_PROCESO);
-                        // IMPORTANTE: Asegúrate de que tu Tarea tenga un método para guardar,
+                        // IMPORTANTE: Asegúrate de que tu Tarea tenga un metodo para guardar,
                         // o pásala al gestor:
                         GestorTareas.getGestorTareas().agregarTarea(nuevaTarea);
                     }
