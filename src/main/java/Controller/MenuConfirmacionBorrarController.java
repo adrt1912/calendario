@@ -8,6 +8,7 @@ import javafx.stage.Stage;
 import javafx.scene.control.Button;
 
 import java.util.List;
+import java.util.prefs.Preferences;
 
 public class MenuConfirmacionBorrarController {
 
@@ -19,7 +20,7 @@ public class MenuConfirmacionBorrarController {
     private AnchorPane rootPane;
 
     public void initialize(){
-        java.util.prefs.Preferences prefs = java.util.prefs.Preferences.userNodeForPackage(ConfiguracionController.class);
+        Preferences prefs = Preferences.userNodeForPackage(ConfiguracionController.class);
         if (prefs.getBoolean("modo_oscuro", false) && rootPane != null) {
             rootPane.getStyleClass().add("dark-mode");
         }
@@ -29,7 +30,7 @@ public class MenuConfirmacionBorrarController {
     @FXML
     private void cancelarOp(){
         Stage ventanaActual = (Stage) botonCancelar.getScene().getWindow();
-        ventanaActual.close();
+        if(ventanaActual!=null)  ventanaActual.close();
     }
 
     //Guarda la tarea que se quiere borrar, para poder usarla
@@ -37,13 +38,14 @@ public class MenuConfirmacionBorrarController {
     //Solo elimina esta tarea
     @FXML
     private void borrarSoloEsta(){
-        GestorTareas.getGestorTareas().eliminarTarea(tarea);
+        if(tarea!=null) GestorTareas.getGestorTareas().eliminarTarea(tarea);
         cancelarOp();
     }
 
     //Borra todas las tareas de esta familia, filtrandolas por su idFamilia
     @FXML
     private void borrarTodas(){
+        if (tarea != null && tarea.getIdFamilia() != null) {
         String idF=tarea.getIdFamilia();
         GestorTareas gestorTareas=GestorTareas.getGestorTareas();
         List<Tarea> listBorrar=gestorTareas.getTodasTareas().stream().filter(tarea1 -> tarea1.getIdFamilia()!=null &&tarea1.getIdFamilia().equals(idF)).toList();
@@ -51,5 +53,6 @@ public class MenuConfirmacionBorrarController {
             gestorTareas.eliminarTarea(tarea1);
         }
         cancelarOp();
+    }
     }
 }

@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.prefs.Preferences;
 
 public class CrearTareaController {
     @FXML
@@ -23,20 +24,6 @@ public class CrearTareaController {
     private Text textoError;
     @FXML
     private AnchorPane rootPane;
-
-    public void initialize(){
-        java.util.prefs.Preferences prefs = java.util.prefs.Preferences.userNodeForPackage(ConfiguracionController.class);
-        if (prefs.getBoolean("modo_oscuro", false) && rootPane != null) {
-            rootPane.getStyleClass().add("dark-mode");
-        }
-    }
-
-    public void initialize(LocalDate fechaf,LocalTime hora){
-        textoPeriodicidad.getItems().addAll(Periodicidad.values());
-        boxEtiquetas.getItems().addAll(GestorTareas.getGestorTareas().getListaEtiquetas());
-        if(fechaf!=null) texFecha.setValue(fechaf);
-        if(hora!=null) textoHoraInicio.setText(hora.toString());
-    }
 
     @FXML
     private TextField textoTitulo;
@@ -60,11 +47,40 @@ public class CrearTareaController {
     private TextArea textoDescripcion;
 
     @FXML
+    private DatePicker textFechaFin;
+
+    @FXML
     private ComboBox<Etiqueta> boxEtiquetas;
+
+    public void initialize(){
+        Preferences prefs = Preferences.userNodeForPackage(ConfiguracionController.class);
+        if (prefs.getBoolean("modo_oscuro", false) && rootPane != null) {
+            rootPane.getStyleClass().add("dark-mode");
+        }
+        texFecha.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                if (textFechaFin.getValue() == null || textFechaFin.getValue().isBefore(newValue)) {
+                    textFechaFin.setValue(newValue);
+                }
+            }
+        });
+    }
+
+    public void initialize(LocalDate fechaf,LocalTime hora){
+        textoPeriodicidad.getItems().addAll(Periodicidad.values());
+        boxEtiquetas.getItems().addAll(GestorTareas.getGestorTareas().getListaEtiquetas());
+        if(fechaf!=null){
+            texFecha.setValue(fechaf);
+            textFechaFin.setValue(fechaf);
+        }
+        if(hora!=null) textoHoraInicio.setText(hora.toString());
+
+    }
 
     @FXML
     private void guardarTarea() {
-        LocalDate fecha = texFecha.getValue();
+        LocalDate fechaInicio = texFecha.getValue();
+        LocalDate fechaFin=textFechaFin.getValue();
         String titulo = textoTitulo.getText();
 
         // --- 1. PROCESAR HORA INICIO ---
@@ -110,7 +126,7 @@ public class CrearTareaController {
         } else {
             String idFamiliaUnico = java.util.UUID.randomUUID().toString();
             // Asegúrate de que este método anadirTarea de tu GestorTareas acepta horaInicio y horaFin en este orden
-            Tarea tarea = GestorTareas.getGestorTareas().anadirTarea(titulo, fecha, descripcion, sitio, horaInicio, horaFin, frecuencia, idFamiliaUnico, etiqueta);
+            Tarea tarea = GestorTareas.getGestorTareas().anadirTarea(titulo, fechaInicio,fechaFin, descripcion, sitio, horaInicio, horaFin, frecuencia, idFamiliaUnico, etiqueta);
             if (tarea != null && frecuencia != Periodicidad.NUNCA) tratarTareasPeriodicas(tarea);
             Stage ventanaActual = (Stage) botonCancelar.getScene().getWindow();
             ventanaActual.close();
@@ -122,8 +138,9 @@ public class CrearTareaController {
         int mes=tarea.getFrecuencia().getMes();
         int anio=tarea.getFrecuencia().getAnios();
         for(int i=1;i<40;i++){
-            LocalDate fecha=tarea.getFechaFin().plusDays((long) i *dias).plusMonths((long) i *mes).plusYears((long) i *anio);
-            GestorTareas.getGestorTareas().anadirTarea(tarea.getNombreTarea(),fecha,tarea.getDescripcion(),tarea.getSitio(),tarea.getHoraInicio(),tarea.getHoraFin(),tarea.getFrecuencia(), tarea.getIdTarea(),tarea.getEtiqueta());
+            LocalDate fechaNuevoInicio=tarea.getFechaInicio().plusDays((long) i *dias).plusMonths((long) i *mes).plusYears((long) i *anio);
+            LocalDate nuevafechaFin=tarea.getFechaFin().plusDays((long)i*dias).plusMonths((long)i*mes).plusYears((long) i*anio);
+            GestorTareas.getGestorTareas().anadirTarea(tarea.getNombreTarea(),fechaNuevoInicio,nuevafechaFin,tarea.getDescripcion(),tarea.getSitio(),tarea.getHoraInicio(),tarea.getHoraFin(),tarea.getFrecuencia(), tarea.getIdTarea(),tarea.getEtiqueta());
         }
     }
 

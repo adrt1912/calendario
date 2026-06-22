@@ -1,5 +1,8 @@
 package Model;
 
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
@@ -182,6 +185,56 @@ public class GestionEnFicheros {
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public void exportarAICS(Stage ventana){
+        List<Tarea> listaTareas=GestorTareas.getGestorTareas().getTodasTareas();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Exportar Calendario");
+        fileChooser.setInitialFileName("Mis_Tareas.ics");
+
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivo de iCalendar (*.ics)", "*.ics"));
+
+        File archivoDestino = fileChooser.showSaveDialog(ventana);
+
+        // Si el usuario canceló la ventana, el archivo es null. Abortamos la operación.
+        if (archivoDestino != null) {
+
+            try (FileWriter printWriter = new FileWriter(archivoDestino);
+                 PrintWriter pw = new PrintWriter(printWriter);) {
+                pw.println("BEGIN:VCALENDAR");
+                pw.println("VERSION:2.0");
+                pw.println("PRODID:-//Aday//Gestor de Tareas//ES");
+                for (Tarea tarea : listaTareas) {
+                    pw.println("BEGIN:VEVENT");
+                    pw.println("UID:" + tarea.getIdTarea());
+                    pw.println("SUMMARY:" + tarea.getNombreTarea());
+                    String fechaInic = tarea.getFechaInicio().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+                    String fechaFin = tarea.getFechaFin().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+                    String horaInic = (tarea.getHoraInicio() != null) ? tarea.getHoraInicio().format(DateTimeFormatter.ofPattern("HHmmss")) : "000000";
+                    String horaFin = (tarea.getHoraFin() != null) ? tarea.getHoraFin().format(DateTimeFormatter.ofPattern("HHmmss")) : "235959";
+                    String fechaInicCompleta = fechaInic + "T" + horaInic;
+                    String fechaFinCompleta = fechaFin + "T" + horaFin;
+                    pw.println("DTSTART:" + fechaInicCompleta);
+                    pw.println("DTEND:" + fechaFinCompleta);
+                    if (tarea.getDescripcion() != null && !tarea.getDescripcion().isBlank())
+                        pw.println("DESCRIPTION:" + tarea.getDescripcion());
+
+                    if (tarea.getSitio() != null && !tarea.getSitio().isBlank())
+                        pw.println("LOCATION:" + tarea.getSitio());
+
+                    if (tarea.getEstadoTarea() == EstadoTarea.CADUCADA)
+                        pw.println("STATUS:CANCELLED"); // Si está caducada, al calendario del móvil le sale tachada
+                    else pw.println("STATUS:CONFIRMED"); // Por defecto (EN_PROCESO)
+                    pw.println("END:VEVENT");
+                }
+
+                pw.println("END:VCALENDAR");
+
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }

@@ -2,6 +2,7 @@ package Controller;
 
 import Model.*;
 import View.view;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
@@ -41,6 +42,10 @@ private Label textoTituloTop;
 private ComboBox<Etiqueta> boxEtiquetas;
 @FXML
 private Text textoError;
+@FXML
+private DatePicker campoFechaFin;
+    @FXML
+    private Button botonCancelar;
 
     @FXML
     private AnchorPane rootPane;
@@ -57,12 +62,15 @@ public void setTareaMos(Tarea tareaMos) {
         this.tareaMos = tareaMos;
         campoTitulo.setText(tareaMos.getNombreTarea());
         if(tareaMos.getFechaFin()!=null){
-            campoFecha.setValue(tareaMos.getFechaFin());
+            campoFechaFin.setValue(tareaMos.getFechaFin());
+        }
+        if(tareaMos.getFechaInicio()!=null){
+            campoFecha.setValue(tareaMos.getFechaInicio());
         }
         if(tareaMos.getHoraInicio()!=null){
             campoHoraInicio.setText(GestorTareas.getGestorTareas().obtenerHoraFormateada(tareaMos.getHoraInicio()));
         }
-        if(tareaMos.getHoraInicio()!=null){
+        if(tareaMos.getHoraFin()!=null){
         campoHoraFin.setText(GestorTareas.getGestorTareas().obtenerHoraFormateada(tareaMos.getHoraFin()));
         }
         if(tareaMos.getSitio()!=null){
@@ -75,10 +83,11 @@ public void setTareaMos(Tarea tareaMos) {
             checkCompletada.setSelected(true);
         }
         //Establece el valor en los combobox ademas de rellenarlos
-    campoPerioricidad.getItems().addAll(Periodicidad.values());
-    boxEtiquetas.getItems().addAll(GestorTareas.getGestorTareas().getListaEtiquetas());
-    textoTituloTop.setText(tareaMos.getNombreTarea());
+    campoPerioricidad.setItems(FXCollections.observableArrayList(Periodicidad.values()));
     campoPerioricidad.setValue(tareaMos.getFrecuencia());
+
+    boxEtiquetas.setItems(FXCollections.observableArrayList(GestorTareas.getGestorTareas().getListaEtiquetas()));
+    textoTituloTop.setText(tareaMos.getNombreTarea());
     boxEtiquetas.setValue(tareaMos.getEtiqueta());
 }
 //Si se elige completado cambia su estado
@@ -89,9 +98,6 @@ private void cambiarEstado(){
     }else {
         tareaMos.setEstadoTarea(EstadoTarea.EN_PROCESO);}
 }
-
-@FXML
-private Button botonCancelar;
 
 //Boton para cerrar sin guardar
 @FXML
@@ -126,10 +132,13 @@ private void eliminarTarea(){//En caso de qeu sea periodica sale una pantalla em
 private void modificarTarea() {
 
     String titulo = campoTitulo.getText();
-    LocalDate fechaFin = campoFecha.getValue();
-    if (fechaFin == null) {
-        fechaFin = LocalDate.now();
-    }
+    LocalDate fechaInic = campoFecha.getValue();
+    if (fechaInic == null) fechaInic = LocalDate.now();
+
+
+    LocalDate fechaFin=campoFechaFin.getValue();
+    if(fechaFin==null) fechaFin=LocalDate.now();
+
     String descripcion = campoDescripcion.getText();
     String sitio = campoSitio.getText();
     LocalTime time;
@@ -148,17 +157,18 @@ private void modificarTarea() {
             time = null;
         }
     }
+    LocalTime horaFin1;
     try {
         // Primero intentamos leerlo normal (formato 24h, ej: "18:30")
-        time = LocalTime.parse(horaFin);
+        horaFin1 = LocalTime.parse(horaFin);
     } catch (Exception e) {
         try {
             // Si falla, intentamos leerlo en formato 12h (ej: "06:30 PM")
             DateTimeFormatter formato12h = DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH);
-            time = LocalTime.parse(horaFin, formato12h);
+            horaFin1 = LocalTime.parse(horaFin, formato12h);
         } catch (Exception ex) {
             // Si el usuario ha escrito "patata", entonces sí lo dejamos en null
-            time = null;
+            horaFin1 = null;
         }
     }
     Periodicidad frecuencia = campoPerioricidad.getValue();
@@ -172,7 +182,7 @@ private void modificarTarea() {
     if (titulo.isBlank()) {
         textoError.setText("Introduzca un titulo");
     } else {
-        GestorTareas.getGestorTareas().modificarTarea(tareaMos, titulo, fechaFin, descripcion, sitio, time, frecuencia, estado, etiqueta);
+        GestorTareas.getGestorTareas().modificarTarea(tareaMos, titulo,fechaInic, fechaFin, descripcion, sitio, time, horaFin1,frecuencia, estado, etiqueta);
         cerrarTodo();
     }
 }

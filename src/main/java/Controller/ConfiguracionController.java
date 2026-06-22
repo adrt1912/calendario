@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,8 +17,19 @@ import java.util.prefs.Preferences;
 
 public class ConfiguracionController {
 
+    private final Preferences prefs=Preferences.userNodeForPackage(View.view.class);
+
     @FXML
     private ComboBox<Idiomas> boxIdioma;
+
+    @FXML
+    private Button botonCancelar;
+
+    @FXML
+    private Pane rootPane;
+
+    @FXML
+    private CheckBox checkModoOscuro;
 
     @FXML
     private ComboBox<String> boxFormatoHora;
@@ -31,27 +43,19 @@ public class ConfiguracionController {
     //Rellena los huecos y los comboBox
     public void initialize(){
         boxIdioma.setItems(FXCollections.observableArrayList(Idiomas.values()));
-        Idiomas idiomas=GestorTareas.getGestorTareas().getIdioma();
-        if(idiomas!=null)  boxIdioma.getSelectionModel().select(idiomas); // Para dejar uno marcado por defecto
-        else boxIdioma.getSelectionModel().select(Idiomas.ESPAÑOL);
+        Idiomas idiomaActual=GestorTareas.getGestorTareas().getIdioma();
+        boxIdioma.getSelectionModel().select(idiomaActual != null ? idiomaActual : Idiomas.ESPAÑOL);
 
         boxFormatoHora.setItems(FXCollections.observableArrayList("24h", "12h"));
 
-        Preferences prefs = Preferences.userNodeForPackage(View.view.class);
+        boxFormatoHora.setItems(FXCollections.observableArrayList("24h", "12h"));
         String formatoGuardado = prefs.get("formato_hora", "24h");
-        if (formatoGuardado != null) boxFormatoHora.getSelectionModel().select(formatoGuardado); // Selecciona el que toca (12h o 24h)
-        else boxFormatoHora.getSelectionModel().select("24h");
-         prefs = Preferences.userNodeForPackage(this.getClass());
+        boxFormatoHora.getSelectionModel().select(formatoGuardado != null ? formatoGuardado : "24h");
+
         boolean isDark = prefs.getBoolean("modo_oscuro", false);
-
         checkModoOscuro.setSelected(isDark);
-
         // Si estaba guardado como oscuro, pintamos el rootPane
-        if (isDark) {
-            // Como a veces el rootPane tarda unos milisegundos en cargar su CSS, es buena práctica hacer esto:
-            rootPane.getStyleClass().add("dark-mode");
-        }
-
+        if (isDark) rootPane.getStyleClass().add("dark-mode");
     }
 
     //Llama al gestorTareas para eliminar  el contenido
@@ -60,8 +64,6 @@ public class ConfiguracionController {
         GestorTareas.getGestorTareas().borrarContenido();
     }
 
-    @FXML
-    private Button botonCancelar;
     //Cierra la ventana como si nada hubiera pasado
     @FXML
     private void cancelar(){
@@ -73,16 +75,11 @@ public class ConfiguracionController {
     @FXML
     private void guardarYCerrar(){
         //Para guardar la configuracion en el ordenador, idea de internet
-        Preferences prefs = Preferences.userNodeForPackage(View.view.class);
-        Idiomas idiomaSeleccionado = (Idiomas) boxIdioma.getValue();
-        if (idiomaSeleccionado == Idiomas.INGLES) prefs.put("idioma_actual", "en");
-        else if(idiomaSeleccionado==Idiomas.FRANCES) prefs.put("idioma_actual","fr");
-        else if(idiomaSeleccionado==Idiomas.EUSKERA)prefs.put("idioma_actual","eu");
-        else if(idiomaSeleccionado==Idiomas.ALEMAN) prefs.put("idioma_actual","de");
-        else prefs.put("idioma_actual", "es");
+        Idiomas idiomaSeleccionado = boxIdioma.getValue();
+        prefs.put("idioma_actual", idiomaSeleccionado.getCodigo());
 
-        if(boxFormatoHora.getValue().equals("24h")) prefs.put("formato_hora",boxFormatoHora.getValue().toString());
-        else prefs.put("formato_hora",boxFormatoHora.getValue().toString());
+        // CÓDIGO OPTIMIZADO: Guardamos el valor directamente sin IFs redundantes
+        prefs.put("formato_hora", boxFormatoHora.getValue());
 
         GestorTareas.getGestorTareas().setIdioma(idiomaSeleccionado);
         cancelar();
@@ -116,27 +113,27 @@ public class ConfiguracionController {
             View.view.showInitialView();
         }
     }
-    @FXML
-    private Pane rootPane;
 
-    @FXML
-    private CheckBox checkModoOscuro;
     @FXML
     private void cambiarModoVisual(){
             boolean activado = checkModoOscuro.isSelected();
             // 1. Guardamos la decisión en Preferences para el futuro
-            Preferences prefs = Preferences.userNodeForPackage(this.getClass());
             prefs.putBoolean("modo_oscuro", activado);
 
             // 2. ACTUALIZACIÓN GLOBAL: Recorremos TODAS las ventanas abiertas en tiempo real
-            for (javafx.stage.Window ventanaAbierta : javafx.stage.Window.getWindows()) {
+            for (Window ventanaAbierta : Window.getWindows()) {
                 if (ventanaAbierta.getScene() != null && ventanaAbierta.getScene().getRoot() != null) {
                     // Aplicamos o quitamos la clase "dark-mode" a la raíz de cada ventana
                     if (activado) {
                         if (!ventanaAbierta.getScene().getRoot().getStyleClass().contains("dark-mode")) ventanaAbierta.getScene().getRoot().getStyleClass().add("dark-mode");
                     } else ventanaAbierta.getScene().getRoot().getStyleClass().remove("dark-mode");
-
                 }
         }
+    }
+
+    @FXML
+    private void crearICS(){
+        Stage ventanaPrincipal = (Stage) rootPane.getScene().getWindow();
+        GestionEnFicheros.getGestionEnFicheros().exportarAICS(ventanaPrincipal);
     }
 }

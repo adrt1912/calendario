@@ -63,7 +63,20 @@
                   </Label>
 
                   <TextField fx:id="textoTitulo" prefHeight="30.0" GridPane.columnIndex="1" />
-                  <DatePicker fx:id="texFecha" prefHeight="30.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
+                     <children>
+                        <DatePicker fx:id="texFecha" prefHeight="26.0" prefWidth="142.0" />
+                        <Label prefHeight="20.0" prefWidth="107.0" text="%crearNuevaTarea.textoFechaFin">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </Label>
+                        <DatePicker fx:id="textFechaFin" layoutX="10.0" layoutY="10.0" prefHeight="26.0" prefWidth="142.0" />
+                     </children>
+                  </HBox>
                   <HBox GridPane.columnIndex="1" GridPane.rowIndex="2">
                      <children>
                         <TextField fx:id="textoHoraInicio" prefHeight="26.0" prefWidth="121.0" promptText="HH:mm" />
