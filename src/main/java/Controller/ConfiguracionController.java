@@ -34,6 +34,12 @@ public class ConfiguracionController {
     @FXML
     private ComboBox<String> boxFormatoHora;
 
+    private boolean borrar=false;
+
+    private boolean cambiarMdooVisual=false;
+
+    private boolean descargarICS=false;
+
     //Llama al metodo para crear un CSV
     @FXML
     private void exportarACSV(){
@@ -60,10 +66,9 @@ public class ConfiguracionController {
 
     //Llama al gestorTareas para eliminar  el contenido
     @FXML
-    private void borrarTodo(){
-        GestorTareas.getGestorTareas().borrarContenido();
-    }
+    private void borrarTodo(){borrar=true;}
 
+    private void borrarSeguroSI(){GestorTareas.getGestorTareas().borrarContenido();}
     //Cierra la ventana como si nada hubiera pasado
     @FXML
     private void cancelar(){
@@ -80,6 +85,10 @@ public class ConfiguracionController {
 
         // CÓDIGO OPTIMIZADO: Guardamos el valor directamente sin IFs redundantes
         prefs.put("formato_hora", boxFormatoHora.getValue());
+
+        if(borrar) borrarSeguroSI();
+        if(cambiarMdooVisual) cambiarModoVisualSeguro();
+        if(descargarICS) descargarICSSeguro();
 
         GestorTareas.getGestorTareas().setIdioma(idiomaSeleccionado);
         cancelar();
@@ -115,19 +124,21 @@ public class ConfiguracionController {
     }
 
     @FXML
-    private void cambiarModoVisual(){
-            boolean activado = checkModoOscuro.isSelected();
-            // 1. Guardamos la decisión en Preferences para el futuro
-            prefs.putBoolean("modo_oscuro", activado);
+    private void cambiarModoVisual(){cambiarMdooVisual=true;}
 
-            // 2. ACTUALIZACIÓN GLOBAL: Recorremos TODAS las ventanas abiertas en tiempo real
-            for (Window ventanaAbierta : Window.getWindows()) {
-                if (ventanaAbierta.getScene() != null && ventanaAbierta.getScene().getRoot() != null) {
-                    // Aplicamos o quitamos la clase "dark-mode" a la raíz de cada ventana
-                    if (activado) {
-                        if (!ventanaAbierta.getScene().getRoot().getStyleClass().contains("dark-mode")) ventanaAbierta.getScene().getRoot().getStyleClass().add("dark-mode");
-                    } else ventanaAbierta.getScene().getRoot().getStyleClass().remove("dark-mode");
-                }
+    private void cambiarModoVisualSeguro(){
+        boolean activado = checkModoOscuro.isSelected();
+        // 1. Guardamos la decisión en Preferences para el futuro
+        prefs.putBoolean("modo_oscuro", activado);
+
+        // 2. ACTUALIZACIÓN GLOBAL: Recorremos TODAS las ventanas abiertas en tiempo real
+        for (Window ventanaAbierta : Window.getWindows()) {
+            if (ventanaAbierta.getScene() != null && ventanaAbierta.getScene().getRoot() != null) {
+                // Aplicamos o quitamos la clase "dark-mode" a la raíz de cada ventana
+                if (activado) {
+                    if (!ventanaAbierta.getScene().getRoot().getStyleClass().contains("dark-mode")) ventanaAbierta.getScene().getRoot().getStyleClass().add("dark-mode");
+                } else ventanaAbierta.getScene().getRoot().getStyleClass().remove("dark-mode");
+            }
         }
     }
 
@@ -135,5 +146,13 @@ public class ConfiguracionController {
     private void crearICS(){
         Stage ventanaPrincipal = (Stage) rootPane.getScene().getWindow();
         GestionEnFicheros.getGestionEnFicheros().exportarAICS(ventanaPrincipal);
+    }
+
+    @FXML
+    private void descargarICS(){descargarICS=true;}
+
+    private void descargarICSSeguro(){
+        Stage ventanaPrincipal = (Stage) rootPane.getScene().getWindow();
+        GestionEnFicheros.getGestionEnFicheros().leerArchivoICS(ventanaPrincipal);
     }
 }

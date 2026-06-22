@@ -75,7 +75,7 @@ public class GestorTareas {
 
     //Se encarga de devolver el texto con tareas de hoy
     public String mostrarTareasUrgentesHoy(){
-       ResourceBundle resourceBundle=obtenerDiccionario();
+        ResourceBundle resourceBundle=obtenerDiccionario();
 //Cogemos solo las tareas en proceso
         StringBuilder taresDevolver= new StringBuilder();
         int numt=0;
@@ -85,10 +85,10 @@ public class GestorTareas {
 
         for (Tarea todasTarea : listTareaEscribir) {
             //Si su fecha fin es hoy la mostrara por pantalla
-               taresDevolver.append(" ").append(todasTarea.getNombreTarea());
-               numt++;
-               if(todasTarea.getHoraInicio()!=null) taresDevolver.append(" a las: ").append(todasTarea.getHoraInicio());
-                if(numt< listTareaEscribir.size()) taresDevolver.append(" y");
+            taresDevolver.append(" ").append(todasTarea.getNombreTarea());
+            numt++;
+            if(todasTarea.getHoraInicio()!=null) taresDevolver.append(" a las: ").append(todasTarea.getHoraInicio());
+            if(numt< listTareaEscribir.size()) taresDevolver.append(" y");
 
         }
         if(numt==0) return resourceBundle.getString("gestor.hoySin");
@@ -102,14 +102,14 @@ public class GestorTareas {
         StringBuilder taresDevolver= new StringBuilder();
         List<Tarea> tareasProcesar=todasTareas.stream().filter(a->a.getEstadoTarea()== EstadoTarea.EN_PROCESO).toList();
         int numT=0;
-            //Si su fecha fin es mañana la mostrara por pantalla
-            List<Tarea> listTareaEscribir=tareasProcesar.stream().filter(tarea -> tarea.getFechaFin().equals(LocalDate.now().plusDays(1))).toList();
+        //Si su fecha fin es mañana la mostrara por pantalla
+        List<Tarea> listTareaEscribir=tareasProcesar.stream().filter(tarea -> tarea.getFechaFin().equals(LocalDate.now().plusDays(1))).toList();
         for(Tarea todasTareaM : listTareaEscribir){
-                taresDevolver.append(" ").append(todasTareaM.getNombreTarea());
-                numT++;
-                if(todasTareaM.getHoraInicio()!=null) taresDevolver.append(" a las: ").append(todasTareaM.getHoraInicio());
-                if(numT< listTareaEscribir.size()) taresDevolver.append(" y ");
-            }
+            taresDevolver.append(" ").append(todasTareaM.getNombreTarea());
+            numT++;
+            if(todasTareaM.getHoraInicio()!=null) taresDevolver.append(" a las: ").append(todasTareaM.getHoraInicio());
+            if(numT< listTareaEscribir.size()) taresDevolver.append(" y ");
+        }
 
         if(numT==0) return resourceBundle.getString("gestor.mananaSin");
         else if(numT==1) return resourceBundle.getString("gestor.mananaCon1")+" "+numT+" "+resourceBundle.getString("gestor.hoyCon2")+" "+taresDevolver.toString();
@@ -140,6 +140,11 @@ public class GestorTareas {
         // Solo la guardamos en BD si de verdad ha entrado en la lista (no era un clon)
         if(todasTareas.size() > tamañoAntes) ConexionBD.getConexionBD().guardarTarea(tareaNueva);
         return tareaNueva;
+    }
+
+    public void agregarTarea(Tarea tarea){
+        todasTareas.add(tarea);
+        ConexionBD.getConexionBD().guardarTarea(tarea);
     }
 
     //Elimina la tarea

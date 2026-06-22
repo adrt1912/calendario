@@ -58,7 +58,7 @@
                   <Insets left="40.0" top="10.0" />
                </VBox.margin>
                <children>
-      
+
                   <Button mnemonicParsing="false" onAction="#exportarACSV" prefHeight="30.0" prefWidth="201.0" style="-fx-cursor: hand;" text="%configuracionMenuPrincipal.exportarACSV">
                      <font>
                         <Font size="14.0" />
@@ -71,10 +71,27 @@
                   </Button>
                </children>
             </HBox>
+            <HBox>
+               <children>
 
-            <Button fx:id="botonRestaurar" mnemonicParsing="false" onAction="#restaurarBackup" prefHeight="30.0" prefWidth="191.0" style="-fx-cursor: hand;" text="%configuracionMenuPrincipal.restaurarBackup">
-               <font><Font size="14.0" /></font>
-            </Button>
+                  <Button fx:id="botonRestaurar" mnemonicParsing="false" onAction="#restaurarBackup" prefHeight="30.0" prefWidth="203.0" style="-fx-cursor: hand;" text="%configuracionMenuPrincipal.restaurarBackup">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="botonRestaurar1" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#descargarICS" prefHeight="30.0" prefWidth="203.0" style="-fx-cursor: hand;" text="%configuracionMenuPrincipal.bajarICS">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets left="80.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+               <VBox.margin>
+                  <Insets left="40.0" />
+               </VBox.margin>
+            </HBox>
 
             <Button fx:id="botonBorrar" mnemonicParsing="false" onAction="#borrarTodo" prefHeight="26.0" prefWidth="193.0" style="-fx-background-color: #ff4444; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="%configuracionMenuPrincipal.borrarContenido">
                <VBox.margin><Insets top="5.0" /></VBox.margin>
