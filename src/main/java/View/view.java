@@ -14,11 +14,29 @@ import java.util.prefs.Preferences;
 public class view {
         //Guardamos la ventana del juego, asi se puede cambiar como se necesite
         private static Stage stage ;
+    // Metodo para fijar el stage que viene de la Application
+    public static void setPrimaryStage(Stage s) {
+        stage = s;
+    }
     private static ResourceBundle obtenerBundleActual() {
-        Preferences prefs = Preferences.userNodeForPackage(view.class);
-        String codIdioma = prefs.get("idioma_actual", "es");
-        Locale locale = new Locale(codIdioma);
-        return ResourceBundle.getBundle("textos", locale);
+        try {
+            Preferences prefs = Preferences.userNodeForPackage(view.class);
+            String codIdioma = prefs.get("idioma_actual", "es");
+
+            // Creamos el locale de forma segura
+            Locale locale = new Locale(codIdioma);
+
+            // Intentamos cargar
+            return ResourceBundle.getBundle("textos", locale);
+
+        } catch (Exception e) {
+            // Si todo falla, imprimimos el error real para saber por qué
+            System.err.println("ERROR CRÍTICO AL CARGAR RECURSOS: " + e.getMessage());
+            e.printStackTrace();
+
+            // Y devolvemos un bundle vacío o forzamos el español de la raíz
+            return ResourceBundle.getBundle("textos", new Locale("es"));
+        }
     }
         //Ventana inicial
         public static void showInitialView() throws IOException {

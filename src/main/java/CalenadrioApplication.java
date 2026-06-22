@@ -13,7 +13,7 @@ public class CalenadrioApplication extends Application {
         public void start(Stage stage) throws Exception {
             this.primaryStage = stage;
             Platform.setImplicitExit(false);
-
+            view.setPrimaryStage(stage);
             view.showInitialView();
             GestorTareas.getGestorTareas().verificarTareasHoy();
 
@@ -22,8 +22,6 @@ public class CalenadrioApplication extends Application {
                 primaryStage.hide();
             });
             configurarSystemTray();
-
-            primaryStage.show();
         }
 
     private void configurarSystemTray() {
@@ -42,11 +40,14 @@ public class CalenadrioApplication extends Application {
             MenuItem salirItem = new MenuItem("Salir");
 
             // Acciones: Recordar usar Platform.runLater para volver a JavaFX
-            abrirItem.addActionListener(e -> Platform.runLater(() -> primaryStage.show()));
-            salirItem.addActionListener(e -> {
-                Platform.exit(); // Cierra JavaFX
-                System.exit(0);  // Cierra el proceso JVM
-            });
+            abrirItem.addActionListener(e -> Platform.runLater(() -> {
+                if (primaryStage.isIconified()) {
+                    primaryStage.setIconified(false); // Si estaba minimizado en la barra, lo restaura
+                }
+                primaryStage.show();
+                primaryStage.toFront(); // Lo trae al frente para que no se quede detrás de otras ventanas
+                primaryStage.requestFocus(); // Fuerza el foco para que no se vea blanco
+            }));
 
             menu.add(abrirItem);
             menu.add(salirItem);
@@ -58,6 +59,10 @@ public class CalenadrioApplication extends Application {
             trayIcon.addActionListener(e -> Platform.runLater(() -> primaryStage.show()));
 
             tray.add(trayIcon);
+            salirItem.addActionListener(e -> {
+                Platform.exit(); // Cierra el entorno JavaFX de forma segura
+                System.exit(0);  // Mata el proceso de la Máquina Virtual de Java (JVM)
+            });
 
         } catch (Exception e) {
             e.printStackTrace();
