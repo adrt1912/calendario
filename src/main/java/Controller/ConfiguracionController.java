@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import java.io.File;
 import java.io.IOException;
@@ -120,7 +121,7 @@ public class ConfiguracionController {
             prefs.putBoolean("modo_oscuro", activado);
 
             // 2. ACTUALIZACIÓN GLOBAL: Recorremos TODAS las ventanas abiertas en tiempo real
-            for (javafx.stage.Window ventanaAbierta : javafx.stage.Window.getWindows()) {
+            for (Window ventanaAbierta : Window.getWindows()) {
                 if (ventanaAbierta.getScene() != null && ventanaAbierta.getScene().getRoot() != null) {
                     // Aplicamos o quitamos la clase "dark-mode" a la raíz de cada ventana
                     if (activado) {
@@ -128,5 +129,11 @@ public class ConfiguracionController {
                     } else ventanaAbierta.getScene().getRoot().getStyleClass().remove("dark-mode");
                 }
         }
+    }
+
+    @FXML
+    private void crearICS(){
+        Stage ventanaPrincipal = (Stage) rootPane.getScene().getWindow();
+        GestionEnFicheros.getGestionEnFicheros().exportarAICS(ventanaPrincipal);
     }
 }
