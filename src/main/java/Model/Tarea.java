@@ -25,6 +25,9 @@ public class Tarea {
     private String idFamilia;
 
     private Etiqueta etiqueta;
+
+    public Tarea() {}
+
     //Getters de la tarea
     public EstadoTarea getEstadoTarea() {
         return estadoTarea;

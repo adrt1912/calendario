@@ -142,6 +142,11 @@ public class GestorTareas {
         return tareaNueva;
     }
 
+    public void agregarTarea(Tarea tarea){
+        todasTareas.add(tarea);
+        ConexionBD.getConexionBD().guardarTarea(tarea);
+    }
+
     //Elimina la tarea
     public void eliminarTarea(Tarea tarea){
         ConexionBD.getConexionBD().borrarTarea(tarea.getIdTarea());

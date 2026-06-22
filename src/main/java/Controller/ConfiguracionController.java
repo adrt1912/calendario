@@ -136,4 +136,11 @@ public class ConfiguracionController {
         Stage ventanaPrincipal = (Stage) rootPane.getScene().getWindow();
         GestionEnFicheros.getGestionEnFicheros().exportarAICS(ventanaPrincipal);
     }
+
+    @FXML
+    private void descargarICS(){
+        Stage ventanaPrincipal = (Stage) rootPane.getScene().getWindow();
+        GestionEnFicheros.getGestionEnFicheros().leerArchivoICS(ventanaPrincipal);
+
+    }
 }
