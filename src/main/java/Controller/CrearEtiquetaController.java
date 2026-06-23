@@ -11,7 +11,7 @@ import javafx.stage.Stage;
 
 import java.util.prefs.Preferences;
 
-public class crearEtiquetaController {
+public class CrearEtiquetaController {
 
     @FXML
     private TextField cuadroNombre;
@@ -35,10 +35,9 @@ public class crearEtiquetaController {
         ventanaActual.close();
     }
 
-
-
+    //Al arrancar, pone el idioma y el modo oscuro o no
     public void initialize(){
-       Preferences prefs = java.util.prefs.Preferences.userNodeForPackage(ConfiguracionController.class);
+        Preferences prefs = Preferences.userNodeForPackage(GestorTareas.class);
         if (prefs.getBoolean("modo_oscuro", false) && rootPane != null) {
             rootPane.getStyleClass().add("dark-mode");
         }
@@ -53,9 +52,10 @@ public class crearEtiquetaController {
         if (nombreEtiqueta == null || nombreEtiqueta.isBlank()) textoError.setText("Error al crear etiqueta, hay campos sin rellenar");
             //El nombre de la etiqueta no puede ser "Sin Etiqueta" es el que se usa como neutra
         else if (nombreEtiqueta.trim().equalsIgnoreCase("Sin Etiqueta")) textoError.setText("Error: Ese nombre está reservado por el sistema.");
-        else if( GestorTareas.getGestorTareas().getListaEtiquetas().stream() .anyMatch(e -> e.getNombreEtiqueta() != null && e.getNombreEtiqueta().equalsIgnoreCase(nombreEtiqueta))) textoError.setText("Error: Ya existe una etiqueta con este nombre.");
+        else if( GestorTareas.getGestorTareas().getListaEtiquetas().stream() .anyMatch(e -> e.nombreEtiqueta() != null && e.nombreEtiqueta().equalsIgnoreCase(nombreEtiqueta))) textoError.setText("Error: Ya existe una etiqueta con este nombre.");
         else{
             GestorTareas.getGestorTareas().nuevaEtiqueta( nombreEtiqueta,colorEtiqueta);
-            cancelarEtiqueta();}
+            cancelarEtiqueta();
+        }
     }
 }

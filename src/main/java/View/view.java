@@ -30,11 +30,6 @@ public class view {
             return ResourceBundle.getBundle("textos", locale);
 
         } catch (Exception e) {
-            // Si todo falla, imprimimos el error real para saber por qué
-            System.err.println("ERROR CRÍTICO AL CARGAR RECURSOS: " + e.getMessage());
-            e.printStackTrace();
-
-            // Y devolvemos un bundle vacío o forzamos el español de la raíz
             return ResourceBundle.getBundle("textos", new Locale("es"));
         }
     }
@@ -44,7 +39,8 @@ public class view {
 
             ResourceBundle bundle=obtenerBundleActual();
             FXMLLoader fxmlLoader = new FXMLLoader(view.class.getResource("/View/MenuPrincipal.fxml"),bundle);
-            Scene scene= new Scene(fxmlLoader.load(), 1500,800);
+            Scene scene= new Scene(fxmlLoader.load(), 1800,900);
+            stage.setMaximized(true);
 
             //Si no está abierta se hace una nueva ventana
             if(stage==null){

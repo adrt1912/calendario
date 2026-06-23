@@ -26,7 +26,7 @@ import java.util.prefs.Preferences;
 
 public class MenuPrincipalController {
 
-    private GestorTareas gestorTareas=GestorTareas.getGestorTareas();
+    private final GestorTareas gestorTareas=GestorTareas.getGestorTareas();
 
     //Guardamos la fecha que se muestra por pantalla
     private LocalDate fechaSeleccionada=LocalDate.now();
@@ -34,32 +34,30 @@ public class MenuPrincipalController {
     private GridPane calendarioMensual;
 
     @FXML
-    private Text TareasPendientesHoy;
+    private Label TareasPendientesHoy;
 
     @FXML
-    private Text TareasPendientesMañana;
+    private Label TareasPendientesManiana;
 
     @FXML
     private GridPane vBoxEtiquetas;
+
     @FXML
     private VBox contenedorSemanal;
 
     @FXML
     private VBox contenedorDiario;
 
-    private Preferences prefs; //Para guardar de forma global si esta en modo oscuro o no
-
     //Es la matriz que rellena el calendario que le toque
     private VBox[][] calendarioVBoxMensual =new VBox[7][7];
-    private Pane[] panelesDiasSemanales = new Pane[7];
-    private VBox[] panelesTareasTodoDia=new VBox[7];
-    private Pane panelDiaro;
-    private VBox panelTareasTodoDiaDiario=new VBox();
+    private final Pane[] panelesDiasSemanales = new Pane[7];
+    private final VBox[] panelesTareasTodoDia=new VBox[7];
+    private final VBox panelTareasTodoDiaDiario=new VBox();
     @FXML
     private ScrollPane mostradorTareas;
 
     @FXML
-    private Text cartelAño;
+    private Text cartelAnio;
 
     @FXML
     private Text cartelMes;
@@ -73,31 +71,29 @@ public class MenuPrincipalController {
     @FXML
     private ComboBox<Etiqueta> comboFiltroEtiquetas;
 
-    //Para escribir el titulo
-
-   @FXML
-   private AnchorPane rootPane;
-   //Se encarga de guardar los nombres de la semana segun el idioma
+    @FXML
+    private AnchorPane rootPane;
 
    //Guarda si se muestra en modo mensual o modo semanal
    private String modo="M";
 
-   @FXML
-   private ChoiceBox seleccionModo;
+    @FXML
+    private ChoiceBox<String> seleccionModo;
 
-   public void setFechaSeleccionada(LocalDate fechaSeleccionada){this.fechaSeleccionada=fechaSeleccionada;}
+    public void setFechaSeleccionada(LocalDate fechaSeleccionada){this.fechaSeleccionada=fechaSeleccionada;}
 
-
-   @FXML
-   public void initialize() {
+    @FXML
+    public void initialize() {
        //Rellena el cuadrado de escoger con modo mensual y semanal
        seleccionModo.getItems().addAll("Mensual", "Semanal","Diario");
        seleccionModo.setValue("Mensual"); //Se establece el modo mensual al arrancar
        //Se inicia el listener por si se cambia el modo
        seleccionModo.getSelectionModel().selectedItemProperty().addListener((observable, valorAntiguo, valorNuevo) -> {
-           if(valorNuevo.equals("Mensual"))modo="M";
-           else if(valorNuevo.equals("Semanal"))modo="S";
-           else if(valorNuevo.equals("Diario"))modo="D";
+           switch (valorNuevo) {
+               case "Mensual" -> modo = "M";
+               case "Semanal" -> modo = "S";
+               case "Diario" -> modo = "D";
+           }
            mostrarCalendario();
        });
        //Inicia el gestor, es decir el model
@@ -112,19 +108,18 @@ public class MenuPrincipalController {
        mostrarCalendario();
        //Muestra los textos de tareas urgentes hoy y mañana
        TareasPendientesHoy.setText(gestorTareas.mostrarTareasUrgentesHoy());
-       TareasPendientesMañana.setText(gestorTareas.mostrarTareasUrgentesMañana());
-       comboFiltroEtiquetas.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-           mostrarCalendario();
-       });
+       TareasPendientesManiana.setText(gestorTareas.mostrarTareasUrgentesManiana());
+       comboFiltroEtiquetas.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> mostrarCalendario());
        buscadorTareas.textProperty().addListener((observable, oldValue, newValue) -> {
            mostrarCalendario();
            mostrarTareas();
        });
+       //Para cambiar de mes con las flechas
        Platform.runLater(() -> {
            rootPane.requestFocus();
-
            if (rootPane.getScene() != null) {
                rootPane.getScene().addEventFilter(javafx.scene.input.KeyEvent.KEY_PRESSED, event -> {
+                   if (buscadorTareas.isFocused()) return;
                    if (event.getCode() == KeyCode.LEFT) {
                        retrocederMes();
                        event.consume();// Flecha izquierda = Atrás
@@ -136,6 +131,7 @@ public class MenuPrincipalController {
            }
        });
    }
+
     //Pone la primera letra en mayusculas
     private String capitaze(String frase){
         if(frase==null||frase.isEmpty()) return "";
@@ -143,44 +139,47 @@ public class MenuPrincipalController {
     }
 
     public void mostrarCalendario(){
-    prefs = Preferences.userNodeForPackage(ConfiguracionController.class);
-
-    if (prefs.getBoolean("modo_oscuro", false)) {
+        //Para guardar de forma global si esta en modo oscuro o no
+        Preferences prefs = Preferences.userNodeForPackage(GestorTareas.class);
+        if (prefs.getBoolean("modo_oscuro", false)) {
         if (!rootPane.getStyleClass().contains("dark-mode")) rootPane.getStyleClass().add("dark-mode");
-    } else rootPane.getStyleClass().remove("dark-mode");
+        } else rootPane.getStyleClass().remove("dark-mode");
 
-    //Se ponen los textos, por si se añade alguna tarea para hoy
-    TareasPendientesHoy.setText(gestorTareas.mostrarTareasUrgentesHoy());
-    TareasPendientesMañana.setText(gestorTareas.mostrarTareasUrgentesMañana());
+        //Se ponen los textos, por si se añade alguna tarea para hoy
+        TareasPendientesHoy.setText(gestorTareas.mostrarTareasUrgentesHoy());
+        TareasPendientesManiana.setText(gestorTareas.mostrarTareasUrgentesManiana());
 
-    //Se pone los meses en el diioma elegido
-    if(GestorTareas.getGestorTareas().getIdioma()!=null) cartelMes.setText(" " + capitaze(fechaSeleccionada.getMonth().getDisplayName(TextStyle.FULL, new Locale(GestorTareas.getGestorTareas().getIdioma().getCodigo(), "ES"))));
-    else cartelMes.setText(" "+fechaSeleccionada.getMonth().getDisplayName(TextStyle.FULL,new Locale("es","ES")));
+        //Se pone los meses en el idioms elegido
+        if(GestorTareas.getGestorTareas().getIdioma()!=null) cartelMes.setText(" " + capitaze(fechaSeleccionada.getMonth().getDisplayName(TextStyle.FULL, new Locale(GestorTareas.getGestorTareas().getIdioma().getCodigo(), "ES"))));
+        else cartelMes.setText(" "+fechaSeleccionada.getMonth().getDisplayName(TextStyle.FULL,new Locale("es","ES")));
 
-    cartelAño.setText("" + fechaSeleccionada.getYear()); //Se pone el mes
+        //Se pone el año en el cartel
+        cartelAnio.setText("" + fechaSeleccionada.getYear());
 
-    if(Objects.equals(modo, "M")){
-        CalendarioRender.getCalendarioRender().mostrarCalendarioMensual(calendarioMensual,contenedorSemanal,contenedorDiario,fechaSeleccionada,this,calendarioVBoxMensual);
-        TareaVisualizer.getTareaVisualizer().mostrarEtiquetasMensuales(comboFiltroEtiquetas.getValue(),buscadorTareas.getText(),fechaSeleccionada,calendarioVBoxMensual,this);
+        //Dependiendo del moto se carga el calendario de esa forma
+        if(Objects.equals(modo, "M")){
+            CalendarioRender.getCalendarioRender().mostrarCalendarioMensual(calendarioMensual,contenedorSemanal,contenedorDiario,fechaSeleccionada,this,calendarioVBoxMensual);
+            TareaVisualizer.getTareaVisualizer().mostrarEtiquetasMensuales(comboFiltroEtiquetas.getValue(),buscadorTareas.getText(),fechaSeleccionada,calendarioVBoxMensual,this);
+        }
+        else if(Objects.equals(modo, "S")){
+            CalendarioRender.getCalendarioRender().mostrarCalendarioSemanal(calendarioMensual,contenedorSemanal,contenedorDiario,fechaSeleccionada,this,panelesDiasSemanales,panelesTareasTodoDia);
+            TareaVisualizer.getTareaVisualizer().mostrarEtiquetasSemanales(panelesDiasSemanales, panelesTareasTodoDia, buscadorTareas.getText(), comboFiltroEtiquetas.getValue(), fechaSeleccionada, this);
+        }
+        else if(Objects.equals(modo, "D")) {
+            Pane panelDiaro = CalendarioRender.getCalendarioRender().mostrarCalendarioDiario(calendarioMensual, contenedorSemanal, contenedorDiario, fechaSeleccionada, this, panelTareasTodoDiaDiario);
+            TareaVisualizer.getTareaVisualizer().mostarEtiquetasDiarias(panelDiaro, panelTareasTodoDiaDiario, buscadorTareas.getText(), comboFiltroEtiquetas.getValue(), fechaSeleccionada, this);
+        }
+
+        //Para que no salte tan brusco la pasar
+        javafx.scene.Node panelAnimado = modo.equals("M") ? calendarioMensual : contenedorSemanal;
+        FadeTransition transicion = new FadeTransition(Duration.millis(200), panelAnimado);
+        transicion.setFromValue(0.3);
+        transicion.setToValue(1.0);
+        transicion.play();
+
+        // Finalmente pintamos las etiquetas laterales
+        TareaVisualizer.getTareaVisualizer().mostrarEtiquetasClasificaciones(vBoxEtiquetas, this);
     }
-    else if(Objects.equals(modo, "S")){
-        CalendarioRender.getCalendarioRender().mostrarCalendarioSemanal(calendarioMensual,contenedorSemanal,contenedorDiario,fechaSeleccionada,this,panelesDiasSemanales,panelesTareasTodoDia);
-        TareaVisualizer.getTareaVisualizer().mostrarEtiquetasSemanales(panelesDiasSemanales, panelesTareasTodoDia, buscadorTareas.getText(), comboFiltroEtiquetas.getValue(), fechaSeleccionada, this);
-    }
-    else if(Objects.equals(modo, "D")) {
-        panelDiaro = CalendarioRender.getCalendarioRender().mostrarCalendarioDiario(calendarioMensual, contenedorSemanal, contenedorDiario, fechaSeleccionada, this, panelTareasTodoDiaDiario);
-        TareaVisualizer.getTareaVisualizer().mostarEtiquetasDiarias(panelDiaro, panelTareasTodoDiaDiario, buscadorTareas.getText(), comboFiltroEtiquetas.getValue(), fechaSeleccionada, this);
-       }
-
-    javafx.scene.Node panelAnimado = modo.equals("M") ? calendarioMensual : contenedorSemanal;
-    FadeTransition transicion = new FadeTransition(Duration.millis(200), panelAnimado);
-    transicion.setFromValue(0.3);
-    transicion.setToValue(1.0);
-    transicion.play();
-
-    // Finalmente pintamos las etiquetas laterales
-    TareaVisualizer.getTareaVisualizer().mostrarEtiquetasClasificaciones(vBoxEtiquetas, this);
-   }
 
     //Muestra las tareas en el menu de la derecha
     public void mostrarTareas(){
@@ -190,7 +189,7 @@ public class MenuPrincipalController {
         List<Tarea> listaTareasMostrar=gestorTareas.getTodasTareas().stream().filter(tarea -> fechaSeleccionada.equals(tarea.getFechaFin())).toList();
 
         //En caso de que no se escoga etiqueta
-        if(etiqueta != null && !etiqueta.getNombreEtiqueta().equals("Sin Etiqueta")) listaTareasMostrar=listaTareasMostrar.stream().filter(tarea -> tarea.getEtiqueta() != null &&tarea.getEtiqueta().equals(etiqueta)).toList();
+        if(etiqueta != null && !etiqueta.nombreEtiqueta().equals("Sin Etiqueta")) listaTareasMostrar=listaTareasMostrar.stream().filter(tarea -> tarea.getEtiqueta() != null &&tarea.getEtiqueta().equals(etiqueta)).toList();
 
         String textoBusqueda = buscadorTareas.getText() != null ? buscadorTareas.getText().toLowerCase() : "";
         if(!textoBusqueda.isEmpty()) listaTareasMostrar = listaTareasMostrar.stream().filter(tarea -> tarea.getNombreTarea().toLowerCase().contains(textoBusqueda)).toList();
@@ -200,7 +199,7 @@ public class MenuPrincipalController {
         int i=1;
         //Por cada tarea se escribe
         for (Tarea tarea : listaTareasMostrar) {
-            Label text = new Label(i+": "+tarea.mostrarTarea());
+            Label text = new Label(i+": "+tarea.mostrarTarea()+"\n\n\n");
             text.setFont(Font.font(15));
             text.setCursor(Cursor.HAND);
             text.setWrapText(true);
@@ -216,7 +215,6 @@ public class MenuPrincipalController {
                    mostrarTareas();
                } catch (Exception e) {
                    System.err.println("Error al abrir la ventana: " + e.getMessage());
-                   e.printStackTrace();
                }
            });
         }
@@ -230,14 +228,16 @@ public class MenuPrincipalController {
             this.fechaSeleccionada = fechaSeleccionada;
             mostrarTareas();
             //Dos clicks crea una nueva tarea con la fecha de ese dia
-        }else if(event.getClickCount()==2)añadirEvento(fechaSeleccionada,horaClick);
+        }else if(event.getClickCount()==2) aniadirEvento(fechaSeleccionada,horaClick);
     }
 
+    //Para eliminar un etiqueta
     public void borrarEtiqueta(Etiqueta etiqueta){
         ResourceBundle bundle = GestorTareas.getGestorTareas().obtenerDiccionario();
+        //Salta una ventan de confirmacion
         Alert alert=new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(bundle.getString("borrarEtiqueta.Titulo"));
-        alert.setHeaderText(bundle.getString("borrarEtiqueta.Header1") + etiqueta.getNombreEtiqueta() + "?");
+        alert.setHeaderText(bundle.getString("borrarEtiqueta.Header1") + etiqueta.nombreEtiqueta() + "?");
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK){
@@ -252,37 +252,40 @@ public class MenuPrincipalController {
     //El boton para retroceder en el calendario, depende del modo que muestra
     @FXML
     private void retrocederMes(){
-        if(modo.equals("M")) fechaSeleccionada=fechaSeleccionada.minusMonths(1);
-        else if (modo.equals("S")) fechaSeleccionada=fechaSeleccionada.minusWeeks(1);
-        else if(modo.equals("D")) fechaSeleccionada=fechaSeleccionada.minusDays(1);
+        switch (modo) {
+            case "M" -> fechaSeleccionada = fechaSeleccionada.minusMonths(1);
+            case "S" -> fechaSeleccionada = fechaSeleccionada.minusWeeks(1);
+            case "D" -> fechaSeleccionada = fechaSeleccionada.minusDays(1);
+        }
         mostrarCalendario();
     }
 
     //Boton para avanzar en el calendario, depende del modo que muestra
     @FXML
     private void pasarMes(){
-       if(modo.equals("M")) fechaSeleccionada=fechaSeleccionada.plusMonths(1);
-       else if (modo.equals("S")) fechaSeleccionada=fechaSeleccionada.plusWeeks(1);
-       else if(modo.equals("D")) fechaSeleccionada=fechaSeleccionada.plusDays(1);
+        switch (modo) {
+            case "M" -> fechaSeleccionada = fechaSeleccionada.plusMonths(1);
+            case "S" -> fechaSeleccionada = fechaSeleccionada.plusWeeks(1);
+            case "D" -> fechaSeleccionada = fechaSeleccionada.plusDays(1);
+        }
         mostrarCalendario();
     }
 
     //Es el metodo de fxml, al dar al boton, como no hay fecha establecida se pone anull y ya se asignara
     @FXML
-    public void añadirEvento(){
-        añadirEvento(null,null);
+    public void aniadirEvento(){
+        aniadirEvento(null,null);
     }
 
     //La fecha se pasa por si se inicia con doble click, se ponga automaticamente
     @FXML
-    private void añadirEvento(LocalDate fecha, LocalTime horaInicio) {
+    private void aniadirEvento(LocalDate fecha, LocalTime horaInicio) {
         try {
             view.showCrearTArea(fecha,horaInicio);
             mostrarCalendario();
             mostrarTareas();
         } catch (Exception e) {
             System.err.println("Error " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
@@ -310,16 +313,20 @@ public class MenuPrincipalController {
         }
     }
 
+    //Boton para volver al dia de hoy
     @FXML
     private void volverHoy(){
         fechaSeleccionada=LocalDate.now();
         mostrarCalendario();
     }
+
+    //Al escribir algo, se actualzia la vista del calendario
     @FXML
     private void buscarTarea(){
         mostrarCalendario();
     }
 
+    //Para arrastrar, cambia su fecha inicial
     public void moverTareaA(String idTarea, LocalDate fechaDestino){
 
        Tarea tarea=gestorTareas.getTodasTareas().stream().filter(tarea1 -> tarea1.getIdTarea().equals(idTarea)).findFirst().orElse(null);

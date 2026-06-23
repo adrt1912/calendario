@@ -21,7 +21,7 @@ public class Tarea {
     private LocalTime horaFin;
     private Periodicidad frecuencia;
 
-    private String idTarea;
+    private String idTarea = UUID.randomUUID().toString();
     private String idFamilia;
 
     private Etiqueta etiqueta;
@@ -116,10 +116,6 @@ public class Tarea {
         this.idTarea = idTarea;
     }
 
-    public void setIdFamilia(String idFamilia) {
-        this.idFamilia = idFamilia;
-    }
-
     public void setEtiqueta(Etiqueta etiqueta) {
         this.etiqueta = etiqueta;
     }
@@ -127,25 +123,28 @@ public class Tarea {
     //Constructor
     public Tarea(String nombreTarea, LocalDate fechaInicio, LocalDate fechaFin, EstadoTarea estadoTarea, String descripcion, String sitio, LocalTime horaInicio, LocalTime horaFin, Periodicidad frecuencia,String idFamilia,Etiqueta etiqueta) {
         this.nombreTarea = nombreTarea;
-        this.fechaInicio = (fechaInicio != null) ? fechaInicio : LocalDate.now();   if(fechaFin==null)this.fechaFin=fechaInicio;
-        this.fechaFin = (fechaFin != null) ? fechaFin : this.fechaInicio;        this.estadoTarea = estadoTarea;
+        this.fechaInicio = (fechaInicio != null) ? fechaInicio : LocalDate.now();
+        this.fechaFin = (fechaFin != null) ? fechaFin : this.fechaInicio;
+        this.estadoTarea = estadoTarea;
         this.descripcion = descripcion;
         this.sitio = sitio;
         this.horaInicio = horaInicio;
         if(horaInicio!=null&&horaFin==null) horaFin=horaInicio.plusHours(1);
         this.horaFin=horaFin;
-        this.frecuencia = frecuencia;
-        idTarea= UUID.randomUUID().toString();
         this.idFamilia=idFamilia;
+
+        if(frecuencia!=null)  this.frecuencia = frecuencia;
+        else this.frecuencia=Periodicidad.NUNCA;
 
         if(etiqueta==null) this.etiqueta=GestorTareas.getGestorTareas().getEtiquetaNeutra();
         else this.etiqueta=etiqueta;
 
         comprobarEstado();
     }
+
     //Obtiene el diccionario y los textos que varian
     private ResourceBundle obtenerDiccionario() {
-        Preferences prefs = Preferences.userNodeForPackage(View.view.class);
+        Preferences prefs = Preferences.userNodeForPackage(Tarea.class);
         String codIdioma = prefs.get("idioma_actual", "es");
         return ResourceBundle.getBundle("textos", new Locale(codIdioma));
     }
@@ -171,7 +170,7 @@ public class Tarea {
         if (LocalDate.now().isAfter(fechaFin) && estadoTarea == EstadoTarea.EN_PROCESO) estadoTarea = EstadoTarea.CADUCADA;
         else if (LocalDate.now().isBefore(fechaFin) && estadoTarea == EstadoTarea.CADUCADA) estadoTarea=EstadoTarea.EN_PROCESO;
     }
-//Comprueba si dos tareas son identicas
+    //Comprueba si dos tareas son identicas
     @Override
     public boolean equals(Object tarea1) {
         if (this == tarea1) return true;
@@ -180,6 +179,6 @@ public class Tarea {
     }
     @Override
     public int hashCode() {
-        return Objects.hash(fechaFin, fechaInicio, nombreTarea, estadoTarea, descripcion, sitio, horaInicio,horaFin);
+        return Objects.hash(idTarea);
     }
 }

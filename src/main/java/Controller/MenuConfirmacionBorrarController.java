@@ -19,8 +19,9 @@ public class MenuConfirmacionBorrarController {
     @FXML
     private AnchorPane rootPane;
 
+    //Initialize que pone el idioma y el color
     public void initialize(){
-        Preferences prefs = Preferences.userNodeForPackage(ConfiguracionController.class);
+        Preferences prefs = Preferences.userNodeForPackage(GestorTareas.class);
         if (prefs.getBoolean("modo_oscuro", false) && rootPane != null) {
             rootPane.getStyleClass().add("dark-mode");
         }
@@ -49,10 +50,9 @@ public class MenuConfirmacionBorrarController {
         String idF=tarea.getIdFamilia();
         GestorTareas gestorTareas=GestorTareas.getGestorTareas();
         List<Tarea> listBorrar=gestorTareas.getTodasTareas().stream().filter(tarea1 -> tarea1.getIdFamilia()!=null &&tarea1.getIdFamilia().equals(idF)).toList();
-        for(Tarea tarea1 : listBorrar){
-            gestorTareas.eliminarTarea(tarea1);
-        }
+
+        for(Tarea tarea1 : listBorrar)gestorTareas.eliminarTarea(tarea1);
         cancelarOp();
-    }
+        }
     }
 }

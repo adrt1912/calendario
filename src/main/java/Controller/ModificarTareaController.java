@@ -15,100 +15,104 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.prefs.Preferences;
 
 //Menu para modificar tareas
 public class ModificarTareaController {
     //todos los campos que hay, ademas de guardar la tarea a modificar
     private Tarea tareaMos;
-@FXML
-private TextField campoTitulo;
-@FXML
-private DatePicker campoFecha;
-@FXML
-private TextField campoHoraInicio;
-@FXML
-private TextField campoHoraFin;
-@FXML
-private TextField campoSitio;
-@FXML
-private ComboBox<Periodicidad> campoPerioricidad;
-@FXML
-private TextArea campoDescripcion;
-@FXML
-private CheckBox checkCompletada;
-@FXML
-private Label textoTituloTop;
-@FXML
-private ComboBox<Etiqueta> boxEtiquetas;
-@FXML
-private Text textoError;
-@FXML
-private DatePicker campoFechaFin;
+
+    @FXML
+    private TextField campoTitulo;
+
+    @FXML
+    private DatePicker campoFechaInicio;
+
+    @FXML
+    private TextField campoHoraInicio;
+
+    @FXML
+    private TextField campoHoraFin;
+
+    @FXML
+    private TextField campoSitio;
+
+    @FXML
+    private ComboBox<Periodicidad> campoPerioricidad;
+
+    @FXML
+    private TextArea campoDescripcion;
+
+    @FXML
+    private CheckBox checkCompletada;
+
+    @FXML
+    private Label textoTituloTop;
+
+    @FXML
+    private ComboBox<Etiqueta> boxEtiquetas;
+
+    @FXML
+    private Text textoError;
+
+    @FXML
+    private DatePicker campoFechaFin;
+
     @FXML
     private Button botonCancelar;
 
     @FXML
     private AnchorPane rootPane;
 
+    //Initialize que pone de color y el idioma guardado
     public void initialize(){
-        java.util.prefs.Preferences prefs = java.util.prefs.Preferences.userNodeForPackage(ConfiguracionController.class);
-        if (prefs.getBoolean("modo_oscuro", false) && rootPane != null) {
-            rootPane.getStyleClass().add("dark-mode");
-        }
+        Preferences prefs = Preferences.userNodeForPackage(GestorTareas.class);
+        if (prefs.getBoolean("modo_oscuro", false) && rootPane != null) rootPane.getStyleClass().add("dark-mode");
     }
 
 //Una vez recibe la tarea establece los campos con los valores que tenemos
 public void setTareaMos(Tarea tareaMos) {
         this.tareaMos = tareaMos;
         campoTitulo.setText(tareaMos.getNombreTarea());
-        if(tareaMos.getFechaFin()!=null){
-            campoFechaFin.setValue(tareaMos.getFechaFin());
-        }
-        if(tareaMos.getFechaInicio()!=null){
-            campoFecha.setValue(tareaMos.getFechaInicio());
-        }
-        if(tareaMos.getHoraInicio()!=null){
-            campoHoraInicio.setText(GestorTareas.getGestorTareas().obtenerHoraFormateada(tareaMos.getHoraInicio()));
-        }
-        if(tareaMos.getHoraFin()!=null){
-        campoHoraFin.setText(GestorTareas.getGestorTareas().obtenerHoraFormateada(tareaMos.getHoraFin()));
-        }
-        if(tareaMos.getSitio()!=null){
-            campoSitio.setText(tareaMos.getSitio());
-        }
-        if(tareaMos.getDescripcion()!=null){
-            campoDescripcion.setText(tareaMos.getDescripcion());
-        }
-        if(tareaMos.getEstadoTarea().equals(EstadoTarea.COMPLETADA)){
-            checkCompletada.setSelected(true);
-        }
+        if(tareaMos.getFechaFin()!=null)campoFechaFin.setValue(tareaMos.getFechaFin());
+
+        if(tareaMos.getFechaInicio()!=null)campoFechaInicio.setValue(tareaMos.getFechaInicio());
+
+        if(tareaMos.getHoraInicio()!=null)campoHoraInicio.setText(GestorTareas.getGestorTareas().obtenerHoraFormateada(tareaMos.getHoraInicio()));
+
+        if(tareaMos.getHoraFin()!=null)campoHoraFin.setText(GestorTareas.getGestorTareas().obtenerHoraFormateada(tareaMos.getHoraFin()));
+
+        if(tareaMos.getSitio()!=null)campoSitio.setText(tareaMos.getSitio());
+
+        if(tareaMos.getDescripcion()!=null)campoDescripcion.setText(tareaMos.getDescripcion());
+
+        if(tareaMos.getEstadoTarea().equals(EstadoTarea.COMPLETADA))checkCompletada.setSelected(true);
+
         //Establece el valor en los combobox ademas de rellenarlos
-    campoPerioricidad.setItems(FXCollections.observableArrayList(Periodicidad.values()));
-    campoPerioricidad.setValue(tareaMos.getFrecuencia());
+        campoPerioricidad.setItems(FXCollections.observableArrayList(Periodicidad.values()));
+        campoPerioricidad.setValue(tareaMos.getFrecuencia());
 
-    boxEtiquetas.setItems(FXCollections.observableArrayList(GestorTareas.getGestorTareas().getListaEtiquetas()));
-    textoTituloTop.setText(tareaMos.getNombreTarea());
-    boxEtiquetas.setValue(tareaMos.getEtiqueta());
-}
-//Si se elige completado cambia su estado
-@FXML
-private void cambiarEstado(){
-    if(checkCompletada.isSelected()){
-        tareaMos.setEstadoTarea(EstadoTarea.COMPLETADA);
-    }else {
-        tareaMos.setEstadoTarea(EstadoTarea.EN_PROCESO);}
-}
+        boxEtiquetas.setItems(FXCollections.observableArrayList(GestorTareas.getGestorTareas().getListaEtiquetas()));
+        textoTituloTop.setText(tareaMos.getNombreTarea());
+        boxEtiquetas.setValue(tareaMos.getEtiqueta());
+    }
+    //Si se elige completado cambia su estado
+    @FXML
+    private void cambiarEstado(){
+        if(checkCompletada.isSelected())tareaMos.setEstadoTarea(EstadoTarea.COMPLETADA);
+        else tareaMos.setEstadoTarea(EstadoTarea.EN_PROCESO);
+    }
 
-//Boton para cerrar sin guardar
-@FXML
-private void cerrarTodo(){
-    Stage ventanaActual = (Stage) botonCancelar.getScene().getWindow();
-    ventanaActual.close();
-}
+    //Boton para cerrar sin guardar
+    @FXML
+    private void cerrarTodo(){
+        Stage ventanaActual = (Stage) botonCancelar.getScene().getWindow();
+        ventanaActual.close();
+    }
 
 //Si se pulsa en eliminar tarea se borra
 @FXML
-private void eliminarTarea(){//En caso de qeu sea periodica sale una pantalla emergente
+private void eliminarTarea(){//En caso de que sea periodica sale una pantalla emergente
     if(tareaMos.getFrecuencia()!=Periodicidad.NUNCA){
         try{
             view.showConfirmacionEl(tareaMos);
@@ -116,6 +120,7 @@ private void eliminarTarea(){//En caso de qeu sea periodica sale una pantalla em
             throw new RuntimeException(e) ;
         }
     }else {
+        //Sale una pantalla de confirmacion
         ResourceBundle bundle = GestorTareas.getGestorTareas().obtenerDiccionario();
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(bundle.getString("modificarTarea.borrarTarea.confirmar.Titulo"));
@@ -127,14 +132,13 @@ private void eliminarTarea(){//En caso de qeu sea periodica sale una pantalla em
     cerrarTodo();
 }
 
-//Guarda la nueva modificacion y cierra
+//Guarda la nueva modificacion y cierra, lee todos los atributos y se los actualiza
 @FXML
 private void modificarTarea() {
 
     String titulo = campoTitulo.getText();
-    LocalDate fechaInic = campoFecha.getValue();
+    LocalDate fechaInic = campoFechaInicio.getValue();
     if (fechaInic == null) fechaInic = LocalDate.now();
-
 
     LocalDate fechaFin=campoFechaFin.getValue();
     if(fechaFin==null) fechaFin=LocalDate.now();
@@ -144,6 +148,7 @@ private void modificarTarea() {
     LocalTime time;
     String horaInicio = campoHoraInicio.getText();
     String horaFin = campoHoraFin.getText();
+
     try {
         // Primero intentamos leerlo normal (formato 24h, ej: "18:30")
         time = LocalTime.parse(horaInicio);
@@ -157,6 +162,7 @@ private void modificarTarea() {
             time = null;
         }
     }
+
     LocalTime horaFin1;
     try {
         // Primero intentamos leerlo normal (formato 24h, ej: "18:30")
@@ -172,16 +178,15 @@ private void modificarTarea() {
         }
     }
     Periodicidad frecuencia = campoPerioricidad.getValue();
-    if (frecuencia == null) {
-        frecuencia = Periodicidad.NUNCA; // Le damos un valor por defecto
-    }
+    if (frecuencia == null) frecuencia = Periodicidad.NUNCA; // Le damos un valor por defecto
+
     EstadoTarea estado = tareaMos.getEstadoTarea();
 
     Etiqueta etiqueta = boxEtiquetas.getValue();
 
-    if (titulo.isBlank()) {
-        textoError.setText("Introduzca un titulo");
-    } else {
+    //Obliga a que exista un titulo
+    if (titulo.isBlank()) textoError.setText("Introduzca un titulo");
+     else {
         GestorTareas.getGestorTareas().modificarTarea(tareaMos, titulo,fechaInic, fechaFin, descripcion, sitio, time, horaFin1,frecuencia, estado, etiqueta);
         cerrarTodo();
     }

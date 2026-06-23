@@ -25,9 +25,6 @@ public class NotificadorDeTareas {
                 ProcessBuilder pb = new ProcessBuilder("powershell", "-Command", psCommand);
                 pb.start();
             }
-        } catch (Exception e) {
-            // Si algo falla, simplemente lo dejamos pasar para no bloquear la app
-            System.err.println("No se pudo mostrar la notificación: " + e.getMessage());
-        }
+        } catch (Exception ignored) {}
     }
 }

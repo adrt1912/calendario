@@ -14,7 +14,7 @@ public enum Periodicidad {
     private final int dias;
     private final int mes;
     private final int anios;
-    private Periodicidad(int dias,int mes,int anios){
+    Periodicidad(int dias,int mes,int anios){
         this.dias=dias;
         this.mes=mes;
         this.anios=anios;

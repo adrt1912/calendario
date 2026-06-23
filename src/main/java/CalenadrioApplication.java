@@ -25,15 +25,11 @@ public class CalenadrioApplication extends Application {
         }
 
     private void configurarSystemTray() {
-        if (!SystemTray.isSupported()) {
-            return; // Si el SO no lo soporta, no hacemos nada
-        }
-
+        if (!SystemTray.isSupported()) return; // Si el SO no lo soporta, no hacemos nada
         try {
             SystemTray tray = SystemTray.getSystemTray();
 
             // Imagen del icono (asegúrate de que la ruta sea correcta)
-// Busca el icono en la raíz de los recursos, dentro de la carpeta View
             java.awt.Image image = javax.imageio.ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/View/icono.png")));
             PopupMenu menu = new PopupMenu();
             MenuItem abrirItem = new MenuItem("Abrir Gestor");
@@ -41,9 +37,7 @@ public class CalenadrioApplication extends Application {
 
             // Acciones: Recordar usar Platform.runLater para volver a JavaFX
             abrirItem.addActionListener(e -> Platform.runLater(() -> {
-                if (primaryStage.isIconified()) {
-                    primaryStage.setIconified(false); // Si estaba minimizado en la barra, lo restaura
-                }
+                if (primaryStage.isIconified()) primaryStage.setIconified(false); // Si estaba minimizado en la barra, lo restaura
                 primaryStage.show();
                 primaryStage.toFront(); // Lo trae al frente para que no se quede detrás de otras ventanas
                 primaryStage.requestFocus(); // Fuerza el foco para que no se vea blanco
@@ -65,7 +59,7 @@ public class CalenadrioApplication extends Application {
             });
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException();
         }
     }
 }

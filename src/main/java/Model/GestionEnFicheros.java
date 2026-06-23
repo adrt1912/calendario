@@ -23,9 +23,7 @@ public class GestionEnFicheros {
 
     private static final GestionEnFicheros gestionEnFicheros = new GestionEnFicheros();
 
-    public static GestionEnFicheros getGestionEnFicheros() {
-        return gestionEnFicheros;
-    }
+    public static GestionEnFicheros getGestionEnFicheros() {return gestionEnFicheros;}
 
     public File obtenerUltimoBackup(String prefijo) {
         File dir = new File("backups");
@@ -41,7 +39,7 @@ public class GestionEnFicheros {
         return files[files.length - 1];
     }
 
-    public void leerFicheroTareas(File ultimoTareas) {
+    public void leerFicheroTareas() {
 
         /*Los ficheros tienen la siguiente estructura
         1.Titulo
@@ -50,7 +48,10 @@ public class GestionEnFicheros {
            estadoTarea
            descripcion
            sitio
-           hora
+           hora inicio
+           hora fin
+           frecuencia
+           etiqueta
         2. Titulo...
         Si alguno va vacio se salta de linea
          */
@@ -59,28 +60,22 @@ public class GestionEnFicheros {
         File archivo = new File(nombreArchivo);
         if (archivo.exists()) {
 
-            try (
-                    Scanner lectorFichero = new Scanner(new File(nombreArchivo))) {
+            try (Scanner lectorFichero = new Scanner(new File(nombreArchivo))) {
                 DateTimeFormatter formatoHora = GestorTareas.getGestorTareas().getFormatoHora();
 
                 while (lectorFichero.hasNextLine()) {
 
                     String titulo = lectorFichero.nextLine();
-                    if (titulo.isBlank()) {
-                        continue;
-                    }
+                    if (titulo.isBlank()) continue;
 
                     String fechainicstring = lectorFichero.nextLine();
                     LocalDate fechainic = null;
-                    if (!fechainicstring.equals("null") && !fechainicstring.isEmpty()) {
-                        fechainic = LocalDate.parse(fechainicstring);
-                    }
+                    if (!fechainicstring.equals("null") && !fechainicstring.isEmpty()) fechainic = LocalDate.parse(fechainicstring);
+
 
                     String fechafinstring = lectorFichero.nextLine();
                     LocalDate fechaFin = null;
-                    if (!fechafinstring.equals("null") && !fechafinstring.isEmpty()) {
-                        fechaFin = LocalDate.parse(fechafinstring);
-                    }
+                    if (!fechafinstring.equals("null") && !fechafinstring.isEmpty()) fechaFin = LocalDate.parse(fechafinstring);
 
                     String estadoTexto = lectorFichero.nextLine();
                     EstadoTarea estadoTarea = null;
@@ -96,30 +91,27 @@ public class GestionEnFicheros {
 
                     String sitio = lectorFichero.nextLine();
 
-                    String horaTexto = lectorFichero.nextLine();
+                    String horaInicTexto = lectorFichero.nextLine();
                     LocalTime horaInicio = null;
-                    if (!horaTexto.equals("null") && !horaTexto.isEmpty()) {
-                        horaInicio = LocalTime.parse(horaTexto, formatoHora);
-                    }
+                    if (!horaInicTexto.equals("null") && !horaInicTexto.isEmpty()) horaInicio = LocalTime.parse(horaInicTexto, formatoHora);
 
+                    String horaFinTexto = lectorFichero.nextLine();
                     LocalTime horaFin = null;
-                    if (!horaTexto.equals("null") && !horaTexto.isEmpty()) {
-                        horaFin = LocalTime.parse(horaTexto, formatoHora);
-                    }
+                    if (!horaFinTexto.equals("null") && !horaFinTexto.isEmpty()) horaFin = LocalTime.parse(horaFinTexto, formatoHora);
 
                     Periodicidad frecuencia = Periodicidad.valueOf(lectorFichero.nextLine());
                     String idFamilia = lectorFichero.nextLine();
 
                     String etiquetaText = lectorFichero.nextLine().trim();
-                    Etiqueta etiquetaAsignada = GestorTareas.getGestorTareas().getListaEtiquetas().stream().filter(e -> e.getNombreEtiqueta() != null && e.getNombreEtiqueta().equals(etiquetaText)).findFirst().orElse(null);
+                    Etiqueta etiquetaAsignada = GestorTareas.getGestorTareas().getListaEtiquetas().stream().filter(e -> e.nombreEtiqueta() != null && e.nombreEtiqueta().equals(etiquetaText)).findFirst().orElse(null);
+                    String idTareaGuardado = lectorFichero.nextLine();
 
                     Tarea tarea = new Tarea(titulo, fechainic, fechaFin, estadoTarea, descripcion, sitio, horaInicio, horaFin, frecuencia, idFamilia, etiquetaAsignada);
-                    GestorTareas.getGestorTareas().añadirTareaALista(tarea);
+                    if (idTareaGuardado != null && !idTareaGuardado.isEmpty() && !idTareaGuardado.equals("null")) tarea.setIdTarea(idTareaGuardado);
 
+                    GestorTareas.getGestorTareas().aniadirTareaAListaDeDocumento(tarea);
                 }
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
+            } catch (Exception ignored) {}
         }
     }
 
@@ -127,13 +119,12 @@ public class GestionEnFicheros {
         File carpeta = new File("backups");
         if (!carpeta.exists()) carpeta.mkdir();
         String nombreArchivo = "backups/tareas_backup_" + LocalDate.now() + ".txt";
-        try (
-                FileWriter printWriter = new FileWriter(nombreArchivo);
+        try (FileWriter printWriter = new FileWriter(nombreArchivo);
                 PrintWriter pw = new PrintWriter(printWriter) {
                 }) {
             for (Tarea tarea : listaTareas) {
-                pw.println(tarea.getNombreTarea() + "\n" + tarea.getFechaInicio() + "\n" + tarea.getFechaFin() + "\n" + tarea.getEstadoTarea() + "\n" + tarea.getDescripcion() + "\n" + tarea.getSitio() + "\n" + tarea.getHoraInicio() + "\n" + tarea.getHoraFin() + "\n" + tarea.getFrecuencia() + "\n" + tarea.getIdFamilia() + "\n" + tarea.getEtiqueta());
-            }
+                String etiquetaTexto = (tarea.getEtiqueta() != null) ? tarea.getEtiqueta().toString() : "Sin Etiqueta";
+                pw.println(tarea.getNombreTarea() + "\n" + tarea.getFechaInicio() + "\n" + tarea.getFechaFin() + "\n" + tarea.getEstadoTarea() + "\n" + tarea.getDescripcion() + "\n" + tarea.getSitio() + "\n" + tarea.getHoraInicio() + "\n" + tarea.getHoraFin() + "\n" + tarea.getFrecuencia() + "\n" + tarea.getIdFamilia() + "\n" + etiquetaTexto + "\n" + tarea.getIdTarea());            }
 
         } catch (Exception e) {
             System.out.println("Error en la copida de seguridad");
@@ -154,37 +145,32 @@ public class GestionEnFicheros {
              PrintWriter pw = new PrintWriter(printWriter) {
              }) {
             for (Etiqueta etiqueta : listaEtiquetas) {
-                if ("Sin Etiqueta".equalsIgnoreCase(etiqueta.getNombreEtiqueta()) || "transparent".equalsIgnoreCase(etiqueta.getCodColor())) {
+                if ("Sin Etiqueta".equalsIgnoreCase(etiqueta.nombreEtiqueta()) || "transparent".equalsIgnoreCase(etiqueta.codColor())) {
                     continue;
                 }
-                pw.println(etiqueta.getNombreEtiqueta() + "\n" + etiqueta.getCodColor());
+                pw.println(etiqueta.nombreEtiqueta() + "\n" + etiqueta.codColor());
             }
-        } catch (Exception e) {
-
-        }
+        } catch (Exception ignored) {}
     }
 
-    public void leerEtiquetas(File ultimasEtiquetas) {
+    public void leerEtiquetas() {
         String nombreArchivo = "backups/etiquetas_backup_" + LocalDate.now() + ".txt";
 
-        try (
-                Scanner lectorFichero = new Scanner(new File(nombreArchivo))) {
+        try (Scanner lectorFichero = new Scanner(new File(nombreArchivo))) {
             while (lectorFichero.hasNext()) {
                 String nomE = lectorFichero.nextLine();
                 String color = lectorFichero.nextLine();
                 GestorTareas.getGestorTareas().nuevaEtiqueta(nomE, color);
             }
-        } catch (Exception e) {
-        }
+        } catch (Exception ignored) {}
     }
 
     public void exportarACSV() {
 
         List<Tarea> listaTareas = GestorTareas.getGestorTareas().getTodasTareas();
-        try (
-                FileWriter printWriter = new FileWriter("archivoCSVTareas.csv");
-                PrintWriter pw = new PrintWriter(printWriter) {
-                }) {
+        try (FileWriter printWriter = new FileWriter("archivoCSVTareas.csv");
+             PrintWriter pw = new PrintWriter(printWriter) {
+             }) {
             pw.println("Titulo;Descripcion;Estado;FechaFin;Hora;Etiqueta");
             for (Tarea tarea : listaTareas) {
                 String titulo = tarea.getNombreTarea();
@@ -193,7 +179,7 @@ public class GestionEnFicheros {
                 String fecha = tarea.getFechaFin() != null ? tarea.getFechaFin().toString() : "";
                 String horaInicio = tarea.getHoraInicio() != null ? tarea.getHoraInicio().toString() : "";
                 String horaFin = tarea.getHoraFin() != null ? tarea.getHoraFin().toString() : "";
-                String etiqueta = tarea.getEtiqueta() != null ? tarea.getEtiqueta().getNombreEtiqueta() : "";
+                String etiqueta = tarea.getEtiqueta() != null ? tarea.getEtiqueta().nombreEtiqueta() : "";
 
                 pw.println(titulo + ";" + desc + ";" + estado + ";" + fecha + ";" + horaInicio + ";" + horaFin + ";" + etiqueta);
             }
@@ -216,7 +202,7 @@ public class GestionEnFicheros {
         if (archivoDestino != null) {
 
             try (FileWriter printWriter = new FileWriter(archivoDestino);
-                 PrintWriter pw = new PrintWriter(printWriter);) {
+                 PrintWriter pw = new PrintWriter(printWriter)) {
                 pw.println("BEGIN:VCALENDAR");
                 pw.println("VERSION:2.0");
                 pw.println("PRODID:-//Aday//Gestor de Tareas//ES");
@@ -243,7 +229,6 @@ public class GestionEnFicheros {
                     else pw.println("STATUS:CONFIRMED"); // Por defecto (EN_PROCESO)
                     pw.println("END:VEVENT");
                 }
-
                 pw.println("END:VCALENDAR");
 
             } catch (Exception e) {
@@ -252,37 +237,42 @@ public class GestionEnFicheros {
         }
     }
 
-    public void leerArchivoICS(Stage ventana) {
+    private  String nombrAR;
+    public void elegirArchivoICSLEER(Stage ventana){
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Importar Calendario");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivo de iCalendar (*.ics)", "*.ics"));
 
-        File archivoElegido = fileChooser.showOpenDialog(ventana);
+        File archivoSeleccionado = fileChooser.showOpenDialog(ventana);
+        if (archivoSeleccionado != null) nombrAR = archivoSeleccionado.getAbsolutePath();
+         else nombrAR = null;
+    }
 
-        if (archivoElegido != null) {
-            try (FileInputStream fin = new FileInputStream(archivoElegido)) {
+    public void leerArchivoICS() {
+
+        if (nombrAR != null) {
+            try (FileInputStream fin = new FileInputStream(nombrAR)) {
                 CalendarBuilder builder = new CalendarBuilder();
                 Calendar calendar = builder.build(fin);
 
                 // Iteramos sobre todos los eventos encontrados
                 for (Component component : calendar.getComponents(Component.VEVENT)) {
-                    Component event = component;
 
-                    // 1. Extraer título (SUMMARY)
-                    String descripcion = event.getProperty(Property.DESCRIPTION)
+                    // 1. Extraer título informacion
+                    String descripcion = component.getProperty(Property.DESCRIPTION)
                             .map(Property::getValue)
                             .orElse("");
 
-                    String resumen = event.getProperty(Property.SUMMARY)
+                    String resumen = component.getProperty(Property.SUMMARY)
                             .map(Property::getValue)
                             .orElse("Tarea importada");
 
-                    String fechaInicioStr = event.getProperty(Property.DTSTART)
+                    String fechaInicioStr = component.getProperty(Property.DTSTART)
                             .map(Property::getValue)
                             .orElse(null);
 
-// 2. Extraer DTEND (Fecha y hora fin)
-                    String fechaFinStr = event.getProperty(Property.DTEND)
+                        // 2. Extraer DTEND (Fecha y hora fin)
+                    String fechaFinStr = component.getProperty(Property.DTEND)
                             .map(Property::getValue)
                             .orElse(fechaInicioStr); // Si no hay fecha fin, usamos la de inicio como fallback
 

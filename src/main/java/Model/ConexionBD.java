@@ -1,16 +1,15 @@
 package Model;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
 public class ConexionBD {
 
+    //Es Singletones
     private static ConexionBD conexionBD;
     private ConexionBD(){
         conexionBD=this;
@@ -21,6 +20,7 @@ public class ConexionBD {
         return conexionBD;
     }
 
+    //En caso de que no existan se crean
     public void crearTablasSiNoExisten() {
         // CAMBIO: Se sustituye 'Hora' por 'HoraInicio' y se añade 'HoraFin'
         String sqlTareas = "CREATE TABLE IF NOT EXISTS Tarea (" +
@@ -34,7 +34,6 @@ public class ConexionBD {
         try (Connection c = DriverManager.getConnection(URL);
              PreparedStatement ps1 = c.prepareStatement(sqlTareas);
              PreparedStatement ps2 = c.prepareStatement(sqlEtiquetas)) {
-
             ps1.execute();
             ps2.execute();
         } catch (Exception e) {
@@ -42,8 +41,10 @@ public class ConexionBD {
         }
     }
 
+    //La url de la conexion
     private static final String URL = "jdbc:sqlite:base_tareas.db";
 
+    //Lee toda la BD y los guarda en local
     public void cargarDatosDeBD(){
 
         String op1="select * from Etiqueta";
@@ -51,8 +52,9 @@ public class ConexionBD {
 
         try (Connection c= DriverManager.getConnection(URL);
              PreparedStatement ps=c.prepareStatement(op);
-             PreparedStatement ps1=c.prepareStatement(op1);
+             PreparedStatement ps1=c.prepareStatement(op1)
         ){
+            //Leemos primero las etiquetas
             ResultSet rs1=ps1.executeQuery();
             while (rs1.next()){
                 String nomE = rs1.getString("nombreEtiqueta");
@@ -61,6 +63,7 @@ public class ConexionBD {
                 GestorTareas.getGestorTareas().getListaEtiquetas().add(nuevaEtiqueta);
             }
 
+            //Leemos las tareas
             ResultSet rs=ps.executeQuery();
             while(rs.next()) {
                 String titulo = rs.getString("Titulo");
@@ -101,36 +104,32 @@ public class ConexionBD {
                 Etiqueta etiquetaAsignada = null;
                 if (etiqueta != null) {
                     etiquetaAsignada = GestorTareas.getGestorTareas().getListaEtiquetas().stream()
-                            .filter(e -> e.getNombreEtiqueta() != null && e.getNombreEtiqueta().equals(etiqueta))
+                            .filter(e -> e.nombreEtiqueta() != null && e.nombreEtiqueta().equals(etiqueta))
                             .findFirst()
                             .orElse(null);
                 }
 
-                // CAMBIO: Se pasan timeInicio y timeFin al constructor de Tarea
                 Tarea tarea = new Tarea(titulo, fechainic, fechaFin, estadoTarea, descripcion, sitio, timeInicio, timeFin, frecuencia, idFamilia, etiquetaAsignada);
-                if (idTarea != null) {
-                    tarea.setIdTarea(idTarea);
-                }
-                GestorTareas.getGestorTareas().añadirTareaALista(tarea);
+                if (idTarea != null) tarea.setIdTarea(idTarea);
+
+                GestorTareas.getGestorTareas().aniadirTareaAListaDeDocumento(tarea);
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        } catch (Exception ignored) {}
     }
 
+    //Borra una tarea de la BD
     public void borrarTarea(String idTarea){
         String opDelete="delete from Tarea where idTarea=?";
         try (Connection c=DriverManager.getConnection(URL);
              PreparedStatement ps=c.prepareStatement(opDelete)
-        ){
-            ps.setString(1,idTarea);
+        ){ ps.setString(1,idTarea);
             ps.executeUpdate();
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
+    //Borra una etiqueta de la BD
     public void borrarEtiqueta(String nombreEtiqueta) {
         String opDelete = "DELETE FROM Etiqueta WHERE NombreEtiqueta=?";
 
@@ -146,11 +145,12 @@ public class ConexionBD {
         }
     }
 
+    //Guarda una tarea nueva
     public void guardarTarea (Tarea tarea){
         // CAMBIO: Añadidos HoraInicio y HoraFin a la consulta SQL y ajustado el número de interrogantes (?) a 12
         String opTareas = "INSERT OR REPLACE INTO Tarea (Titulo, FechaInicio, FechaFin, EstadoTarea, HoraInicio, HoraFin, Frecuencia, Descripcion, Sitio, idTarea, idFamilia, Etiqueta) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
         try (Connection c=DriverManager.getConnection(URL);
-             PreparedStatement psTareas=c.prepareStatement(opTareas);
+             PreparedStatement psTareas=c.prepareStatement(opTareas)
         ){
             psTareas.setString(1, tarea.getNombreTarea());
             psTareas.setString(2, tarea.getFechaInicio() != null ? tarea.getFechaInicio().toString() : null);
@@ -167,7 +167,7 @@ public class ConexionBD {
             psTareas.setString(9, tarea.getSitio());
             psTareas.setString(10, tarea.getIdTarea());
             psTareas.setString(11, tarea.getIdFamilia());
-            psTareas.setString(12, tarea.getEtiqueta() != null ? tarea.getEtiqueta().getNombreEtiqueta() : null);
+            psTareas.setString(12, tarea.getEtiqueta() != null ? tarea.getEtiqueta().nombreEtiqueta() : null);
 
             psTareas.executeUpdate();
 
@@ -176,25 +176,27 @@ public class ConexionBD {
         }
     }
 
+    //Gurada una etiqueta nueva
     public void guardarEtiqueta(Etiqueta etiqueta){
         String opEtiquetas = "INSERT OR REPLACE INTO Etiqueta (nombreEtiqueta,codColor) VALUES (?,?)";
         try (Connection c=DriverManager.getConnection(URL);
-             PreparedStatement psEtiquetas=c.prepareStatement(opEtiquetas);
+             PreparedStatement psEtiquetas=c.prepareStatement(opEtiquetas)
         ){
-            psEtiquetas.setString(1,etiqueta.getNombreEtiqueta());
-            psEtiquetas.setString(2,etiqueta.getCodColor());
+            psEtiquetas.setString(1,etiqueta.nombreEtiqueta());
+            psEtiquetas.setString(2,etiqueta.codColor());
             psEtiquetas.executeUpdate();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
+    //Para borrar todos los datos de la BD
     public void vaciarBaseDeDatos(){
         String borrarTareas="Delete from Tarea";
         String borrarEtiqueta="Delete from Etiqueta";
         try(Connection c=DriverManager.getConnection(URL);
             PreparedStatement psTareas=c.prepareStatement(borrarTareas);
-            PreparedStatement psEtiquetas=c.prepareStatement(borrarEtiqueta);
+            PreparedStatement psEtiquetas=c.prepareStatement(borrarEtiqueta)
         ) {
             psTareas.executeUpdate();
             psEtiquetas.executeUpdate();

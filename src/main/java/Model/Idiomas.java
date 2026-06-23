@@ -1,29 +1,25 @@
 package Model;
 
 public enum Idiomas {
-    ESPAÑOL("es", "Español"),
+    Espaniol("es", "Español"),
     INGLES("en", "English"),
     FRANCES("fr", "Français"),
     EUSKERA("eu", "Euskara"),
     ALEMAN("de", "Deutsch");
 
-
-
-    private Idiomas(String codigo,String nombreVisible){
+     Idiomas(String codigo,String nombreVisible){
         this.codigo=codigo;
         this.nombreVisible=nombreVisible;
     }
     private final String codigo;
-    private  final String nombreVisible;
+    private final String nombreVisible;
 
     public String getCodigo() {
         return codigo;
     }
 
     @Override
-    public String toString() {
-        return nombreVisible;
-    }
+    public String toString() {return nombreVisible;}
 
     //Trasnforma el codigo "es" al idioma correspondiente
     public static Idiomas desdeCodigo(String codigoBuscado) {
@@ -32,6 +28,6 @@ public enum Idiomas {
                 return idioma;
             }
         }
-        return ESPAÑOL;
+        return Espaniol;
     }
 }

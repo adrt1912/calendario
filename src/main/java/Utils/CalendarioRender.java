@@ -1,6 +1,5 @@
 package Utils;
 
-import Controller.ConfiguracionController;
 import Controller.MenuPrincipalController;
 import Model.GestorTareas;
 import javafx.geometry.Pos;
@@ -20,25 +19,27 @@ import java.util.prefs.Preferences;
 
 public class CalendarioRender {
 
-    private Preferences prefs; //Para guardar de forma global si esta en modo oscuro o no
+    private final Preferences prefs; //Para guardar de forma global si esta en modo oscuro o no
 
+    //Patrón singletone
     private static CalendarioRender calendarioRender;
 
     public static CalendarioRender getCalendarioRender() {
-        if (calendarioRender == null) {
-            calendarioRender = new CalendarioRender();
-        }
+        if (calendarioRender == null) calendarioRender = new CalendarioRender();
         return calendarioRender;
     }
 
     private CalendarioRender(){
         calendarioRender=this;
-        prefs = Preferences.userNodeForPackage(ConfiguracionController.class);}
+        prefs = Preferences.userNodeForPackage(GestorTareas.class);
+    }
 
-    private GestorTareas gestorTareas=GestorTareas.getGestorTareas();
+    private final GestorTareas gestorTareas=GestorTareas.getGestorTareas();
 
+    //Para los nombres de la semana
     private String[] semana;
 
+    //Inicia todos los cuadrados del mes
     public VBox[][] iniciarMatrizVBoxMensual(){
         VBox[][] calendarioVBoxMensual=new VBox[7][7];
         //Simplemente crea un VBox en cada hueco del calendario, para poder añadir ahi todos los nombres de las tareas
@@ -50,6 +51,7 @@ public class CalendarioRender {
         return calendarioVBoxMensual;
     }
 
+    //da valor al array de string con los nombres de la semana segun el idioma
     public void rellenarSemanaSegunIdioma(){
         String[] semanas = new String[7];
         //Se mira el idioma guardado
@@ -65,17 +67,19 @@ public class CalendarioRender {
     }
 
     public void mostrarCalendarioMensual(GridPane calendarioMensual, VBox contenedorSemanal, VBox contenedorDiario, LocalDate fechaSeleccionada, MenuPrincipalController jefe, VBox[][] calendarioVBoxMensual){
-        //Se pone invisible el semanal y visible el mensual
+        //Se pone invisible el semanal y el diario, y visible el mensual
         contenedorSemanal.setVisible(false);
         calendarioMensual.setVisible(true);
         contenedorDiario.setVisible(false);
 
+        //Obtenemos cuantos dias tiene el mes y el primer dia
         int numDiasMes = fechaSeleccionada.lengthOfMonth();
         int fechaPrimerDiaMes = LocalDate.of(fechaSeleccionada.getYear(), fechaSeleccionada.getMonthValue(), 1).getDayOfWeek().getValue();
 
         LocalDate fechaHoy = LocalDate.now();
         int numMes = 1;
 
+        //Recorremos casialla a casilla
         for(int i=0; i<calendarioMensual.getRowCount(); i++){
             for (int j=0; j< calendarioMensual.getColumnCount(); j++){
                 VBox casillaActual = calendarioVBoxMensual[j][i];
@@ -95,9 +99,8 @@ public class CalendarioRender {
                 casillaActual.setStyle("-fx-background-color: "+colorFondo+";");
 
                 // Fila 0: Nombres de los días de la semana
-                if(i == 0) {
-                    casillaActual.getChildren().add(new Label(semana[j]));
-                }
+                if(i == 0) casillaActual.getChildren().add(new Label(semana[j]));
+                //El resto de filas van ya con numero
                 else {
                     // Calculamos si la casilla actual corresponde a un día real del mes
                     boolean esDiaValido = false;
@@ -105,28 +108,24 @@ public class CalendarioRender {
                     else if (i > 1 && numMes <= numDiasMes) esDiaValido = true;  // Resto del mes
 
                     if (esDiaValido) {
+                        //Creamos la etiqueta donde ira el numero
                         Label label = new Label(numMes+"");
                         casillaActual.getChildren().add(label);
 
                         int diaClicado = numMes;
                         LocalDate fechaDeEstaCasilla = LocalDate.of(fechaSeleccionada.getYear(), fechaSeleccionada.getMonthValue(), diaClicado);
 
-                        casillaActual.setOnMouseClicked(event -> {
-                            jefe.tratarEventoClick(event, fechaDeEstaCasilla, null);
-                        });
+                        //Ponemos el evento de al clicar en el dia se trate como se deba
+                        casillaActual.setOnMouseClicked(event -> jefe.tratarEventoClick(event, fechaDeEstaCasilla, null));
 
-                        // --- DRAG & DROP: DESTINO (Buzón) ---
+                        // Listener para mover las etiquetas
+
                         casillaActual.setOnDragOver(event -> {
-                            if (event.getGestureSource() != casillaActual && event.getDragboard().hasString()) {
-                                event.acceptTransferModes(javafx.scene.input.TransferMode.MOVE);
-                            }
+                            if (event.getGestureSource() != casillaActual && event.getDragboard().hasString()) event.acceptTransferModes(javafx.scene.input.TransferMode.MOVE);
                             event.consume();
                         });
-
                         casillaActual.setOnDragEntered(event -> {
-                            if (event.getGestureSource() != casillaActual && event.getDragboard().hasString()) {
-                                casillaActual.setStyle("-fx-background-color: #d0e8f2; -fx-border-color: #0078D7; -fx-border-width: 2px;");
-                            }
+                            if (event.getGestureSource() != casillaActual && event.getDragboard().hasString()) casillaActual.setStyle("-fx-background-color: #d0e8f2; -fx-border-color: #0078D7; -fx-border-width: 2px;");
                         });
 
                         int finalJ = j;
@@ -157,8 +156,9 @@ public class CalendarioRender {
             }
         }
     }
+    //Para mostrar el calendario semanal
     public void mostrarCalendarioSemanal(GridPane calendarioMensual, VBox contenedorSemanal, VBox contenedorDiario, LocalDate fechaSeleccionada, MenuPrincipalController jefe,Pane[] panelesDiasSemanales, VBox[] panelesTareasTodoDia){
-        //En caso de la semana se hace invisible el mensual y visible el semanal
+        //En caso de la semana se hace invisible el mensual y el diarios, y visible el semanal
         calendarioMensual.setVisible(false);
         contenedorSemanal.setVisible(true);
         contenedorDiario.setVisible(false);
@@ -179,9 +179,11 @@ public class CalendarioRender {
         Label[] cabecerasDia = new Label[7]; //Se guardan para alinearlas luego
         contenedorSemanal.getChildren().add(cajaNombresSemana);
 
+        //Se recorre los sdias
         for(int i=0;i<7;i++) {
             Label label=new Label();
             int diaQueTocaDibujar = lunesDeEstaSemana.plusDays(i).getDayOfMonth();
+            //Se pone el texto con el nombre del dia de la semana
             label.setText(semana[i]+"\n"+diaQueTocaDibujar);
             label.setAlignment(Pos.CENTER);
             label.setTextAlignment(TextAlignment.CENTER);
@@ -198,15 +200,18 @@ public class CalendarioRender {
             cajaNombresSemana.getChildren().add(label);
             cabecerasDia[i]=label;
             LocalDate fechaExactaDelDia = lunesDeEstaSemana.plusDays(i);
+            //Se pone el listener al clicar
             label.setOnMouseClicked(event -> {
                 jefe.setFechaSeleccionada(fechaExactaDelDia);
                 jefe.mostrarTareas();});
-            //Para qeu se marque al clicar
+
+            //Para q8e se marque al ser hoy
             if(diaQueTocaDibujar == fechaHoy.getDayOfMonth() && fechaSeleccionada.getMonth() == fechaHoy.getMonth() && fechaSeleccionada.getYear() == fechaHoy.getYear()) {// Si es hoy: Letra grande + Borde rojo
                 label.setStyle(estiloBase+"-fx-font-size: 15px; -fx-font-weight: bold; -fx-border-color: red; -fx-border-width: 2px; -fx-border-radius: 50em; -fx-padding: 2 6 2 6;");
             } else label.setStyle(estiloBase);// Si no es hoy: Solo letra grande
         }
 
+        //Para las tareas de todo el dia
         HBox filaTodoElDia = new HBox();
         filaTodoElDia.setMinHeight(30); // Altura mínima si no hay tareas
         Pane huecoTodoElDia = new Pane();
@@ -214,6 +219,7 @@ public class CalendarioRender {
         huecoTodoElDia.setMinWidth(60);
         filaTodoElDia.getChildren().add(huecoTodoElDia);
 
+        //Se van añadiendo en cada dia
         for(int i = 0; i < 7; i++){
             VBox vBoxTareasTodoDia = new VBox();
             vBoxTareasTodoDia.setSpacing(2);
@@ -227,12 +233,14 @@ public class CalendarioRender {
             filaTodoElDia.getChildren().add(vBoxTareasTodoDia);
         }
 
+        //Para las tareas de varias horas
         contenedorSemanal.getChildren().add(filaTodoElDia);
 
         ScrollPane scrollReal = new ScrollPane();
         scrollReal.setFitToWidth(true); // Para que no haya scroll horizontal feo
         scrollReal.setStyle("-fx-background-color: transparent;");
 
+        //Cada hora son 60 pixeles
         HBox cajaDeTareas=new HBox();
         cajaDeTareas.setPrefHeight(24*60);
 
@@ -240,6 +248,7 @@ public class CalendarioRender {
         panelHoras.setPrefHeight(24*60);
         panelHoras.setPrefWidth(60);
         panelHoras.setMinWidth(60);
+        //Se recorren hasta 24, poniendo las horas
         for(int i=0;i<24;i++){
             int posY=i*60;
             Text textoHora=new Text(String.format("%02d:00",i));
@@ -261,6 +270,7 @@ public class CalendarioRender {
             panelDia.setStyle("-fx-border-color: #e0e0e0; -fx-border-width: 0 1 0 0;"); // Línea separadora
 
             for(int j=0;j<24;j++){
+                //Por cad ahora se mete una lineas para facilitar su vision
                 Line linea =new Line();
                 linea.setStartX(0);
                 linea.setStartY(j*60);
@@ -273,13 +283,15 @@ public class CalendarioRender {
                 panelDia.getChildren().add(linea);
             }
 
-            panelDia.setOnMouseClicked(event -> {jefe.tratarEventoClick(event, fechaExactaDelDia, LocalTime.of((int) (event.getY()/60),(int) (event.getY() % 60)));});
+            //Si se cica salte el evento
+            panelDia.setOnMouseClicked(event -> jefe.tratarEventoClick(event, fechaExactaDelDia, LocalTime.of((int) (event.getY()/60),(int) (event.getY() % 60))));
             panelesDiasSemanales[i]=panelDia;
             cajaDeTareas.getChildren().add(panelDia);
         }
         scrollReal.setContent(cajaDeTareas);
         contenedorSemanal.getChildren().add(scrollReal);
 
+        //Para ajustar los tamaños bien
         for(int i=0;i<7;i++){
             // Obligamos a la cabecera a medir exactamente igual que su columna de horas
             cabecerasDia[i].minWidthProperty().bind(panelesDiasSemanales[i].widthProperty());
@@ -291,8 +303,10 @@ public class CalendarioRender {
         }
     }
 
+    //PAra mostrar el modo dia
     public Pane mostrarCalendarioDiario(GridPane calendarioMensual, VBox contenedorSemanal, VBox contenedorDiario, LocalDate fechaSeleccionada, MenuPrincipalController jefe,VBox panelTareasTodoDiaDiario){
 
+        //Se ponene invisibles el semanal y mensual y el diario visible
         contenedorSemanal.setVisible(false);
         calendarioMensual.setVisible(false);
         contenedorDiario.setVisible(true);
@@ -301,17 +315,18 @@ public class CalendarioRender {
         String fechaFormateada = fechaSeleccionada.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault())
                 + ", " + fechaSeleccionada.getDayOfMonth() + " de " + fechaSeleccionada.getMonth().getDisplayName(TextStyle.FULL, Locale.getDefault());
 
+        //Se pone el tiutolo de lafecha
         Label tituloFecha = new Label(fechaFormateada);
         tituloFecha.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-padding: 10px;");
         tituloFecha.setAlignment(Pos.CENTER);
         tituloFecha.setMaxWidth(Double.MAX_VALUE);
         contenedorDiario.getChildren().add(tituloFecha);
 
-        VBox vBoxTodoElDia = new VBox();
-        vBoxTodoElDia.setSpacing(5);
-        vBoxTodoElDia.setStyle("-fx-border-color: #d0d0d0; -fx-border-width: 0 0 1 0;");
+        //se cra el panel para taresa que son del dia entero
+        panelTareasTodoDiaDiario.setStyle("-fx-border-color: #d0d0d0; -fx-border-width: 0 0 1 0; -fx-padding: 5px;");
         contenedorDiario.getChildren().add(panelTareasTodoDiaDiario);
 
+        //Se crea un scrollpane para las tareas de varias horas
         ScrollPane scrollReal = new ScrollPane();
         scrollReal.setFitToWidth(true); // Para que no haya scroll horizontal feo
         scrollReal.setStyle("-fx-background-color: transparent;");
@@ -323,6 +338,7 @@ public class CalendarioRender {
         panelHoras.setPrefHeight(24*60);
         panelHoras.setPrefWidth(60);
         panelHoras.setMinWidth(60);
+        //Se ponen las horas a la derecha
         for(int i=0;i<24;i++){
             int posY=i*60;
             Text textoHora=new Text(String.format("%02d:00",i));
@@ -341,6 +357,7 @@ public class CalendarioRender {
         HBox.setHgrow(panelDia,Priority.ALWAYS);
         panelDia.setStyle("-fx-border-color: #e0e0e0; -fx-border-width: 0 1 0 0;"); // Línea separadora
 
+        //Se ponen las lineas de las horas
         for(int j=0;j<24;j++){
             Line linea =new Line();
             linea.setStartX(0);
@@ -353,7 +370,8 @@ public class CalendarioRender {
 
             panelDia.getChildren().add(linea);
         }
-        panelDia.setOnMouseClicked(event -> {jefe.tratarEventoClick(event, fechaSeleccionada,LocalTime.of((int) (event.getY()/60),(int) (event.getY() % 60)));});
+        //si se clica en la tarea se trata
+        panelDia.setOnMouseClicked(event -> jefe.tratarEventoClick(event, fechaSeleccionada,LocalTime.of((int) (event.getY()/60),(int) (event.getY() % 60))));
         cajaDeTareas.getChildren().add(panelDia);
         scrollReal.setContent(cajaDeTareas);
         contenedorDiario.getChildren().add(scrollReal);
