@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="600.0" style="-fx-background-color: -fx-base;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.MenuInsertarPin">
+    <children>
+        <VBox alignment="TOP_CENTER" spacing="15.0">
+            <padding>
+                <Insets bottom="20.0" left="40.0" right="40.0" top="25.0" />
+            </padding>
+            <children>
+                <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-fill: -fx-text-base;" text="%loginPin.Titulo">
+                    <font>
+                        <Font name="System Bold" size="20.0" />
+                    </font>
+                </Text>
+
+                <VBox alignment="CENTER" spacing="12.0">
+                    <children>
+                        <TextField fx:id="boxUsuarios" alignment="CENTER" maxWidth="220.0" prefHeight="35.0" promptText="%loginPin.Usuario" style="-fx-background-radius: 6px; -fx-border-radius: 6px; -fx-font-size: 14px;">
+                            <VBox.margin>
+                                <Insets bottom="5.0" />
+                            </VBox.margin>
+                        </TextField>
+                        <PasswordField fx:id="campoContraseña" alignment="CENTER" maxWidth="220.0" onAction="#comprobarPIN" prefHeight="35.0" promptText="••••" style="-fx-background-radius: 6px; -fx-border-radius: 6px; -fx-font-size: 15px;" />
+                    </children>
+                </VBox>
+
+                <Text fx:id="err" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-fill: #ff4444;" textAlignment="CENTER" wrappingWidth="450.0">
+                    <font>
+                        <Font size="13.0" />
+                    </font>
+                </Text>
+
+                <HBox alignment="CENTER" spacing="12.0" VBox.vgrow="ALWAYS">
+                    <children>
+                        <Button mnemonicParsing="false" onAction="#comprobarPIN" prefHeight="35.0" prefWidth="130.0" style="-fx-background-color: #2196F3; -fx-background-radius: 6px; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-font-size: 13px;" text="%loginPin.Boton" />
+
+                        <Button mnemonicParsing="false" onAction="#entrarComoInvitado" prefHeight="35.0" prefWidth="110.0" style="-fx-background-color: #6c757d; -fx-background-radius: 6px; -fx-text-fill: white; -fx-cursor: hand; -fx-font-size: 13px;" text="Invitado" />
+
+                        <Button mnemonicParsing="false" onAction="#abrirRegistroNuevoUsuario" prefHeight="35.0" prefWidth="130.0" style="-fx-background-color: transparent; -fx-border-color: #2196F3; -fx-border-radius: 6px; -fx-text-fill: #2196F3; -fx-cursor: hand; -fx-font-size: 13px;" text="Crear Cuenta" />
+                    </children>
+                    <VBox.margin>
+                        <Insets top="5.0" />
+                    </VBox.margin>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

@@ -28,3 +28,33 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+# Ignorar la base de datos local de SQLite
+*.db
+*.db-journal
+*.db-wal
+
+# Ignorar la carpeta de compilación de Maven (¡importante!)
+target/
+
+# Ignorar archivos de configuración de IntelliJ
+.idea/
+*.iml
+
+# Ignorar archivos de backup específicos de la app
+*backup*
+etiquetas_backup_*
+
+# Ignorar todas las exportaciones de datos
+*.csv
+*.ics
+
+# Por si creas una carpeta llamada "backups" o "data" en la raíz
+backups/
+data/
+
+# Ignorar carpeta de compilación nativa de IntelliJ
+out/
+
+# Ignorar proyecto de DB Browser for SQLite
+*.sqbpro

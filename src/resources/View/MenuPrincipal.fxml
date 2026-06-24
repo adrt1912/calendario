@@ -186,12 +186,15 @@
                                 </Button>
                                 <HBox alignment="CENTER" prefHeight="60.0" prefWidth="420.0">
                                     <children>
-                                        <Text fx:id="cartelMes" strokeType="OUTSIDE" strokeWidth="0.0" text="%principal.textoMes" textAlignment="RIGHT" wrappingWidth="250.0">
+                                        <Text fx:id="cartelMes" strokeType="OUTSIDE" strokeWidth="0.0" text="%principal.textoMes" textAlignment="RIGHT" wrappingWidth="290.0">
                                             <font>
                                                 <Font size="36.0" />
                                             </font>
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
                                         </Text>
-                                        <Text fx:id="cartelAnio" strokeType="OUTSIDE" strokeWidth="0.0" text="%principal.textoAño" wrappingWidth="150.0">
+                                        <Text fx:id="cartelAnio" strokeType="OUTSIDE" strokeWidth="0.0" text="%principal.textoAño" wrappingWidth="176.0">
                                             <font>
                                                 <Font size="36.0" />
                                             </font>

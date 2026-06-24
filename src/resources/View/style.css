@@ -1,14 +1,19 @@
-/* Color base para modo claro (opcional) */
 .root {
+    /* Modo Claro por defecto */
+    -fx-base: #f4f4f4;
+    -fx-text-base: #222222;
     -fx-background-color: #f4f4f4;
 }
 
 /* --- MODO OSCURO GLOBAL --- */
 .dark-mode {
+    /* Redefinimos las variables para el Modo Oscuro */
+    -fx-base: #2b2b2b;
+    -fx-text-base: #ffffff;
     -fx-background-color: #2b2b2b;
 }
 
-/* Textos blancos */
+/* Textos blancos en modo oscuro */
 .dark-mode Text,
 .dark-mode .label,
 .dark-mode .check-box,
@@ -20,7 +25,7 @@
 /* ScrollPane y sus fondos interiores */
 .dark-mode .scroll-pane,
 .dark-mode .scroll-pane .viewport {
-    -fx-background-color: transparent; /* Hace que coja el color gris oscuro del fondo */
+    -fx-background-color: transparent;
 }
 .dark-mode .scroll-pane .content {
     -fx-background-color: #2b2b2b;
@@ -31,10 +36,10 @@
 .dark-mode .text-area {
     -fx-control-inner-background: #3c3f41;
     -fx-text-fill: white;
-    -fx-prompt-text-fill: #808080; /* Color del texto fantasma */
+    -fx-prompt-text-fill: #808080;
 }
 
-/* Botones genéricos (que no tengan un estilo rojo/azul ya forzado) */
+/* Botones genéricos */
 .dark-mode .button {
     -fx-background-color: #4a4a4a;
     -fx-text-fill: white;
@@ -53,24 +58,23 @@
     -fx-text-fill: white;
 }
 
-/* --- EXCEPCIONES DE COLOR --- */
+/* =========================================================================
+   🎯 EXCEPCIONES DE ID REBELDES
+   ========================================================================= */
 
 /* Obligamos a que el textoError siempre sea rojo */
-#textoError {
+#textoError, #err {
     -fx-fill: #ff4444 !important;
 }
 
-/* Si tu texto azul es un Text (sustituye tuTextoAzul por su fx:id real) */
 #tuTextoAzul {
     -fx-fill: #2196F3 !important;
 }
 
-/* Si tu texto azul es un Label (como textoTituloTop en ModificarTarea) */
 #textoTituloTop {
     -fx-text-fill: #2196F3 !important;
 }
 
-/* Forzamos al cuadrado rebelde a volverse oscuro */
 #cabeceraModificar {
     -fx-background-color: #2b2b2b !important;
 }
@@ -83,20 +87,18 @@
     -fx-background-color: #5c5c5c;
 }
 .dark-mode .date-picker .arrow-button .arrow {
-    -fx-background-color: white; /* Pinta el icono del calendario en blanco */
+    -fx-background-color: white;
 }
-/* Estilo general para el ComboBox */
-.combo-box {
+
+/* Estilo general para los selectores */
+.combo-box, .choice-box {
     -fx-background-color: #333333;
     -fx-text-fill: white;
 }
 
-/* Estilo para el ChoiceBox */
 .choice-box {
-    -fx-background-color: #333333;
-    -fx-mark-color: white; /* Color de la flechita */
+    -fx-mark-color: white;
 }
-
 .choice-box .label {
     -fx-text-fill: white;
 }
@@ -107,7 +109,6 @@
     -fx-background-color: #333333;
 }
 
-/* Estilo para cada celda dentro de los menús */
 .combo-box-popup .list-view .list-cell,
 .choice-box .context-menu .menu-item {
     -fx-text-fill: white;
@@ -115,9 +116,13 @@
 }
 
 .tarea-todo-dia {
-    -fx-background-color: #e3f2fd;
-    -fx-padding: 2;
-    -fx-background-radius: 3;
+    -fx-background-color: #e0e0e0;
+    -fx-padding: 5px;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+    -fx-cursor: hand;
+    -fx-font-size: 13px;
+    -fx-min-height: 25px;
     -fx-text-fill: #000000;
 }
 
@@ -129,6 +134,7 @@
     -fx-background-radius: 5px;
     -fx-text-fill: #333333;
 }
+
 .dark-mode .tarea-todo-dia {
     -fx-background-color: #2A3B4C;
     -fx-text-fill: #ffffff;
@@ -138,14 +144,4 @@
     -fx-background-color: #3A3A3A;
     -fx-border-color: #555555;
     -fx-text-fill: #E0E0E0;
-}
-.tarea-todo-dia {
-    -fx-background-color: #e0e0e0;
-    -fx-padding: 5px;
-    -fx-border-radius: 3px;
-    -fx-background-radius: 3px;
-    -fx-cursor: hand;
-    -fx-font-size: 13px;
-    /* Esto evita que se encojan de forma rara */
-    -fx-min-height: 25px;
 }

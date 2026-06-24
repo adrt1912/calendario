@@ -7,6 +7,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
@@ -94,12 +95,22 @@ public class CalendarioRender {
                 casillaActual.setOnDragExited(null);
                 casillaActual.setOnDragDropped(null);
 
+                boolean esOscuro = prefs.getBoolean("modo_oscuro", false);
+                String colorBorde = esOscuro ? "#555555" : "#666666";
                 String colorFondo="transparent";
-                if(j==6||j==5) colorFondo = prefs.getBoolean("modo_oscuro",false) ? "#333333" : "#e4e4e4";
-                casillaActual.setStyle("-fx-background-color: "+colorFondo+";");
 
+                if(j==6||j==5) colorFondo = prefs.getBoolean("modo_oscuro",false) ? "#333333" : "#e4e4e4";
+                casillaActual.setStyle("-fx-background-color: " + colorFondo + "; " +
+                        "-fx-border-color: " + colorBorde + "; " +
+                        "-fx-border-width: 0 1 1 0; " +
+                        "-fx-background-insets: 0 1 1 0;");
                 // Fila 0: Nombres de los días de la semana
-                if(i == 0) casillaActual.getChildren().add(new Label(semana[j]));
+                if(i == 0)
+                { Label label=new Label(semana[j]);
+                    label.setFont(Font.font(16));
+                    casillaActual.getChildren().add(label);
+
+                }
                 //El resto de filas van ya con numero
                 else {
                     // Calculamos si la casilla actual corresponde a un día real del mes
@@ -111,6 +122,7 @@ public class CalendarioRender {
                         //Creamos la etiqueta donde ira el numero
                         Label label = new Label(numMes+"");
                         casillaActual.getChildren().add(label);
+                        label.setFont(Font.font(16));
 
                         int diaClicado = numMes;
                         LocalDate fechaDeEstaCasilla = LocalDate.of(fechaSeleccionada.getYear(), fechaSeleccionada.getMonthValue(), diaClicado);
@@ -252,6 +264,7 @@ public class CalendarioRender {
         for(int i=0;i<24;i++){
             int posY=i*60;
             Text textoHora=new Text(String.format("%02d:00",i));
+            textoHora.setFont(Font.font(16));
             textoHora.setX(5);
             textoHora.setY(posY+15);
             textoHora.setStyle("-fx-fill: gray;");
@@ -342,6 +355,7 @@ public class CalendarioRender {
         for(int i=0;i<24;i++){
             int posY=i*60;
             Text textoHora=new Text(String.format("%02d:00",i));
+            textoHora.setFont(Font.font(16));
             textoHora.setX(5);
             textoHora.setY(posY+15);
             textoHora.setStyle("-fx-fill: gray;");

@@ -1,5 +1,6 @@
 package Controller;
 
+import Model.ConexionBD;
 import Model.GestionEnFicheros;
 import Model.GestorTareas;
 import Model.Idiomas;
@@ -10,6 +11,7 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
+import View.view;
 import java.io.File;
 import java.io.IOException;
 import java.util.ResourceBundle;
@@ -89,17 +91,19 @@ public class ConfiguracionController {
 
         prefs.put("formato_hora", boxFormatoHora.getValue());
 
+        int idUsuario=GestorTareas.getGestorTareas().getIdUsuarioLogueado() ;
+
         //Si se ha pulsado algun boton se hace la accion
         if(borrar) borrarSeguroSI();
         if(cambiarMdooVisual) cambiarModoVisualSeguro();
         if(descargarICS) descargarICSSeguro();
-
+        if (idUsuario != -1) ConexionBD.getConexionBD().guardarDatosUsuario(idUsuario,idiomaSeleccionado.getCodigo(),checkModoOscuro.isSelected());
         //Se establece el idioma y se cierra la ventana
         GestorTareas.getGestorTareas().setIdioma(idiomaSeleccionado);
         cancelar();
 
         try {
-            View.view.showInitialView();
+            view.showInitialView();
         } catch (Exception e) {
             System.out.println("Error al recargar el menú principal: " + e.getMessage());
         }
@@ -121,7 +125,7 @@ public class ConfiguracionController {
             GestorTareas.getGestorTareas().borrarContenido();
             gf.leerFicheroTareas();
             if (ultimasEtiquetas != null) gf.leerEtiquetas();
-            View.view.showInitialView();
+            view.showInitialView();
         }
     }
 
@@ -138,11 +142,10 @@ public class ConfiguracionController {
         //Se recorren todas las ventanas aberitas y se les cambia el color
         for (Window ventanaAbierta : Window.getWindows()) {
             if (ventanaAbierta.getScene() != null && ventanaAbierta.getScene().getRoot() != null) {
-                // Aplicamos o quitamos la clase "dark-mode" a la raíz de cada ventana
                 if (activado){
                     if (!ventanaAbierta.getScene().getRoot().getStyleClass().contains("dark-mode")) ventanaAbierta.getScene().getRoot().getStyleClass().add("dark-mode");
-                 else ventanaAbierta.getScene().getRoot().getStyleClass().remove("dark-mode");
-            }
+                    else ventanaAbierta.getScene().getRoot().getStyleClass().remove("dark-mode");
+                }
             }
         }
     }
@@ -165,5 +168,50 @@ public class ConfiguracionController {
     //Al darle a guardar y salir es cuando se lee, por si se confunde
     private void descargarICSSeguro(){
         GestionEnFicheros.getGestionEnFicheros().leerArchivoICS();
+    }
+
+    @FXML
+    private void abrirConfiguracionPIN() {
+        // Llama a la clase view para que despliegue la ventana modal
+        try {
+            view.showCrearPIN();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    @FXML
+    private void cerrarSesion(){
+    try {
+        GestorTareas.getGestorTareas().cerrarSesion();
+        Stage ventanaActual = (Stage) rootPane.getScene().getWindow();
+        ventanaActual.close();
+
+        // 4. Ordenamos a la vista reabrir la ventana de Login/Bloqueo
+        View.view.showPINInsert();
+    } catch (Exception e) {System.err.println("Error al intentar cambiar de usuario: " + e.getMessage());}
+    }
+    @FXML
+    private void eliminarPerfil(){
+
+        int idActivo=GestorTareas.getGestorTareas().getIdUsuarioLogueado();
+        if (idActivo == -1) return;
+
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Eliminar Perfil");
+        alert.setHeaderText("¿Estás seguro de que quieres eliminar tu cuenta?");
+        alert.setContentText("Esta acción es irreversible y borrará para siempre todas tus tareas y etiquetas.");
+
+        if (alert.showAndWait().get() == javafx.scene.control.ButtonType.OK) {
+
+            ConexionBD.getConexionBD().borrarPerfil(idActivo);
+            GestorTareas.getGestorTareas().cerrarSesion();
+            Stage ventanaActual = (Stage) rootPane.getScene().getWindow();
+            ventanaActual.close();
+            try {
+                View.view.showPINInsert();
+            } catch (Exception ignored) {}
+        }
+
+
     }
 }

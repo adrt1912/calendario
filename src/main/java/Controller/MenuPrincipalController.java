@@ -150,9 +150,13 @@ public class MenuPrincipalController {
         TareasPendientesManiana.setText(gestorTareas.mostrarTareasUrgentesManiana());
 
         //Se pone los meses en el idioms elegido
-        if(GestorTareas.getGestorTareas().getIdioma()!=null) cartelMes.setText(" " + capitaze(fechaSeleccionada.getMonth().getDisplayName(TextStyle.FULL, new Locale(GestorTareas.getGestorTareas().getIdioma().getCodigo(), "ES"))));
-        else cartelMes.setText(" "+fechaSeleccionada.getMonth().getDisplayName(TextStyle.FULL,new Locale("es","ES")));
+        Locale localeSesion = Locale.getDefault();
+        String nombreMesTraducido = fechaSeleccionada.getMonth().getDisplayName(TextStyle.FULL, localeSesion);
 
+        cartelMes.setText(" " + capitaze(nombreMesTraducido));
+
+        cartelMes.setFont(Font.font(50));
+        cartelAnio.setFont(Font.font(50));
         //Se pone el año en el cartel
         cartelAnio.setText("" + fechaSeleccionada.getYear());
 

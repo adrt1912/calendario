@@ -6,6 +6,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.prefs.Preferences;
 
+import static Utils.SeguridadUtils.encriptarPIN;
+
 public class GestorTareas {
 
     //Se aplica el patron singletone, ya que solo vamos a tener un gestor de tareas
@@ -37,7 +39,14 @@ public class GestorTareas {
     public Idiomas getIdioma() {
         return idioma;
     }
+    private int idUsuarioLogueado = -1; //-1 nadie logueado
+    public int getIdUsuarioLogueado() {
+        return idUsuarioLogueado;
+    }
 
+    public void setIdUsuarioLogueado(int idUsuarioLogueado) {
+        this.idUsuarioLogueado = idUsuarioLogueado;
+    }
     //Lista etiquetas
     private final List<Etiqueta> listaEtiquetas=new ArrayList<>();
     //PAra evitar repetir la llamada al metodo constantemente lo guardamos
@@ -129,7 +138,7 @@ public class GestorTareas {
         listaEtiquetas.clear();
         listaEtiquetas.add(etiquetaNeutra);
         todasTareas.clear();
-        ConexionBD.getConexionBD().cargarDatosDeBD();
+        ConexionBD.getConexionBD().cargarDatosDeBD(idUsuarioLogueado);
     }
 
 // 1. USADO POR LA BD / FICHEROS: Para cargar los datos al arrancar sin duplicar en RAM
@@ -225,5 +234,46 @@ public class GestorTareas {
                 NotificadorDeTareas.mostrarNotificacion("Tarea para hoy", "Tienes pendiente: " + t.getNombreTarea(),t);
             }
         }
+    }
+
+    // Importa java.util.prefs.Preferences si no lo tienes arriba
+
+    public boolean tienePINConfigurado() {
+        Preferences prefs = Preferences.userNodeForPackage(GestorTareas.class);
+        String pinGuardado = prefs.get("pin_seguridad_hash", null);
+        return pinGuardado != null && !pinGuardado.isBlank();
+    }
+
+    public boolean verificarPIN(String pinIntroducido) {
+        Preferences prefs = Preferences.userNodeForPackage(GestorTareas.class);
+        String pinGuardado = prefs.get("pin_seguridad_hash", null);
+        if (pinGuardado == null) return false;
+
+        // Encriptamos el que introduce el usuario y comparamos los dos hashes
+        String hashIntroducido = encriptarPIN(pinIntroducido);
+        return pinGuardado.equals(hashIntroducido);
+    }
+
+    public void registrarNuevoPIN(String nuevoPin) {
+        Preferences prefs = Preferences.userNodeForPackage(GestorTareas.class);
+        if (nuevoPin == null || nuevoPin.isBlank()) {
+            prefs.remove("pin_seguridad_hash"); // Borrar PIN si se pasa vacío
+        } else {
+            String hash = encriptarPIN(nuevoPin);
+            prefs.put("pin_seguridad_hash", hash);
+        }
+    }
+    public boolean verificarHash(String pinIntroducido, String hashGuardado) {
+        if (pinIntroducido == null || hashGuardado == null) {
+            return false;
+        }
+        // Encriptamos el PIN introducido y vemos si da el mismo resultado que el de la BD
+        String hashDelIntento = encriptarPIN(pinIntroducido);
+        return hashDelIntento.equals(hashGuardado);
+    }
+    public void cerrarSesion(){
+        listaEtiquetas.clear();
+        todasTareas.clear();
+        idUsuarioLogueado=-1;
     }
 }
