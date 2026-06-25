@@ -34,6 +34,9 @@ public class ConfiguracionController {
     private CheckBox checkModoOscuro;
 
     @FXML
+    private PasswordField txtNuevoPin;
+
+    @FXML
     private ComboBox<String> boxFormatoHora;
 
     //Varaibles para actuar solo al darle a guardar y salir
@@ -171,15 +174,6 @@ public class ConfiguracionController {
     }
 
     @FXML
-    private void abrirConfiguracionPIN() {
-        // Llama a la clase view para que despliegue la ventana modal
-        try {
-            view.showCrearPIN();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-    @FXML
     private void cerrarSesion(){
     try {
         GestorTareas.getGestorTareas().cerrarSesion();
@@ -211,7 +205,33 @@ public class ConfiguracionController {
                 View.view.showPINInsert();
             } catch (Exception ignored) {}
         }
+    }
 
+    @FXML
+    private void onCambiarPinClick() {
 
+        String nuevoPin = txtNuevoPin.getText();
+
+        if (nuevoPin == null || nuevoPin.isBlank()) {
+            mostrarAlerta("Campo vacío", "Por favor, introduce un nuevo PIN.", javafx.scene.control.Alert.AlertType.WARNING);
+            return;
+        }if (nuevoPin.length() != 4) {
+            mostrarAlerta("Seguridad", "El PIN de seguridad debe tener exactamente 4 dígitos.", javafx.scene.control.Alert.AlertType.WARNING);
+            return;
+        }
+        boolean operacion=ConexionBD.getConexionBD().cambiarPin(nuevoPin);
+        if(operacion){
+            mostrarAlerta("Éxito", "¡PIN actualizado y base de datos re-cifrada correctamente!", javafx.scene.control.Alert.AlertType.INFORMATION);
+            txtNuevoPin.clear();
+        }
+        else mostrarAlerta("Error", "No se pudo actualizar el PIN. Comprueba la conexión.", javafx.scene.control.Alert.AlertType.ERROR);
+    }
+
+    private void mostrarAlerta(String titulo, String mensaje, javafx.scene.control.Alert.AlertType tipo) {
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(tipo);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
     }
 }

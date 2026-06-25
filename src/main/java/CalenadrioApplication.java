@@ -43,27 +43,7 @@ public class CalenadrioApplication extends Application {
 
             // Carga segura del icono de la aplicación
             java.awt.Image image = javax.imageio.ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/View/icono.png")));
-            PopupMenu menu = new PopupMenu();
-            MenuItem abrirItem = new MenuItem("Abrir Gestor");
-            MenuItem salirItem = new MenuItem("Salir");
-
-            abrirItem.addActionListener(e -> Platform.runLater(() -> {
-                if (primaryStage.isIconified()) primaryStage.setIconified(false);
-                primaryStage.show();
-                primaryStage.toFront();
-                primaryStage.requestFocus();
-            }));
-
-            salirItem.addActionListener(e -> {
-                Platform.exit();
-                System.exit(0);
-            });
-
-            menu.add(abrirItem);
-            menu.add(salirItem);
-
-            TrayIcon trayIcon = new TrayIcon(image, "Gestor de Tareas", menu);
-            trayIcon.setImageAutoSize(true);
+            TrayIcon trayIcon = getTrayIcon(image);
 
             // Doble clic en el icono de la barra de herramientas restaura la ventana
             trayIcon.addActionListener(e -> Platform.runLater(() -> {
@@ -78,4 +58,39 @@ public class CalenadrioApplication extends Application {
             System.err.println("Aviso: No se pudo configurar el SystemTray: " + e.getMessage());
         }
     }
+
+    private TrayIcon getTrayIcon(Image image) {
+        PopupMenu menu = new PopupMenu();
+        MenuItem abrirItem = new MenuItem("Abrir Gestor");
+        MenuItem salirItem = new MenuItem("Salir");
+
+        abrirItem.addActionListener(e -> Platform.runLater(() -> {
+            if (primaryStage.isIconified()) primaryStage.setIconified(false);
+            primaryStage.show();
+            primaryStage.toFront();
+            primaryStage.requestFocus();
+        }));
+
+        salirItem.addActionListener(e -> {
+            Platform.exit();
+            System.exit(0);
+        });
+
+        menu.add(abrirItem);
+        menu.add(salirItem);
+
+        TrayIcon trayIcon = new TrayIcon(image, "Gestor de Tareas", menu);
+        trayIcon.setImageAutoSize(true);
+        return trayIcon;
+    }
+
+    @Override
+    public void stop() throws Exception {
+        // Fuerza el cierre de todos los hilos internos y libera la RAM en tu Linux
+        Model.GestorTareas.getGestorTareas().cerrarSesion();
+        javafx.application.Platform.exit();
+
+        System.exit(0);
+    }
+
 }

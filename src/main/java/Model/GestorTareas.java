@@ -61,13 +61,38 @@ public class GestorTareas {
         return etiquetaNeutra;
     }
 
+    private List<Tarea> listaTareasAvisadasT=new ArrayList<>();
+
     //Al iniciar añade la etiqueta neutra y obtiene el idioma guardado
     private GestorTareas(){
         listaEtiquetas.add(etiquetaNeutra);
         setFormatoHora();
         Preferences prefs = Preferences.userNodeForPackage(View.view.class);
         String codIdioma = prefs.get("idioma_actual", "es");
+        java.util.Timer timer = new java.util.Timer(true);
         this.idioma = Idiomas.desdeCodigo(codIdioma);
+        TimerTask timerTask =new TimerTask() {
+            @Override
+            public void run() {
+                List<Tarea> listaTareasComprobar = todasTareas.stream().filter(tarea -> !listaTareasAvisadasT.contains(tarea)).toList();
+                for (Tarea tarea : listaTareasComprobar) {
+                    if (tarea.getFechaFin() != null && LocalDate.now().equals(tarea.getFechaFin())
+                            && tarea.getEstadoTarea() == EstadoTarea.EN_PROCESO
+                            && tarea.getHoraInicio() != null
+                            && LocalTime.now().isAfter(tarea.getHoraInicio()) || LocalTime.now().equals(tarea.getHoraInicio())) {
+                        listaTareasAvisadasT.add(tarea);
+                        javafx.application.Platform.runLater(() -> {
+                            NotificadorDeTareas.mostrarNotificacion(
+                                    "¡Tarea Pendiente ahora!",
+                                    "Es hora de: " + tarea.getNombreTarea(),
+                                    tarea
+                            );
+                        });
+                    }
+                }
+            }
+        };
+        timer.scheduleAtFixedRate(timerTask, 0, 30000);
     }
 
     //Establece el formato hora
@@ -236,37 +261,9 @@ public class GestorTareas {
         }
     }
 
-    // Importa java.util.prefs.Preferences si no lo tienes arriba
-
-    public boolean tienePINConfigurado() {
-        Preferences prefs = Preferences.userNodeForPackage(GestorTareas.class);
-        String pinGuardado = prefs.get("pin_seguridad_hash", null);
-        return pinGuardado != null && !pinGuardado.isBlank();
-    }
-
-    public boolean verificarPIN(String pinIntroducido) {
-        Preferences prefs = Preferences.userNodeForPackage(GestorTareas.class);
-        String pinGuardado = prefs.get("pin_seguridad_hash", null);
-        if (pinGuardado == null) return false;
-
-        // Encriptamos el que introduce el usuario y comparamos los dos hashes
-        String hashIntroducido = encriptarPIN(pinIntroducido);
-        return pinGuardado.equals(hashIntroducido);
-    }
-
-    public void registrarNuevoPIN(String nuevoPin) {
-        Preferences prefs = Preferences.userNodeForPackage(GestorTareas.class);
-        if (nuevoPin == null || nuevoPin.isBlank()) {
-            prefs.remove("pin_seguridad_hash"); // Borrar PIN si se pasa vacío
-        } else {
-            String hash = encriptarPIN(nuevoPin);
-            prefs.put("pin_seguridad_hash", hash);
-        }
-    }
     public boolean verificarHash(String pinIntroducido, String hashGuardado) {
-        if (pinIntroducido == null || hashGuardado == null) {
-            return false;
-        }
+        if (pinIntroducido == null || hashGuardado == null) return false;
+
         // Encriptamos el PIN introducido y vemos si da el mismo resultado que el de la BD
         String hashDelIntento = encriptarPIN(pinIntroducido);
         return hashDelIntento.equals(hashGuardado);
@@ -275,5 +272,17 @@ public class GestorTareas {
         listaEtiquetas.clear();
         todasTareas.clear();
         idUsuarioLogueado=-1;
+        claveCifradoActiva=null;
     }
+
+    private javax.crypto.spec.SecretKeySpec claveCifradoActiva;
+
+    public javax.crypto.spec.SecretKeySpec getClaveCifradoActiva() {
+        return claveCifradoActiva;
+    }
+
+    public void setClaveCifradoActiva(javax.crypto.spec.SecretKeySpec clave) {
+        this.claveCifradoActiva = clave;
+    }
+
 }

@@ -57,7 +57,7 @@ public class MenuCrearPINController {
         // Cargamos el diccionario de idiomas activo (ES, EN, EU, FR, DE)
         ResourceBundle bundle = GestorTareas.getGestorTareas().obtenerDiccionario();
         if(pin==null||pin.isBlank()||confirmacion==null||confirmacion.isBlank())  textoError.setText(bundle.getString("establecerPin.error.vacio"));
-        else if (pin.length() <= 4) textoError.setText(bundle.getString("establecerPin.error.corto"));
+        else if (pin.length() <= 3) textoError.setText(bundle.getString("establecerPin.error.corto"));
         else if (!pin.matches("\\d+")) textoError.setText(bundle.getString("establecerPin.error.numerico"));
         else if (!pin.equals(confirmacion)) textoError.setText(bundle.getString("establecerPin.error.noCoincide"));
         else {

@@ -4,13 +4,14 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="520.0" prefWidth="600.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.ConfiguracionController">
+<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="520.0" prefWidth="600.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.ConfiguracionController">
    <children>
       <VBox alignment="TOP_CENTER" prefHeight="520.0" prefWidth="600.0" spacing="20.0">
          <children>
@@ -54,15 +55,18 @@
                <VBox.margin><Insets left="20.0" /></VBox.margin>
             </HBox>
 
-            <HBox alignment="CENTER" prefHeight="39.0" prefWidth="600.0">
+            <HBox alignment="CENTER" prefHeight="39.0" prefWidth="600.0" spacing="10.0">
                <children>
-                  <Button mnemonicParsing="false" onAction="#abrirConfiguracionPIN" prefHeight="32.0" prefWidth="240.0" style="-fx-cursor: hand;" text="%configuracionMenuPrincipal.configurarPIN">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Nuevo PIN:" wrappingWidth="110.0">
+                     <font><Font size="16.0" /></font>
+                     <HBox.margin><Insets right="10.0" /></HBox.margin>
+                  </Text>
+                  <PasswordField fx:id="txtNuevoPin" prefHeight="30.0" prefWidth="180.0" promptText="4 dígitos" />
+                  <Button mnemonicParsing="false" onAction="#onCambiarPinClick" prefHeight="30.0" prefWidth="90.0" style="-fx-background-color: #2e7d32; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="Modificar">
+                     <font><Font size="13.0" /></font>
                   </Button>
                </children>
-               <VBox.margin><Insets left="20.0" /></VBox.margin>
+               <VBox.margin><Insets left="120.0" /></VBox.margin>
             </HBox>
 
             <HBox>

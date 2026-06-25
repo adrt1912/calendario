@@ -2,6 +2,7 @@ package Model;
 
 import Utils.SeguridadUtils;
 
+import javax.crypto.spec.SecretKeySpec;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -66,11 +67,14 @@ public class ConexionBD {
         }
     }
 
-    // Lee la BD y descifra los textos sensibles al vuelo para cargarlos en local
+    // Lee la BD y descifra los textos usando la clave única del usuario activo
     public void cargarDatosDeBD(int idObtenido) {
         String op1 = "select * from Etiqueta where usuario_id=?";
         String op = "select * from Tarea where usuario_id=?";
         GestorTareas.getGestorTareas().getListaEtiquetas().clear();
+
+        // 🔑 Recuperamos la clave AES exclusiva de la sesión actual
+        var clave = GestorTareas.getGestorTareas().getClaveCifradoActiva();
 
         try (Connection c = obtenerConexion();
              PreparedStatement ps = c.prepareStatement(op);
@@ -80,8 +84,8 @@ public class ConexionBD {
             ps1.setInt(1, idObtenido);
             ResultSet rs1 = ps1.executeQuery();
             while (rs1.next()) {
-                // 🔓 DESCIFRAMOS el nombre de la etiqueta
-                String nomE = SeguridadUtils.descifrarTexto(rs1.getString("nombreEtiqueta"));
+                // 🔓 DESCIFRAMOS el nombre de la etiqueta usando la clave de sesión
+                String nomE = SeguridadUtils.descifrarTexto(rs1.getString("nombreEtiqueta"), clave);
                 String color = rs1.getString("codColor");
                 Etiqueta nuevaEtiqueta = new Etiqueta(nomE, color);
                 GestorTareas.getGestorTareas().getListaEtiquetas().add(nuevaEtiqueta);
@@ -91,11 +95,11 @@ public class ConexionBD {
             ps.setInt(1, idObtenido);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                // 🔓 DESCIFRAMOS los datos legibles de la tarea
-                String titulo = SeguridadUtils.descifrarTexto(rs.getString("Titulo"));
-                String descripcion = SeguridadUtils.descifrarTexto(rs.getString("Descripcion"));
-                String sitio = SeguridadUtils.descifrarTexto(rs.getString("Sitio"));
-                String etiqueta = SeguridadUtils.descifrarTexto(rs.getString("Etiqueta"));
+                // 🔓 DESCIFRAMOS los datos usando la clave de sesión
+                String titulo = SeguridadUtils.descifrarTexto(rs.getString("Titulo"), clave);
+                String descripcion = SeguridadUtils.descifrarTexto(rs.getString("Descripcion"), clave);
+                String sitio = SeguridadUtils.descifrarTexto(rs.getString("Sitio"), clave);
+                String etiqueta = SeguridadUtils.descifrarTexto(rs.getString("Etiqueta"), clave);
 
                 String fechaInicStr = rs.getString("FechaInicio");
                 LocalDate fechainic = (fechaInicStr != null && !fechaInicStr.isBlank() && !fechaInicStr.equals("null"))
@@ -156,16 +160,18 @@ public class ConexionBD {
         }
     }
 
-    // Borra una etiqueta de la BD (Cifrando el nombre para poder encontrarla)
+    // Borra una etiqueta de la BD (Cifrando el nombre con la clave del usuario para hacer Match)
     public void borrarEtiqueta(String nombreEtiqueta) {
         int idActivo = GestorTareas.getGestorTareas().getIdUsuarioLogueado();
         String opDelete = "DELETE FROM Etiqueta WHERE NombreEtiqueta=? and usuario_id=?";
 
+        var clave = GestorTareas.getGestorTareas().getClaveCifradoActiva();
+
         try (Connection c = obtenerConexion();
              PreparedStatement ps = c.prepareStatement(opDelete)
         ) {
-            // 🔒 Pasamos el nombre cifrado porque así es como está almacenado
-            ps.setString(1, SeguridadUtils.cifrarTexto(nombreEtiqueta));
+            // 🔒 Pasamos el nombre cifrado con su clave específica
+            ps.setString(1, SeguridadUtils.cifrarTexto(nombreEtiqueta, clave));
             ps.setInt(2, idActivo);
             ps.executeUpdate();
         } catch (Exception e) {
@@ -185,26 +191,29 @@ public class ConexionBD {
         }
     }
 
-    // Cifra los campos de texto sensibles antes de guardarlos o reemplazarlos
+    // Cifra los campos usando la contraseña de sesión del usuario logueado antes de guardar
     public void guardarTarea(Tarea tarea) {
         int idActivo = GestorTareas.getGestorTareas().getIdUsuarioLogueado();
         String opTareas = "INSERT OR REPLACE INTO Tarea (Titulo, FechaInicio, FechaFin, EstadoTarea, HoraInicio, HoraFin, Frecuencia, Descripcion, Sitio, idTarea, idFamilia, Etiqueta,usuario_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+        var clave = GestorTareas.getGestorTareas().getClaveCifradoActiva();
+
         try (Connection c = obtenerConexion();
              PreparedStatement psTareas = c.prepareStatement(opTareas)
         ) {
-            // 🔒 APLICAMOS CIFRADO AES A LOS TEXTOS
-            psTareas.setString(1, SeguridadUtils.cifrarTexto(tarea.getNombreTarea()));
+            // 🔒 APLICAMOS CIFRADO AES BASADO EN EL USUARIO ACTIVO
+            psTareas.setString(1, SeguridadUtils.cifrarTexto(tarea.getNombreTarea(), clave));
             psTareas.setString(2, tarea.getFechaInicio() != null ? tarea.getFechaInicio().toString() : null);
             psTareas.setString(3, tarea.getFechaFin() != null ? tarea.getFechaFin().toString() : null);
             psTareas.setString(4, tarea.getEstadoTarea() != null ? tarea.getEstadoTarea().name() : null);
             psTareas.setString(5, tarea.getHoraInicio() != null ? tarea.getHoraInicio().toString() : null);
             psTareas.setString(6, tarea.getHoraFin() != null ? tarea.getHoraFin().toString() : null);
             psTareas.setString(7, tarea.getFrecuencia() != null ? tarea.getFrecuencia().name() : null);
-            psTareas.setString(8, SeguridadUtils.cifrarTexto(tarea.getDescripcion()));
-            psTareas.setString(9, SeguridadUtils.cifrarTexto(tarea.getSitio()));
+            psTareas.setString(8, SeguridadUtils.cifrarTexto(tarea.getDescripcion(), clave));
+            psTareas.setString(9, SeguridadUtils.cifrarTexto(tarea.getSitio(), clave));
             psTareas.setString(10, tarea.getIdTarea());
             psTareas.setString(11, tarea.getIdFamilia());
-            psTareas.setString(12, tarea.getEtiqueta() != null ? SeguridadUtils.cifrarTexto(tarea.getEtiqueta().nombreEtiqueta()) : null);
+            psTareas.setString(12, tarea.getEtiqueta() != null ? SeguridadUtils.cifrarTexto(tarea.getEtiqueta().nombreEtiqueta(), clave) : null);
             psTareas.setInt(13, idActivo);
 
             psTareas.executeUpdate();
@@ -217,11 +226,14 @@ public class ConexionBD {
     public void guardarEtiqueta(Etiqueta etiqueta) {
         int idActivo = GestorTareas.getGestorTareas().getIdUsuarioLogueado();
         String opEtiquetas = "INSERT OR REPLACE INTO Etiqueta (nombreEtiqueta,codColor,usuario_id) VALUES (?,?,?)";
+
+        var clave = GestorTareas.getGestorTareas().getClaveCifradoActiva();
+
         try (Connection c = obtenerConexion();
              PreparedStatement psEtiquetas = c.prepareStatement(opEtiquetas)
         ) {
-            // 🔒 Ciframos el nombre de la etiqueta
-            psEtiquetas.setString(1, SeguridadUtils.cifrarTexto(etiqueta.nombreEtiqueta()));
+            // 🔒 Ciframos con la clave exclusiva del usuario
+            psEtiquetas.setString(1, SeguridadUtils.cifrarTexto(etiqueta.nombreEtiqueta(), clave));
             psEtiquetas.setString(2, etiqueta.codColor());
             psEtiquetas.setInt(3, idActivo);
             psEtiquetas.executeUpdate();
@@ -248,7 +260,7 @@ public class ConexionBD {
         }
     }
 
-    // Autentica al usuario comprobando su PIN_HASH (No requiere cambios AES)
+    // Autentica al usuario y activa su clave criptográfica simétrica
     public int verificarUsuarioYObtenerId(String nombreUsuario, String pinIntroducido) {
         String sql = "SELECT id, pin_hash FROM Usuario WHERE nombre_usuario = ?";
 
@@ -263,6 +275,8 @@ public class ConexionBD {
                 String hashGuardado = rs.getString("pin_hash");
 
                 if (GestorTareas.getGestorTareas().verificarHash(pinIntroducido, hashGuardado)) {
+                    // 🚀 PERFECTO: Guardamos la clave criptográfica derivada de este PIN en el Gestor
+                    GestorTareas.getGestorTareas().setClaveCifradoActiva(SeguridadUtils.generarClaveDesdePIN(pinIntroducido));
                     return id;
                 }
             }
@@ -272,16 +286,22 @@ public class ConexionBD {
         return -1;
     }
 
-    // Registra un nuevo perfil de usuario con su hash correspondiente
+    // Registra un nuevo perfil de usuario
     public boolean registrarNuevoUsuario(String nombreUsuario, String pinPlano){
-        String sql = "insert into Usuario (nombre_usuario,pin_hash) values(?,?)";
+        String sql = "insert OR IGNORE into Usuario (nombre_usuario,pin_hash) values(?,?)";
         String hash = SeguridadUtils.encriptarPIN(pinPlano);
 
         try (Connection c = obtenerConexion();
              PreparedStatement ps = c.prepareStatement(sql)){
             ps.setString(1, nombreUsuario);
             ps.setString(2, hash);
-            return ps.executeUpdate() > 0;
+
+            boolean insertado = ps.executeUpdate() > 0;
+            if (insertado) {
+                // 🚀 Al registrarse con éxito, también dejamos su sesión criptográfica preconfigurada
+                GestorTareas.getGestorTareas().setClaveCifradoActiva(SeguridadUtils.generarClaveDesdePIN(pinPlano));
+            }
+            return insertado;
         } catch (Exception e) {
             System.err.println("Error al registrar usuario en la BD: " + e.getMessage());
             return false;
@@ -311,6 +331,9 @@ public class ConexionBD {
                 java.util.Locale nuevoLocale = new java.util.Locale(idiomaDB);
                 java.util.Locale.setDefault(nuevoLocale);
 
+                // El metodo verificarUsuarioYObtenerId ya generó la clave dinámicamente antes de llegar aquí,
+                // así que hemos eliminado la línea rota que llamaba al metodo sin parámetros.
+
                 for (Idiomas idm : Idiomas.values()) {
                     if (idm.getCodigo().equalsIgnoreCase(idiomaDB)) {
                         GestorTareas.getGestorTareas().setIdioma(idm);
@@ -337,6 +360,87 @@ public class ConexionBD {
             ps1.executeUpdate();
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+
+
+    public boolean cambiarPin(String nuevoPin){
+
+        var claveVieja = GestorTareas.getGestorTareas().getClaveCifradoActiva();
+        int idUsuarioCambiar = GestorTareas.getGestorTareas().getIdUsuarioLogueado();
+        if (idUsuarioCambiar == -1) return false;
+
+        String nuevaClaveHash = SeguridadUtils.encriptarPIN(nuevoPin);
+
+        String op1 = "UPDATE Usuario set pin_hash=? where id=?";
+        String sqlUpdateTarea = "UPDATE Tarea SET Titulo = ?, FechaInicio = ?, FechaFin = ?, EstadoTarea = ?, HoraInicio = ?, HoraFin = ?, Frecuencia = ?, Descripcion = ?, Sitio = ?, idFamilia = ?, Etiqueta = ?, usuario_id = ? WHERE idTarea = ?";
+        String sqlBorrarEtiquetas = "DELETE FROM Etiqueta WHERE usuario_id = ?";
+        String sqlInsertEtiqueta = "INSERT OR REPLACE INTO Etiqueta (nombreEtiqueta, codColor, usuario_id) VALUES (?,?,?)";
+
+        try (Connection c = obtenerConexion();
+             PreparedStatement ps1 = c.prepareStatement(op1);
+             PreparedStatement psTareas = c.prepareStatement(sqlUpdateTarea);
+             PreparedStatement psEtiquetas = c.prepareStatement(sqlBorrarEtiquetas);
+             PreparedStatement psInsertEtiqueta = c.prepareStatement(sqlInsertEtiqueta)
+        ){
+            javax.crypto.spec.SecretKeySpec claveNueva = SeguridadUtils.generarClaveDesdePIN(nuevoPin);
+            c.setAutoCommit(false); // Iniciamos transacción manual
+
+            ps1.setString(1, nuevaClaveHash);
+            ps1.setInt(2, idUsuarioCambiar);
+
+            int numa = ps1.executeUpdate();
+            if(numa == 1){
+                // 1. Purgamos del disco las etiquetas encriptadas con el PIN viejo
+                psEtiquetas.setInt(1, idUsuarioCambiar);
+                psEtiquetas.executeUpdate();
+
+                // 2. Insertamos las etiquetas en lote con el nuevo cifrado
+                for (Etiqueta etiqueta : GestorTareas.getGestorTareas().getListaEtiquetas()) {
+                    if (!etiqueta.nombreEtiqueta().equals("Sin Etiqueta")) {
+
+                        psInsertEtiqueta.setString(1, SeguridadUtils.cifrarTexto(etiqueta.nombreEtiqueta(), claveNueva));
+                        psInsertEtiqueta.setString(2, etiqueta.codColor());
+                        psInsertEtiqueta.setInt(3, idUsuarioCambiar);
+                        psInsertEtiqueta.addBatch();
+                    }
+                }
+                psInsertEtiqueta.executeBatch();
+
+                // 3. Modificamos todas las tareas del usuario aplicando el nuevo escudo AES
+                for (Tarea tarea : GestorTareas.getGestorTareas().getTodasTareas()) {
+                    psTareas.setString(1, SeguridadUtils.cifrarTexto(tarea.getNombreTarea(), claveNueva));
+                    psTareas.setString(2, tarea.getFechaInicio() != null ? tarea.getFechaInicio().toString() : null);
+                    psTareas.setString(3, tarea.getFechaFin() != null ? tarea.getFechaFin().toString() : null);
+                    psTareas.setString(4, tarea.getEstadoTarea() != null ? tarea.getEstadoTarea().name() : null);
+                    psTareas.setString(5, tarea.getHoraInicio() != null ? tarea.getHoraInicio().toString() : null);
+                    psTareas.setString(6, tarea.getHoraFin() != null ? tarea.getHoraFin().toString() : null);
+                    psTareas.setString(7, tarea.getFrecuencia() != null ? tarea.getFrecuencia().name() : null);
+                    psTareas.setString(8, SeguridadUtils.cifrarTexto(tarea.getDescripcion(), claveNueva));
+                    psTareas.setString(9, SeguridadUtils.cifrarTexto(tarea.getSitio(), claveNueva));
+                    psTareas.setString(10, tarea.getIdFamilia());
+                    psTareas.setString(11, tarea.getEtiqueta() != null ? SeguridadUtils.cifrarTexto(tarea.getEtiqueta().nombreEtiqueta(), claveNueva) : null);
+                    psTareas.setInt(12, idUsuarioCambiar);
+                    psTareas.setString(13, tarea.getIdTarea()); // Filtro WHERE
+
+                    psTareas.addBatch();
+                }
+                psTareas.executeBatch();
+
+                // 4. Actualizamos la clave en memoria RAM y consolidamos los cambios en el archivo .db
+                GestorTareas.getGestorTareas().setClaveCifradoActiva(claveNueva);
+                c.commit();
+                return true;
+            } else {
+                c.rollback();
+                return false;
+            }
+
+        } catch (Exception e) {
+            GestorTareas.getGestorTareas().setClaveCifradoActiva(claveVieja);
+            System.err.println("Error crítico al re-cifrar por cambio de PIN: " + e.getMessage());
+            return false;
         }
     }
 }

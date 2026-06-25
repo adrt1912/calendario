@@ -278,7 +278,7 @@ public class GestionEnFicheros {
 
                     if (fechaInicioStr != null) {
                         // Definimos el formateador. Nota: el formato ical suele ser siempre el mismo
-                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'");
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss['Z']");
 
                         LocalDateTime fechaInicio = LocalDateTime.parse(fechaInicioStr, formatter);
                         LocalDateTime fechaFin = LocalDateTime.parse(fechaFinStr, formatter);
