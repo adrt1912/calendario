@@ -75,7 +75,7 @@ public class MenuPrincipalController {
     private AnchorPane rootPane;
 
    //Guarda si se muestra en modo mensual o modo semanal
-   private String modo="M";
+    private String modo="M";
 
     @FXML
     private ChoiceBox<String> seleccionModo;

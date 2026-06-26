@@ -168,6 +168,7 @@ public class CalendarioRender {
             }
         }
     }
+
     //Para mostrar el calendario semanal
     public void mostrarCalendarioSemanal(GridPane calendarioMensual, VBox contenedorSemanal, VBox contenedorDiario, LocalDate fechaSeleccionada, MenuPrincipalController jefe,Pane[] panelesDiasSemanales, VBox[] panelesTareasTodoDia){
         //En caso de la semana se hace invisible el mensual y el diarios, y visible el semanal
@@ -223,7 +224,7 @@ public class CalendarioRender {
             } else label.setStyle(estiloBase);// Si no es hoy: Solo letra grande
         }
 
-        //Para las tareas de todo el dia
+        //Para las tareas del dia entero
         HBox filaTodoElDia = new HBox();
         filaTodoElDia.setMinHeight(30); // Altura mínima si no hay tareas
         Pane huecoTodoElDia = new Pane();
@@ -318,7 +319,6 @@ public class CalendarioRender {
 
     //PAra mostrar el modo dia
     public Pane mostrarCalendarioDiario(GridPane calendarioMensual, VBox contenedorSemanal, VBox contenedorDiario, LocalDate fechaSeleccionada, MenuPrincipalController jefe,VBox panelTareasTodoDiaDiario){
-
         //Se ponene invisibles el semanal y mensual y el diario visible
         contenedorSemanal.setVisible(false);
         calendarioMensual.setVisible(false);

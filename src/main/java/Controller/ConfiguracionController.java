@@ -184,6 +184,7 @@ public class ConfiguracionController {
         View.view.showPINInsert();
     } catch (Exception e) {System.err.println("Error al intentar cambiar de usuario: " + e.getMessage());}
     }
+
     @FXML
     private void eliminarPerfil(){
 

@@ -28,7 +28,6 @@ public class SeguridadUtils {
         }
     }
 
-
     //Genera una clave secreta AES válida de 16 bytes a partir del PIN plano del usuario
     public static SecretKeySpec generarClaveDesdePIN(String pinRaw) {
         if (pinRaw == null || pinRaw.isBlank()) return null;
