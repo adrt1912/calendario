@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -14,10 +14,12 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 public class GestionEnFicheros {
 
@@ -25,8 +27,12 @@ public class GestionEnFicheros {
 
     public static GestionEnFicheros getGestionEnFicheros() {return gestionEnFicheros;}
 
+    private final static String textBackUp="backups";
+    Logger logger = Logger.getLogger(getClass().getName());
+
+
     public File obtenerUltimoBackup(String prefijo) {
-        File dir = new File("backups");
+        File dir = new File(textBackUp);
         // Filtramos solo los archivos que empiezan por el prefijo (ej: "tareas_backup_")
         File[] files = dir.listFiles((d, name) -> name.startsWith(prefijo) && name.endsWith(".txt"));
 
@@ -55,7 +61,7 @@ public class GestionEnFicheros {
         2. Titulo...
         Si alguno va vacio se salta de linea
          */
-        String nombreArchivo = "backups/tareas_backup_" + LocalDate.now() + ".txt";
+        String nombreArchivo = "backups/tareas_backup_" +  LocalDateTime.now(ZoneId.systemDefault()) + ".txt";
 
         File archivo = new File(nombreArchivo);
         if (archivo.exists()) {
@@ -106,19 +112,23 @@ public class GestionEnFicheros {
                     Etiqueta etiquetaAsignada = GestorTareas.getGestorTareas().getListaEtiquetas().stream().filter(e -> e.nombreEtiqueta() != null && e.nombreEtiqueta().equals(etiquetaText)).findFirst().orElse(null);
                     String idTareaGuardado = lectorFichero.nextLine();
 
-                    Tarea tarea = new Tarea(titulo, fechainic, fechaFin, estadoTarea, descripcion, sitio, horaInicio, horaFin, frecuencia, idFamilia, etiquetaAsignada);
+                    TareaDatos datos = new TareaDatos(titulo, fechainic, fechaFin, descripcion, sitio, horaInicio, horaFin, frecuencia, idFamilia, etiquetaAsignada);
+
+                    Tarea tarea = new Tarea(datos, estadoTarea);
                     if (idTareaGuardado != null && !idTareaGuardado.isEmpty() && !idTareaGuardado.equals("null")) tarea.setIdTarea(idTareaGuardado);
 
                     GestorTareas.getGestorTareas().aniadirTareaAListaDeDocumento(tarea);
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception e) {
+                logger.info("Advertencia leyendo el fichero: "+e.getMessage());
+            }
         }
     }
 
     public void guardarCopiaSeguridadTareas(List<Tarea> listaTareas) {
-        File carpeta = new File("backups");
+        File carpeta = new File(textBackUp);
         if (!carpeta.exists()) carpeta.mkdir();
-        String nombreArchivo = "backups/tareas_backup_" + LocalDate.now() + ".txt";
+        String nombreArchivo = "backups/tareas_backup_" +  LocalDateTime.now(ZoneId.systemDefault()) + ".txt";
         try (FileWriter printWriter = new FileWriter(nombreArchivo);
                 PrintWriter pw = new PrintWriter(printWriter) {
                 }) {
@@ -133,14 +143,16 @@ public class GestionEnFicheros {
 
     public void borrarFichero(String nomF) {
         File archivo = new File(nomF);
-        archivo.delete();
+        if (!archivo.delete()) {
+            logger.info("No se pudo eliminar el archivo físico del disco: " + nomF);
+        }
     }
 
     public void guardarEtiquetasCopiaSeguridadEtiquetas(List<Etiqueta> listaEtiquetas) {
-        File carpeta = new File("backups");
+        File carpeta = new File(textBackUp);
         if (!carpeta.exists()) carpeta.mkdir();
 
-        String nombreArchivo = "backups/etiquetas_backup_" + LocalDate.now() + ".txt";
+        String nombreArchivo = "backups/etiquetas_backup_" +  LocalDateTime.now(ZoneId.systemDefault()) + ".txt";
         try (FileWriter printWriter = new FileWriter(nombreArchivo);
              PrintWriter pw = new PrintWriter(printWriter) {
              }) {
@@ -150,11 +162,14 @@ public class GestionEnFicheros {
                 }
                 pw.println(etiqueta.nombreEtiqueta() + "\n" + etiqueta.codColor());
             }
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            logger.info("Advertencia guardando etiquetas en el fichero: "+e.getMessage());
+
+        }
     }
 
     public void leerEtiquetas() {
-        String nombreArchivo = "backups/etiquetas_backup_" + LocalDate.now() + ".txt";
+        String nombreArchivo = "backups/etiquetas_backup_" +  LocalDateTime.now(ZoneId.systemDefault()) + ".txt";
 
         try (Scanner lectorFichero = new Scanner(new File(nombreArchivo))) {
             while (lectorFichero.hasNext()) {
@@ -162,7 +177,10 @@ public class GestionEnFicheros {
                 String color = lectorFichero.nextLine();
                 GestorTareas.getGestorTareas().nuevaEtiqueta(nomE, color);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            logger.info("Advertencia leyendo etiquetas el fichero: "+e.getMessage());
+
+        }
     }
 
     public void exportarACSV() {
@@ -184,8 +202,7 @@ public class GestionEnFicheros {
                 pw.println(titulo + ";" + desc + ";" + estado + ";" + fecha + ";" + horaInicio + ";" + horaFin + ";" + etiqueta);
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+            throw new IllegalStateException("Error crítico al procesar y guardar la nueva tarea en el sistema", e);        }
     }
 
     public void exportarAICS(Stage ventana) {
@@ -232,8 +249,7 @@ public class GestionEnFicheros {
                 pw.println("END:VCALENDAR");
 
             } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+                throw new IllegalStateException("Error crítico al procesar y guardar la nueva tarea en el sistema", e);            }
         }
     }
 
@@ -301,8 +317,7 @@ public class GestionEnFicheros {
                     }
                 }
             } catch (Exception e) {
-                throw new RuntimeException(e.getMessage());
-            }
+                throw new IllegalStateException("Error crítico al procesar y guardar la nueva tarea en el sistema", e);            }
         }
     }
 }

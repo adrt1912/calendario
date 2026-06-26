@@ -1,7 +1,8 @@
-package Model;
+package model;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -121,27 +122,30 @@ public class Tarea {
     }
 
     //Constructor
-    public Tarea(String nombreTarea, LocalDate fechaInicio, LocalDate fechaFin, EstadoTarea estadoTarea, String descripcion, String sitio, LocalTime horaInicio, LocalTime horaFin, Periodicidad frecuencia,String idFamilia,Etiqueta etiqueta) {
-        this.nombreTarea = nombreTarea;
-        this.fechaInicio = (fechaInicio != null) ? fechaInicio : LocalDate.now();
-        this.fechaFin = (fechaFin != null) ? fechaFin : this.fechaInicio;
+    public Tarea(TareaDatos tareaDatos, EstadoTarea estadoTarea) {
+        this.nombreTarea = tareaDatos.titulo();
         this.estadoTarea = estadoTarea;
-        this.descripcion = descripcion;
-        this.sitio = sitio;
-        this.horaInicio = horaInicio;
-        if(horaInicio!=null&&horaFin==null) horaFin=horaInicio.plusHours(1);
-        this.horaFin=horaFin;
-        this.idFamilia=idFamilia;
+        this.descripcion = tareaDatos.descripcion();
+        this.sitio = tareaDatos.sitio();
+        this.idFamilia = tareaDatos.idFamilia();
 
-        if(frecuencia!=null)  this.frecuencia = frecuencia;
-        else this.frecuencia=Periodicidad.NUNCA;
+        this.fechaInicio = (tareaDatos.fechaInicio() != null) ? tareaDatos.fechaInicio() : LocalDate.now(ZoneId.systemDefault());
+        this.fechaFin = (tareaDatos.fechaFin() != null) ? tareaDatos.fechaFin() : this.fechaInicio;
 
-        if(etiqueta==null) this.etiqueta=GestorTareas.getGestorTareas().getEtiquetaNeutra();
-        else this.etiqueta=etiqueta;
+        this.horaInicio = tareaDatos.timeInicial();
+        LocalTime hFin = tareaDatos.horaFin();
+        if (this.horaInicio != null && hFin == null) hFin = this.horaInicio.plusHours(1);
+
+        this.horaFin = hFin;
+
+        this.frecuencia = (tareaDatos.frecuencia() != null) ? tareaDatos.frecuencia() : Periodicidad.NUNCA;
+
+        if (tareaDatos.etiqueta() == null) this.etiqueta = GestorTareas.getGestorTareas().getEtiquetaNeutra();
+        else this.etiqueta = tareaDatos.etiqueta();
+
 
         comprobarEstado();
     }
-
     //Obtiene el diccionario y los textos que varian
     private ResourceBundle obtenerDiccionario() {
         Preferences prefs = Preferences.userNodeForPackage(Tarea.class);
@@ -167,8 +171,8 @@ public class Tarea {
     //Compureba que no se ha caducado la tarea
     private void comprobarEstado() {
         if (fechaFin == null) return;
-        if (LocalDate.now().isAfter(fechaFin) && estadoTarea == EstadoTarea.EN_PROCESO) estadoTarea = EstadoTarea.CADUCADA;
-        else if (LocalDate.now().isBefore(fechaFin) && estadoTarea == EstadoTarea.CADUCADA) estadoTarea=EstadoTarea.EN_PROCESO;
+        if (LocalDate.now(ZoneId.systemDefault()).isAfter(fechaFin) && estadoTarea == EstadoTarea.EN_PROCESO) estadoTarea = EstadoTarea.CADUCADA;
+        else if (LocalDate.now(ZoneId.systemDefault()).isBefore(fechaFin) && estadoTarea == EstadoTarea.CADUCADA) estadoTarea=EstadoTarea.EN_PROCESO;
     }
     //Comprueba si dos tareas son identicas
     @Override

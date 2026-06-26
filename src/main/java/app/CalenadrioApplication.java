@@ -1,3 +1,5 @@
+package app;
+
 import View.view;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -5,22 +7,27 @@ import javafx.stage.Stage;
 
 import java.awt.*;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 public class CalenadrioApplication extends Application {
     private Stage primaryStage;
 
+    //Idea sonarcloud.io
+    private final Logger logger = Logger.getLogger(getClass().getName());
+
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage){
         // OBLIGATORIO: Registramos el Stage principal y el ciclo de vida antes de evaluar nada
         this.primaryStage = stage;
         Platform.setImplicitExit(false);
         view.setPrimaryStage(stage);
 
+
         // Inicializamos el SystemTray de fondo para que esté listo desde el segundo cero
         configurarSystemTray();
-        Model.ConexionBD.getConexionBD().crearTablasSiNoExisten();
+        model.ConexionBD.getConexionBD().crearTablasSiNoExisten();
         //Cuenta por si acaso
-        Model.ConexionBD.getConexionBD().registrarNuevoUsuario("safe", "1234");
+        model.ConexionBD.getConexionBD().registrarNuevoUsuario("safe", "1234");
         try {
             // Comportamiento de seguridad: Si cierran el Login sin meter el PIN, la app muere de verdad
             primaryStage.setOnCloseRequest(event -> {
@@ -32,8 +39,7 @@ public class CalenadrioApplication extends Application {
             view.showPINInsert();
 
         } catch (Exception e) {
-            System.err.println("Error catastrófico al cargar la pantalla de PIN: " + e.getMessage());
-            throw new RuntimeException(e);
+            logger.info("Error catastrófico al cargar la pantalla de PIN: " + e.getMessage());
         }
     }
 
@@ -55,7 +61,7 @@ public class CalenadrioApplication extends Application {
             tray.add(trayIcon);
 
         } catch (Exception e) {
-            System.err.println("Aviso: No se pudo configurar el SystemTray: " + e.getMessage());
+            logger.info("Error al intentar cerrar sesión: "+ e.getMessage());
         }
     }
 
@@ -85,12 +91,10 @@ public class CalenadrioApplication extends Application {
     }
 
     @Override
-    public void stop() throws Exception {
+    public void stop(){
         // Fuerza el cierre de todos los hilos internos y libera la RAM en tu Linux
-        Model.GestorTareas.getGestorTareas().cerrarSesion();
+        model.GestorTareas.getGestorTareas().cerrarSesion();
         javafx.application.Platform.exit();
-
         System.exit(0);
     }
-
 }

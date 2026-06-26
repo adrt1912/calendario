@@ -1,3 +1,5 @@
+package app;
+
 import javafx.application.Application;
 
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.

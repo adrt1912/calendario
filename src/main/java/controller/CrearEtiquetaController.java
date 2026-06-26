@@ -1,6 +1,6 @@
-package Controller;
+package controller;
 
-import Model.GestorTareas;
+import model.GestorTareas;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
@@ -47,14 +47,14 @@ public class CrearEtiquetaController {
     @FXML
     private void crearEtiqueta(){
         String nombreEtiqueta=cuadroNombre.getText();
-        String colorEtiqueta="#"+this.colorEtiqueta.getValue().toString().substring(2,8);
+        String colorEx="#"+this.colorEtiqueta.getValue().toString().substring(2,8);
         //El nombre de la etiqueta no puede ser null ni estar en blanco
         if (nombreEtiqueta == null || nombreEtiqueta.isBlank()) textoError.setText("Error al crear etiqueta, hay campos sin rellenar");
             //El nombre de la etiqueta no puede ser "Sin Etiqueta" es el que se usa como neutra
         else if (nombreEtiqueta.trim().equalsIgnoreCase("Sin Etiqueta")) textoError.setText("Error: Ese nombre está reservado por el sistema.");
         else if( GestorTareas.getGestorTareas().getListaEtiquetas().stream() .anyMatch(e -> e.nombreEtiqueta() != null && e.nombreEtiqueta().equalsIgnoreCase(nombreEtiqueta))) textoError.setText("Error: Ya existe una etiqueta con este nombre.");
         else{
-            GestorTareas.getGestorTareas().nuevaEtiqueta( nombreEtiqueta,colorEtiqueta);
+            GestorTareas.getGestorTareas().nuevaEtiqueta( nombreEtiqueta,colorEx);
             cancelarEtiqueta();
         }
     }

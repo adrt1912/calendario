@@ -1,7 +1,7 @@
-package Controller;
+package controller;
 
-import Model.ConexionBD;
-import Model.GestorTareas;
+import model.ConexionBD;
+import model.GestorTareas;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;

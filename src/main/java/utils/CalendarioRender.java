@@ -1,7 +1,7 @@
-package Utils;
+package utils;
 
-import Controller.MenuPrincipalController;
-import Model.GestorTareas;
+import controller.MenuPrincipalController;
+import model.GestorTareas;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -14,6 +14,7 @@ import javafx.scene.text.TextAlignment;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.TextStyle;
 import java.util.Locale;
 import java.util.prefs.Preferences;
@@ -25,13 +26,20 @@ public class CalendarioRender {
     //Patrón singletone
     private static CalendarioRender calendarioRender;
 
+    private static final String textoDark = "modo_oscuro";
+
+    private static final String textTransparente ="transparent";
+
+    private static final String textcodColor1 = "#333333";
+
+    private static final String textcodColor2 ="#e4e4e4";
+
     public static CalendarioRender getCalendarioRender() {
         if (calendarioRender == null) calendarioRender = new CalendarioRender();
         return calendarioRender;
     }
 
     private CalendarioRender(){
-        calendarioRender=this;
         prefs = Preferences.userNodeForPackage(GestorTareas.class);
     }
 
@@ -77,7 +85,7 @@ public class CalendarioRender {
         int numDiasMes = fechaSeleccionada.lengthOfMonth();
         int fechaPrimerDiaMes = LocalDate.of(fechaSeleccionada.getYear(), fechaSeleccionada.getMonthValue(), 1).getDayOfWeek().getValue();
 
-        LocalDate fechaHoy = LocalDate.now();
+        LocalDate fechaHoy = LocalDate.now(ZoneId.systemDefault());
         int numMes = 1;
 
         //Recorremos casialla a casilla
@@ -95,11 +103,11 @@ public class CalendarioRender {
                 casillaActual.setOnDragExited(null);
                 casillaActual.setOnDragDropped(null);
 
-                boolean esOscuro = prefs.getBoolean("modo_oscuro", false);
+                boolean esOscuro = prefs.getBoolean(textoDark, false);
                 String colorBorde = esOscuro ? "#555555" : "#666666";
-                String colorFondo="transparent";
+                String colorFondo=textTransparente;
 
-                if(j==6||j==5) colorFondo = prefs.getBoolean("modo_oscuro",false) ? "#333333" : "#e4e4e4";
+                if(j==6||j==5) colorFondo = prefs.getBoolean(textoDark,false) ? textcodColor1 : textcodColor2;
                 casillaActual.setStyle("-fx-background-color: " + colorFondo + "; " +
                         "-fx-border-color: " + colorBorde + "; " +
                         "-fx-border-width: 0 1 1 0; " +
@@ -114,9 +122,7 @@ public class CalendarioRender {
                 //El resto de filas van ya con numero
                 else {
                     // Calculamos si la casilla actual corresponde a un día real del mes
-                    boolean esDiaValido = false;
-                    if(i == 1 && j >= fechaPrimerDiaMes - 1) esDiaValido = true; // Primera semana
-                    else if (i > 1 && numMes <= numDiasMes) esDiaValido = true;  // Resto del mes
+                    boolean esDiaValido = (i == 1 && j >= fechaPrimerDiaMes - 1) || (i > 1 && numMes <= numDiasMes);
 
                     if (esDiaValido) {
                         //Creamos la etiqueta donde ira el numero
@@ -142,7 +148,10 @@ public class CalendarioRender {
 
                         int finalJ = j;
                         casillaActual.setOnDragExited(event -> {
-                            String colorOriginal = (finalJ == 5 || finalJ == 6) ? (prefs.getBoolean("modo_oscuro", false) ? "#333333" : "#e4e4e4") : "transparent";
+                            String colorOriginal;
+
+                            if (finalJ == 5 || finalJ == 6) colorOriginal = prefs.getBoolean("modo_oscuro", false) ? textcodColor1 : textcodColor2;
+                            else {colorOriginal = textTransparente;}
                             casillaActual.setStyle("-fx-background-color: " + colorOriginal + ";");
                         });
 
@@ -159,7 +168,7 @@ public class CalendarioRender {
                         });
 
                         // Marcar el día de hoy
-                        if(numMes == fechaHoy.getDayOfMonth() && fechaSeleccionada.getMonth() == fechaHoy.getMonth() && fechaSeleccionada.getYear() == fechaHoy.getYear()) {
+                        if(numMes == fechaHoy.getDayOfMonth() && fechaSeleccionada.getMonth().equals( fechaHoy.getMonth()) && fechaSeleccionada.getYear() == fechaHoy.getYear()) {
                             label.setStyle("-fx-border-color: red; -fx-border-width: 2px; -fx-border-radius: 50em; -fx-padding: 2 6 2 6");
                         }
                         numMes++;
@@ -179,8 +188,8 @@ public class CalendarioRender {
 
         //Se coge el dia de la semana de la fecha seleccionada, y el lunes de la semana
         int diaDeLaSemana = fechaSeleccionada.getDayOfWeek().getValue();
-        LocalDate lunesDeEstaSemana = fechaSeleccionada.minusDays(diaDeLaSemana - 1);
-        LocalDate fechaHoy=LocalDate.now();
+        LocalDate lunesDeEstaSemana = fechaSeleccionada.minusDays(diaDeLaSemana - 1L);
+        LocalDate fechaHoy=LocalDate.now(ZoneId.systemDefault());
 
         HBox cajaNombresSemana = new HBox();
         //Es para el hueco de las horas
@@ -206,8 +215,8 @@ public class CalendarioRender {
             label.setMinHeight(80);
             HBox.setHgrow(label, Priority.ALWAYS);
 
-            String colorFondo="transparent";
-            if(i==5 || i==6) colorFondo = prefs.getBoolean("modo_oscuro",false) ? "#333333" : "#e4e4e4";
+            String colorFondo=textTransparente;
+            if(i==5 || i==6) colorFondo = prefs.getBoolean(textoDark,false) ? textcodColor1 : textcodColor2;
             String estiloBase = "-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: " + colorFondo + ";";
 
             cajaNombresSemana.getChildren().add(label);
@@ -219,7 +228,7 @@ public class CalendarioRender {
                 jefe.mostrarTareas();});
 
             //Para q8e se marque al ser hoy
-            if(diaQueTocaDibujar == fechaHoy.getDayOfMonth() && fechaSeleccionada.getMonth() == fechaHoy.getMonth() && fechaSeleccionada.getYear() == fechaHoy.getYear()) {// Si es hoy: Letra grande + Borde rojo
+            if(diaQueTocaDibujar == fechaHoy.getDayOfMonth() && fechaSeleccionada.getMonth().equals(fechaHoy.getMonth()) && fechaSeleccionada.getYear() == fechaHoy.getYear()) {// Si es hoy: Letra grande + Borde rojo
                 label.setStyle(estiloBase+"-fx-font-size: 15px; -fx-font-weight: bold; -fx-border-color: red; -fx-border-width: 2px; -fx-border-radius: 50em; -fx-padding: 2 6 2 6;");
             } else label.setStyle(estiloBase);// Si no es hoy: Solo letra grande
         }

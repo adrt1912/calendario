@@ -1,31 +1,34 @@
-package Model;
+package model;
 
-import Utils.SeguridadUtils;
-
+import utils.SeguridadUtils;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.prefs.Preferences;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConexionBD {
 
     // Patrón Singleton
     private static ConexionBD conexionBD;
 
+    private static final Logger logger = LoggerFactory.getLogger(ConexionBD.class);
+
     // La URL de la conexión estándar (estable de toda la vida)
     private static final String URL = "jdbc:sqlite:base_tareas.db";
 
-    private ConexionBD() {
-        conexionBD = this;
-    }
+    private ConexionBD() {}
 
     public static ConexionBD getConexionBD() {
-        if (conexionBD == null) conexionBD = new ConexionBD();
+        if (conexionBD == null) {
+            conexionBD = new ConexionBD();
+        }
         return conexionBD;
     }
 
     // Método de conexión limpio y estándar
-    private Connection obtenerConexion() throws Exception {
+    private Connection obtenerConexion() throws SQLException {
         Connection c = DriverManager.getConnection(URL);
         try (Statement stmt = c.createStatement()) {
             // Activamos las claves foráneas obligatorias
@@ -62,87 +65,94 @@ public class ConexionBD {
             ps2.execute();
             ps3.execute();
         } catch (Exception e) {
-            System.err.println("Error al crear las tablas: " + e.getMessage());
+            logger.error("Error al crear las tablas en la base de datos: ", e);
         }
     }
 
-    // Lee la BD y descifra los textos usando la clave única del usuario activo
     public void cargarDatosDeBD(int idObtenido) {
-        String op1 = "select * from Etiqueta where usuario_id=?";
-        String op = "select * from Tarea where usuario_id=?";
         GestorTareas.getGestorTareas().getListaEtiquetas().clear();
-
-        // 🔑 Recuperamos la clave AES exclusiva de la sesión actual
         var clave = GestorTareas.getGestorTareas().getClaveCifradoActiva();
 
-        try (Connection c = obtenerConexion();
-             PreparedStatement ps = c.prepareStatement(op);
-             PreparedStatement ps1 = c.prepareStatement(op1)
-        ) {
-            // Leemos primero las etiquetas
+        try (Connection c = obtenerConexion()) {
+            cargarEtiquetasDesdeBD(c, idObtenido, clave);
+            cargarTareasDesdeBD(c, idObtenido, clave);
+        } catch (Exception e) {
+            logger.error("Error crítico al procesar la carga general de datos cifrados: ", e);
+        }
+    }
+
+    private void cargarEtiquetasDesdeBD(Connection c, int idObtenido, javax.crypto.spec.SecretKeySpec clave) throws SQLException {
+        String sqlEtiquetas = "SELECT id, nombreEtiqueta, codColor FROM Etiqueta WHERE usuario_id = ?";
+        try (PreparedStatement ps1 = c.prepareStatement(sqlEtiquetas)) {
             ps1.setInt(1, idObtenido);
-            ResultSet rs1 = ps1.executeQuery();
-            while (rs1.next()) {
-                // 🔓 DESCIFRAMOS el nombre de la etiqueta usando la clave de sesión
-                String nomE = SeguridadUtils.descifrarTexto(rs1.getString("nombreEtiqueta"), clave);
-                String color = rs1.getString("codColor");
-                Etiqueta nuevaEtiqueta = new Etiqueta(nomE, color);
-                GestorTareas.getGestorTareas().getListaEtiquetas().add(nuevaEtiqueta);
+            try (ResultSet rs1 = ps1.executeQuery()) {
+                while (rs1.next()) {
+                    String nomE = SeguridadUtils.descifrarTexto(rs1.getString("nombreEtiqueta"), clave);
+                    String color = rs1.getString("codColor");
+                    Etiqueta nuevaEtiqueta = new Etiqueta(nomE, color);
+                    GestorTareas.getGestorTareas().getListaEtiquetas().add(nuevaEtiqueta);
+                }
             }
+        }
+    }
 
-            // Leemos las tareas
+    // Submétodo privado para extraer tareas (Especificando las columnas exactas del SELECT)
+    private void cargarTareasDesdeBD(Connection c, int idObtenido, javax.crypto.spec.SecretKeySpec clave) throws SQLException {
+        String sqlTareas = "SELECT Titulo, FechaInicio, FechaFin, EstadoTarea, HoraInicio, HoraFin, Frecuencia, Descripcion, Sitio, idTarea, idFamilia, Etiqueta FROM Tarea WHERE usuario_id = ?";
+        try (PreparedStatement ps = c.prepareStatement(sqlTareas)) {
             ps.setInt(1, idObtenido);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                // 🔓 DESCIFRAMOS los datos usando la clave de sesión
-                String titulo = SeguridadUtils.descifrarTexto(rs.getString("Titulo"), clave);
-                String descripcion = SeguridadUtils.descifrarTexto(rs.getString("Descripcion"), clave);
-                String sitio = SeguridadUtils.descifrarTexto(rs.getString("Sitio"), clave);
-                String etiqueta = SeguridadUtils.descifrarTexto(rs.getString("Etiqueta"), clave);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String titulo = SeguridadUtils.descifrarTexto(rs.getString("Titulo"), clave);
+                    String descripcion = SeguridadUtils.descifrarTexto(rs.getString("Descripcion"), clave);
+                    String sitio = SeguridadUtils.descifrarTexto(rs.getString("Sitio"), clave);
+                    String etiqueta = SeguridadUtils.descifrarTexto(rs.getString("Etiqueta"), clave);
 
-                String fechaInicStr = rs.getString("FechaInicio");
-                LocalDate fechainic = (fechaInicStr != null && !fechaInicStr.isBlank() && !fechaInicStr.equals("null"))
-                        ? LocalDate.parse(fechaInicStr) : null;
+                    String fechaInicStr = rs.getString("FechaInicio");
+                    LocalDate fechainic = (fechaInicStr != null && !fechaInicStr.isBlank() && !fechaInicStr.equals("null"))
+                            ? LocalDate.parse(fechaInicStr) : null;
 
-                String fechaFinS = rs.getString("FechaFin");
-                LocalDate fechaFin = (fechaFinS != null && !fechaFinS.isBlank() && !fechaFinS.equals("null"))
-                        ? LocalDate.parse(fechaFinS) : null;
+                    String fechaFinS = rs.getString("FechaFin");
+                    LocalDate fechaFin = (fechaFinS != null && !fechaFinS.isBlank() && !fechaFinS.equals("null"))
+                            ? LocalDate.parse(fechaFinS) : null;
 
-                String estadoTareaS = rs.getString("EstadoTarea");
-                EstadoTarea estadoTarea = null;
-                if (estadoTareaS != null && !estadoTareaS.isBlank() && !estadoTareaS.equals("null")) {
-                    estadoTarea = EstadoTarea.valueOf(estadoTareaS);
+                    String estadoTareaS = rs.getString("EstadoTarea");
+                    EstadoTarea estadoTarea = null;
+                    if (estadoTareaS != null && !estadoTareaS.isBlank() && !estadoTareaS.equals("null")) {
+                        estadoTarea = EstadoTarea.valueOf(estadoTareaS);
+                    }
+
+                    String horaInicioStr = rs.getString("HoraInicio");
+                    LocalTime timeInicio = (horaInicioStr != null && !horaInicioStr.isBlank() && !horaInicioStr.equals("null"))
+                            ? LocalTime.parse(horaInicioStr) : null;
+
+                    String horaFinStr = rs.getString("HoraFin");
+                    LocalTime timeFin = (horaFinStr != null && !horaFinStr.isBlank() && !horaFinStr.equals("null"))
+                            ? LocalTime.parse(horaFinStr) : null;
+
+                    String frecuenciaStr = rs.getString("Frecuencia");
+                    Periodicidad frecuencia = (frecuenciaStr != null && !frecuenciaStr.isBlank() && !frecuenciaStr.equals("null"))
+                            ? Periodicidad.valueOf(frecuenciaStr) : null;
+
+                    String idTarea = rs.getString("idTarea");
+                    String idFamilia = rs.getString("idFamilia");
+
+                    Etiqueta etiquetaAsignada = null;
+                    if (etiqueta != null) {
+                        etiquetaAsignada = GestorTareas.getGestorTareas().getListaEtiquetas().stream()
+                                .filter(e -> e.nombreEtiqueta() != null && e.nombreEtiqueta().equals(etiqueta))
+                                .findFirst()
+                                .orElse(null);
+                    }
+
+                    // 🚀 Usamos el constructor refactorizado acoplándolo al record TareaDatos
+                    TareaDatos datos = new TareaDatos(titulo, fechainic, fechaFin, descripcion, sitio, timeInicio, timeFin, frecuencia, idFamilia, etiquetaAsignada);
+                    Tarea tarea = new Tarea(datos, estadoTarea);
+                    if (idTarea != null) tarea.setIdTarea(idTarea);
+
+                    GestorTareas.getGestorTareas().aniadirTareaAListaDeDocumento(tarea);
                 }
-
-                String horaInicioStr = rs.getString("HoraInicio");
-                LocalTime timeInicio = (horaInicioStr != null && !horaInicioStr.isBlank() && !horaInicioStr.equals("null"))
-                        ? LocalTime.parse(horaInicioStr) : null;
-
-                String horaFinStr = rs.getString("HoraFin");
-                LocalTime timeFin = (horaFinStr != null && !horaFinStr.isBlank() && !horaFinStr.equals("null"))
-                        ? LocalTime.parse(horaFinStr) : null;
-
-                String frecuenciaStr = rs.getString("Frecuencia");
-                Periodicidad frecuencia = (frecuenciaStr != null && !frecuenciaStr.isBlank() && !frecuenciaStr.equals("null"))
-                        ? Periodicidad.valueOf(frecuenciaStr) : null;
-
-                String idTarea = rs.getString("idTarea");
-                String idFamilia = rs.getString("idFamilia");
-
-                Etiqueta etiquetaAsignada = null;
-                if (etiqueta != null) {
-                    etiquetaAsignada = GestorTareas.getGestorTareas().getListaEtiquetas().stream()
-                            .filter(e -> e.nombreEtiqueta() != null && e.nombreEtiqueta().equals(etiqueta))
-                            .findFirst()
-                            .orElse(null);
-                }
-
-                Tarea tarea = new Tarea(titulo, fechainic, fechaFin, estadoTarea, descripcion, sitio, timeInicio, timeFin, frecuencia, idFamilia, etiquetaAsignada);
-                if (idTarea != null) tarea.setIdTarea(idTarea);
-
-                GestorTareas.getGestorTareas().aniadirTareaAListaDeDocumento(tarea);
             }
-        } catch (Exception ignored) {
         }
     }
 
@@ -155,26 +165,25 @@ public class ConexionBD {
             ps.setString(1, idTarea);
             ps.executeUpdate();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException("Error al eliminar la tarea con ID: " + idTarea, e);
         }
     }
 
-    // Borra una etiqueta de la BD (Cifrando el nombre con la clave del usuario para hacer Match)
+    // Borra una etiqueta de la BD
     public void borrarEtiqueta(String nombreEtiqueta) {
         int idActivo = GestorTareas.getGestorTareas().getIdUsuarioLogueado();
-        String opDelete = "DELETE FROM Etiqueta WHERE NombreEtiqueta=? and usuario_id=?";
+        String opDelete = "DELETE FROM Etiqueta WHERE nombreEtiqueta=? and usuario_id=?"; // Columna corregida
 
         var clave = GestorTareas.getGestorTareas().getClaveCifradoActiva();
 
         try (Connection c = obtenerConexion();
              PreparedStatement ps = c.prepareStatement(opDelete)
         ) {
-            // 🔒 Pasamos el nombre cifrado con su clave específica
             ps.setString(1, SeguridadUtils.cifrarTexto(nombreEtiqueta, clave));
             ps.setInt(2, idActivo);
             ps.executeUpdate();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException("Error al intentar eliminar la etiqueta: " + nombreEtiqueta, e);
         }
     }
 
@@ -186,7 +195,7 @@ public class ConexionBD {
             ps.setInt(1, idUsusario);
             ps.executeUpdate();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException("Error al purgar el perfil de usuario con ID: " + idUsusario, e);
         }
     }
 
@@ -200,7 +209,6 @@ public class ConexionBD {
         try (Connection c = obtenerConexion();
              PreparedStatement psTareas = c.prepareStatement(opTareas)
         ) {
-            // 🔒 APLICAMOS CIFRADO AES BASADO EN EL USUARIO ACTIVO
             psTareas.setString(1, SeguridadUtils.cifrarTexto(tarea.getNombreTarea(), clave));
             psTareas.setString(2, tarea.getFechaInicio() != null ? tarea.getFechaInicio().toString() : null);
             psTareas.setString(3, tarea.getFechaFin() != null ? tarea.getFechaFin().toString() : null);
@@ -217,7 +225,7 @@ public class ConexionBD {
 
             psTareas.executeUpdate();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException("Error crítico al persistir la tarea cifrada en la base de datos", e);
         }
     }
 
@@ -231,13 +239,12 @@ public class ConexionBD {
         try (Connection c = obtenerConexion();
              PreparedStatement psEtiquetas = c.prepareStatement(opEtiquetas)
         ) {
-            // 🔒 Ciframos con la clave exclusiva del usuario
             psEtiquetas.setString(1, SeguridadUtils.cifrarTexto(etiqueta.nombreEtiqueta(), clave));
             psEtiquetas.setString(2, etiqueta.codColor());
             psEtiquetas.setInt(3, idActivo);
             psEtiquetas.executeUpdate();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException("Error crítico al registrar la nueva etiqueta cifrada", e);
         }
     }
 
@@ -255,7 +262,7 @@ public class ConexionBD {
             psTareas.executeUpdate();
             psEtiquetas.executeUpdate();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException("Error al vaciar los registros del panel del usuario", e);
         }
     }
 
@@ -267,20 +274,19 @@ public class ConexionBD {
              PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setString(1, nombreUsuario);
-            ResultSet rs = ps.executeQuery();
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int id = rs.getInt("id");
+                    String hashGuardado = rs.getString("pin_hash");
 
-            if (rs.next()) {
-                int id = rs.getInt("id");
-                String hashGuardado = rs.getString("pin_hash");
-
-                if (GestorTareas.getGestorTareas().verificarHash(pinIntroducido, hashGuardado)) {
-                    // 🚀 PERFECTO: Guardamos la clave criptográfica derivada de este PIN en el Gestor
-                    GestorTareas.getGestorTareas().setClaveCifradoActiva(SeguridadUtils.generarClaveDesdePIN(pinIntroducido));
-                    return id;
+                    if (GestorTareas.getGestorTareas().verificarHash(pinIntroducido, hashGuardado)) {
+                        GestorTareas.getGestorTareas().setClaveCifradoActiva(SeguridadUtils.generarClaveDesdePIN(pinIntroducido));
+                        return id;
+                    }
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error al autenticar usuario: " + e.getMessage());
+            logger.error("Error al autenticar usuario en el sistema: ", e);
         }
         return -1;
     }
@@ -297,12 +303,11 @@ public class ConexionBD {
 
             boolean insertado = ps.executeUpdate() > 0;
             if (insertado) {
-                // 🚀 Al registrarse con éxito, también dejamos su sesión criptográfica preconfigurada
                 GestorTareas.getGestorTareas().setClaveCifradoActiva(SeguridadUtils.generarClaveDesdePIN(pinPlano));
             }
             return insertado;
         } catch (Exception e) {
-            System.err.println("Error al registrar usuario en la BD: " + e.getMessage());
+            logger.error("Error al registrar usuario en la BD: ", e);
             return false;
         }
     }
@@ -315,33 +320,30 @@ public class ConexionBD {
              PreparedStatement ps = c.prepareStatement(sql)
         ){
             ps.setInt(1, idUsuario);
-            ResultSet rs = ps.executeQuery();
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String idiomaDB = rs.getString("idioma");
+                    boolean modoOscuro = rs.getInt("modo_oscuro") == 1;
 
-            if(rs.next()){
-                String idiomaDB = rs.getString("idioma");
-                boolean modoOscuro = rs.getInt("modo_oscuro") == 1;
+                    if (idiomaDB == null || idiomaDB.isBlank()) idiomaDB = "es";
 
-                if (idiomaDB == null || idiomaDB.isBlank()) idiomaDB = "es";
+                    Preferences prefs = Preferences.userNodeForPackage(GestorTareas.class);
+                    prefs.put("idioma_actual", idiomaDB);
+                    prefs.putBoolean("modo_oscuro", modoOscuro);
 
-                Preferences prefs = Preferences.userNodeForPackage(GestorTareas.class);
-                prefs.put("idioma_actual", idiomaDB);
-                prefs.putBoolean("modo_oscuro", modoOscuro);
+                    java.util.Locale nuevoLocale = new java.util.Locale(idiomaDB);
+                    java.util.Locale.setDefault(nuevoLocale);
 
-                java.util.Locale nuevoLocale = new java.util.Locale(idiomaDB);
-                java.util.Locale.setDefault(nuevoLocale);
-
-                // El metodo verificarUsuarioYObtenerId ya generó la clave dinámicamente antes de llegar aquí,
-                // así que hemos eliminado la línea rota que llamaba al metodo sin parámetros.
-
-                for (Idiomas idm : Idiomas.values()) {
-                    if (idm.getCodigo().equalsIgnoreCase(idiomaDB)) {
-                        GestorTareas.getGestorTareas().setIdioma(idm);
-                        break;
+                    for (Idiomas idm : Idiomas.values()) {
+                        if (idm.getCodigo().equalsIgnoreCase(idiomaDB)) {
+                            GestorTareas.getGestorTareas().setIdioma(idm);
+                            break;
+                        }
                     }
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException("Error al cargar las preferencias del perfil de usuario", e);
         }
     }
 
@@ -358,12 +360,11 @@ public class ConexionBD {
 
             ps1.executeUpdate();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException("Error al guardar las preferencias de interfaz de usuario", e);
         }
     }
 
     public boolean cambiarPin(String nuevoPin){
-
         var claveVieja = GestorTareas.getGestorTareas().getClaveCifradoActiva();
         int idUsuarioCambiar = GestorTareas.getGestorTareas().getIdUsuarioLogueado();
         if (idUsuarioCambiar == -1) return false;
@@ -389,23 +390,20 @@ public class ConexionBD {
 
             int numa = ps1.executeUpdate();
             if(numa == 1){
-                //  Purgamos del disco las etiquetas encriptadas con el PIN viejo
                 psEtiquetas.setInt(1, idUsuarioCambiar);
                 psEtiquetas.executeUpdate();
 
-                //  Insertamos las etiquetas en lote con el nuevo cifrado
+                psInsertEtiqueta.setInt(3, idUsuarioCambiar);
                 for (Etiqueta etiqueta : GestorTareas.getGestorTareas().getListaEtiquetas()) {
                     if (!etiqueta.nombreEtiqueta().equals("Sin Etiqueta")) {
-
                         psInsertEtiqueta.setString(1, SeguridadUtils.cifrarTexto(etiqueta.nombreEtiqueta(), claveNueva));
                         psInsertEtiqueta.setString(2, etiqueta.codColor());
-                        psInsertEtiqueta.setInt(3, idUsuarioCambiar);
                         psInsertEtiqueta.addBatch();
                     }
                 }
                 psInsertEtiqueta.executeBatch();
 
-                // Modificamos todas las tareas del usuario aplicando el nuevo escudo AES
+                psTareas.setInt(12, idUsuarioCambiar);
                 for (Tarea tarea : GestorTareas.getGestorTareas().getTodasTareas()) {
                     psTareas.setString(1, SeguridadUtils.cifrarTexto(tarea.getNombreTarea(), claveNueva));
                     psTareas.setString(2, tarea.getFechaInicio() != null ? tarea.getFechaInicio().toString() : null);
@@ -418,14 +416,12 @@ public class ConexionBD {
                     psTareas.setString(9, SeguridadUtils.cifrarTexto(tarea.getSitio(), claveNueva));
                     psTareas.setString(10, tarea.getIdFamilia());
                     psTareas.setString(11, tarea.getEtiqueta() != null ? SeguridadUtils.cifrarTexto(tarea.getEtiqueta().nombreEtiqueta(), claveNueva) : null);
-                    psTareas.setInt(12, idUsuarioCambiar);
                     psTareas.setString(13, tarea.getIdTarea()); // Filtro WHERE
 
                     psTareas.addBatch();
                 }
                 psTareas.executeBatch();
 
-                //  Actualizamos la clave en memoria RAM y consolidamos los cambios en el archivo .db
                 GestorTareas.getGestorTareas().setClaveCifradoActiva(claveNueva);
                 c.commit();
                 return true;
@@ -436,7 +432,7 @@ public class ConexionBD {
 
         } catch (Exception e) {
             GestorTareas.getGestorTareas().setClaveCifradoActiva(claveVieja);
-            System.err.println("Error crítico al re-cifrar por cambio de PIN: " + e.getMessage());
+            logger.error("Error crítico al re-cifrar los registros por cambio de PIN: ", e);
             return false;
         }
     }

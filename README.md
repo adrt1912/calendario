@@ -39,4 +39,4 @@ Para clonar el repositorio, compilar el código fuente y lanzar la aplicación d
 git clone https://github.com/adr71912/calendario.git
 cd GestorTareas
 mvn clean package
-mvn exec:java -Dexec.mainClass="Main"
+mvn exec:java -Dexec.mainClass="app.Main"

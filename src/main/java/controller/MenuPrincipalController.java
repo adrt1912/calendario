@@ -1,8 +1,8 @@
-package Controller;
+package controller;
 
-import Model.*;
-import Utils.CalendarioRender;
-import Utils.TareaVisualizer;
+import model.*;
+import utils.CalendarioRender;
+import utils.TareaVisualizer;
 import View.view;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
@@ -18,9 +18,12 @@ import javafx.scene.text.Text;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.TextStyle;
 import java.util.*;
 import javafx.util.Duration;
+
+import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
 
@@ -29,15 +32,15 @@ public class MenuPrincipalController {
     private final GestorTareas gestorTareas=GestorTareas.getGestorTareas();
 
     //Guardamos la fecha que se muestra por pantalla
-    private LocalDate fechaSeleccionada=LocalDate.now();
+    private LocalDate fechaSeleccionada= LocalDate.now(ZoneId.systemDefault());
     @FXML
     private GridPane calendarioMensual;
 
     @FXML
-    private Label TareasPendientesHoy;
+    private Label tareasPendientesHoy;
 
     @FXML
-    private Label TareasPendientesManiana;
+    private Label tareasPendientesManiana;
 
     @FXML
     private GridPane vBoxEtiquetas;
@@ -53,6 +56,13 @@ public class MenuPrincipalController {
     private final Pane[] panelesDiasSemanales = new Pane[7];
     private final VBox[] panelesTareasTodoDia=new VBox[7];
     private final VBox panelTareasTodoDiaDiario=new VBox();
+    private static final String MODO_MENSUAL = "Mensual";
+    private static final String MODO_SEMANAL = "Semanal";
+    private static final String MODO_DIARIO = "Diario";
+    private static final String textoDark = "dark-mode";
+    Logger logger = Logger.getLogger(getClass().getName());
+
+
     @FXML
     private ScrollPane mostradorTareas;
 
@@ -85,14 +95,14 @@ public class MenuPrincipalController {
     @FXML
     public void initialize() {
        //Rellena el cuadrado de escoger con modo mensual y semanal
-       seleccionModo.getItems().addAll("Mensual", "Semanal","Diario");
-       seleccionModo.setValue("Mensual"); //Se establece el modo mensual al arrancar
+       seleccionModo.getItems().addAll(MODO_MENSUAL, MODO_SEMANAL,MODO_DIARIO);
+       seleccionModo.setValue(MODO_MENSUAL); //Se establece el modo mensual al arrancar
        //Se inicia el listener por si se cambia el modo
        seleccionModo.getSelectionModel().selectedItemProperty().addListener((observable, valorAntiguo, valorNuevo) -> {
            switch (valorNuevo) {
-               case "Mensual" -> modo = "M";
-               case "Semanal" -> modo = "S";
-               case "Diario" -> modo = "D";
+               case MODO_MENSUAL -> modo = "M";
+               case MODO_SEMANAL -> modo = "S";
+               case MODO_DIARIO -> modo = "D";
            }
            mostrarCalendario();
        });
@@ -107,8 +117,8 @@ public class MenuPrincipalController {
 
        mostrarCalendario();
        //Muestra los textos de tareas urgentes hoy y mañana
-       TareasPendientesHoy.setText(gestorTareas.mostrarTareasUrgentesHoy());
-       TareasPendientesManiana.setText(gestorTareas.mostrarTareasUrgentesManiana());
+       tareasPendientesHoy.setText(gestorTareas.mostrarTareasUrgentesHoy());
+       tareasPendientesManiana.setText(gestorTareas.mostrarTareasUrgentesManiana());
        comboFiltroEtiquetas.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> mostrarCalendario());
        buscadorTareas.textProperty().addListener((observable, oldValue, newValue) -> {
            mostrarCalendario();
@@ -142,12 +152,12 @@ public class MenuPrincipalController {
         //Para guardar de forma global si esta en modo oscuro o no
         Preferences prefs = Preferences.userNodeForPackage(GestorTareas.class);
         if (prefs.getBoolean("modo_oscuro", false)) {
-        if (!rootPane.getStyleClass().contains("dark-mode")) rootPane.getStyleClass().add("dark-mode");
-        } else rootPane.getStyleClass().remove("dark-mode");
+        if (!rootPane.getStyleClass().contains(textoDark)) rootPane.getStyleClass().add(textoDark);
+        } else rootPane.getStyleClass().remove(textoDark);
 
         //Se ponen los textos, por si se añade alguna tarea para hoy
-        TareasPendientesHoy.setText(gestorTareas.mostrarTareasUrgentesHoy());
-        TareasPendientesManiana.setText(gestorTareas.mostrarTareasUrgentesManiana());
+        tareasPendientesHoy.setText(gestorTareas.mostrarTareasUrgentesHoy());
+        tareasPendientesManiana.setText(gestorTareas.mostrarTareasUrgentesManiana());
 
         //Se pone los meses en el idioms elegido
         Locale localeSesion = Locale.getDefault();
@@ -218,7 +228,7 @@ public class MenuPrincipalController {
                    mostrarCalendario();
                    mostrarTareas();
                } catch (Exception e) {
-                   System.err.println("Error al abrir la ventana: " + e.getMessage());
+                   logger.info("Error al abrir la ventana: " + e.getMessage());
                }
            });
         }
@@ -260,6 +270,7 @@ public class MenuPrincipalController {
             case "M" -> fechaSeleccionada = fechaSeleccionada.minusMonths(1);
             case "S" -> fechaSeleccionada = fechaSeleccionada.minusWeeks(1);
             case "D" -> fechaSeleccionada = fechaSeleccionada.minusDays(1);
+            default -> fechaSeleccionada=fechaSeleccionada.minusMonths(1);
         }
         mostrarCalendario();
     }
@@ -271,6 +282,7 @@ public class MenuPrincipalController {
             case "M" -> fechaSeleccionada = fechaSeleccionada.plusMonths(1);
             case "S" -> fechaSeleccionada = fechaSeleccionada.plusWeeks(1);
             case "D" -> fechaSeleccionada = fechaSeleccionada.plusDays(1);
+            default -> fechaSeleccionada=fechaSeleccionada.plusMonths(1);
         }
         mostrarCalendario();
     }
@@ -289,7 +301,7 @@ public class MenuPrincipalController {
             mostrarCalendario();
             mostrarTareas();
         } catch (Exception e) {
-            System.err.println("Error " + e.getMessage());
+            logger.info("Error " + e.getMessage());
         }
     }
 
@@ -320,7 +332,7 @@ public class MenuPrincipalController {
     //Boton para volver al dia de hoy
     @FXML
     private void volverHoy(){
-        fechaSeleccionada=LocalDate.now();
+        fechaSeleccionada = LocalDate.now(ZoneId.systemDefault());;
         mostrarCalendario();
     }
 
@@ -337,8 +349,8 @@ public class MenuPrincipalController {
        if(tarea!=null){
            long diasDuracion = java.time.temporal.ChronoUnit.DAYS.between(tarea.getFechaInicio(), tarea.getFechaFin());
            LocalDate fechafin=fechaDestino.plusDays(diasDuracion);
-           gestorTareas.modificarTarea(tarea,tarea.getNombreTarea(),fechaDestino,fechafin,tarea.getDescripcion(),tarea.getSitio(),tarea.getHoraInicio(),tarea.getHoraFin(),tarea.getFrecuencia(),tarea.getEstadoTarea(),tarea.getEtiqueta());
-       }
+           gestorTareas.modificarTarea(tarea, new TareaDatos(tarea.getNombreTarea(), fechaDestino, fechafin, tarea.getDescripcion(), tarea.getSitio(), tarea.getHoraInicio(), tarea.getHoraFin(), tarea.getFrecuencia(), tarea.getIdFamilia(), tarea.getEtiqueta()), tarea.getEstadoTarea());       }
        mostrarCalendario();
     }
+
 }

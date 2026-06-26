@@ -1,6 +1,6 @@
-package Controller;
+package controller;
 
-import Model.*;
+import model.*;
 import View.view;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
@@ -138,10 +139,10 @@ private void modificarTarea() {
 
     String titulo = campoTitulo.getText();
     LocalDate fechaInic = campoFechaInicio.getValue();
-    if (fechaInic == null) fechaInic = LocalDate.now();
+    if (fechaInic == null) fechaInic =LocalDate.now(ZoneId.systemDefault());
 
     LocalDate fechaFin=campoFechaFin.getValue();
-    if(fechaFin==null) fechaFin=LocalDate.now();
+    if(fechaFin==null) fechaFin=LocalDate.now(ZoneId.systemDefault());
 
     String descripcion = campoDescripcion.getText();
     String sitio = campoSitio.getText();
@@ -187,7 +188,8 @@ private void modificarTarea() {
     //Obliga a que exista un titulo
     if (titulo.isBlank()) textoError.setText("Introduzca un titulo");
      else {
-        GestorTareas.getGestorTareas().modificarTarea(tareaMos, titulo,fechaInic, fechaFin, descripcion, sitio, time, horaFin1,frecuencia, estado, etiqueta);
+        TareaDatos datosNuevos = new TareaDatos(titulo, fechaInic, fechaFin, descripcion, sitio, time, horaFin1, frecuencia, tareaMos.getIdFamilia(), etiqueta);
+        GestorTareas.getGestorTareas().modificarTarea(tareaMos, datosNuevos, estado);
         cerrarTodo();
     }
 }

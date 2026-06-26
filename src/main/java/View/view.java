@@ -1,7 +1,7 @@
 package View;
 
-import Model.GestorTareas;
-import Model.Tarea;
+import model.GestorTareas;
+import model.Tarea;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -97,7 +97,7 @@ public class view {
         FXMLLoader fxmlLoader = new FXMLLoader(view.class.getResource("/View/crearTarea.fxml"), bundle);
         Scene scene = new Scene(fxmlLoader.load(), 600, 500);
 
-        Controller.CrearTareaController controlador = fxmlLoader.getController();
+        controller.CrearTareaController controlador = fxmlLoader.getController();
         controlador.initialize(fecha, hora);
 
         Stage stage1 = new Stage();
@@ -111,7 +111,7 @@ public class view {
         FXMLLoader fxmlLoader = new FXMLLoader(view.class.getResource("/View/modificarTarea.fxml"), bundle);
         Scene scene = new Scene(fxmlLoader.load(), 600, 500);
 
-        Controller.ModificarTareaController controlador = fxmlLoader.getController();
+        controller.ModificarTareaController controlador = fxmlLoader.getController();
         controlador.setTareaMos(tarea);
 
         Stage stage1 = new Stage();
@@ -125,7 +125,7 @@ public class view {
         FXMLLoader fxmlLoader = new FXMLLoader(view.class.getResource("/View/menuConfirmacionPer.fxml"), bundle);
         Scene scene = new Scene(fxmlLoader.load(), 600, 222);
 
-        Controller.MenuConfirmacionBorrarController controlador = fxmlLoader.getController();
+        controller.MenuConfirmacionBorrarController controlador = fxmlLoader.getController();
         controlador.setTareaMos(tarea);
 
         Stage stage1 = new Stage();

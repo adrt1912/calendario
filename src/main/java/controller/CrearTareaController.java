@@ -1,9 +1,6 @@
-package Controller;
+package controller;
 
-import Model.Etiqueta;
-import Model.GestorTareas;
-import Model.Periodicidad;
-import Model.Tarea;
+import model.*;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -68,9 +65,7 @@ public class CrearTareaController {
 
         // Listener inteligente para la coherencia de fechas, para que la fin no sea antes que la inicio
         texFecha.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) {
-                if (textFechaFin.getValue() == null || textFechaFin.getValue().isBefore(newValue)) textFechaFin.setValue(newValue);
-            }
+                if (newValue != null&&(textFechaFin.getValue() == null || textFechaFin.getValue().isBefore(newValue))) textFechaFin.setValue(newValue);
         });
     }
 
@@ -136,7 +131,7 @@ public class CrearTareaController {
         } else {
             //se crea la tarea
             String idFamiliaUnico = java.util.UUID.randomUUID().toString();
-            Tarea tarea = GestorTareas.getGestorTareas().anadirTarea(titulo, fechaInicio,fechaFin, descripcion, sitio, horaInicio, horaFin, frecuencia, idFamiliaUnico, etiqueta);
+            Tarea tarea = GestorTareas.getGestorTareas().anadirTarea(new TareaDatos(titulo, fechaInicio,fechaFin, descripcion, sitio, horaInicio, horaFin, frecuencia, idFamiliaUnico, etiqueta));
 
             if (tarea != null && frecuencia != Periodicidad.NUNCA) tratarTareasPeriodicas(tarea);
             Stage ventanaActual = (Stage) botonCancelar.getScene().getWindow();
@@ -152,7 +147,7 @@ public class CrearTareaController {
         for(int i=1;i<40;i++){
             LocalDate fechaNuevoInicio=tarea.getFechaInicio().plusDays((long) i *dias).plusMonths((long) i *mes).plusYears((long) i *anio);
             LocalDate nuevafechaFin=tarea.getFechaFin().plusDays((long)i*dias).plusMonths((long)i*mes).plusYears((long) i*anio);
-            GestorTareas.getGestorTareas().anadirTarea(tarea.getNombreTarea(), fechaNuevoInicio, nuevafechaFin, tarea.getDescripcion(), tarea.getSitio(), tarea.getHoraInicio(), tarea.getHoraFin(), tarea.getFrecuencia(), tarea.getIdFamilia(), tarea.getEtiqueta());
+            GestorTareas.getGestorTareas().anadirTarea(new TareaDatos(tarea.getNombreTarea(), fechaNuevoInicio, nuevafechaFin, tarea.getDescripcion(), tarea.getSitio(), tarea.getHoraInicio(), tarea.getHoraFin(), tarea.getFrecuencia(), tarea.getIdFamilia(), tarea.getEtiqueta()));
         }
     }
 

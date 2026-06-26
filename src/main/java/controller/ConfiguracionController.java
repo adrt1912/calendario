@@ -1,9 +1,9 @@
-package Controller;
+package controller;
 
-import Model.ConexionBD;
-import Model.GestionEnFicheros;
-import Model.GestorTareas;
-import Model.Idiomas;
+import model.ConexionBD;
+import model.GestionEnFicheros;
+import model.GestorTareas;
+import model.Idiomas;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -15,6 +15,7 @@ import View.view;
 import java.io.File;
 import java.io.IOException;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
 public class ConfiguracionController {
@@ -26,6 +27,8 @@ public class ConfiguracionController {
 
     @FXML
     private Button botonCancelar;
+
+    private static final String textoDark = "dark-mode";  // Compliant
 
     @FXML
     private Pane rootPane;
@@ -43,6 +46,8 @@ public class ConfiguracionController {
     private boolean borrar=false;
     private boolean cambiarMdooVisual=false;
     private boolean descargarICS=false;
+
+    Logger logger = Logger.getLogger(getClass().getName());
 
     //Llama al metodo para crear un CSV
     @FXML
@@ -64,7 +69,7 @@ public class ConfiguracionController {
         boolean isDark = prefs.getBoolean("modo_oscuro", false);
         checkModoOscuro.setSelected(isDark);
         // Si estaba guardado como oscuro, pintamos el rootPane
-        if (isDark) rootPane.getStyleClass().add("dark-mode");
+        if (isDark) rootPane.getStyleClass().add(textoDark);
     }
 
     //Al clicar en el boton se pone a true, y solo se borra si se da a guardar y salir
@@ -108,7 +113,7 @@ public class ConfiguracionController {
         try {
             view.showInitialView();
         } catch (Exception e) {
-            System.out.println("Error al recargar el menú principal: " + e.getMessage());
+            logger.info("Error al recargar el menú principal: " + e.getMessage());
         }
     }
 
@@ -144,11 +149,9 @@ public class ConfiguracionController {
 
         //Se recorren todas las ventanas aberitas y se les cambia el color
         for (Window ventanaAbierta : Window.getWindows()) {
-            if (ventanaAbierta.getScene() != null && ventanaAbierta.getScene().getRoot() != null) {
-                if (activado){
-                    if (!ventanaAbierta.getScene().getRoot().getStyleClass().contains("dark-mode")) ventanaAbierta.getScene().getRoot().getStyleClass().add("dark-mode");
-                    else ventanaAbierta.getScene().getRoot().getStyleClass().remove("dark-mode");
-                }
+            if (ventanaAbierta.getScene() != null && ventanaAbierta.getScene().getRoot() != null && activado) {
+                    if (!ventanaAbierta.getScene().getRoot().getStyleClass().contains(textoDark)) ventanaAbierta.getScene().getRoot().getStyleClass().add(textoDark);
+                    else ventanaAbierta.getScene().getRoot().getStyleClass().remove(textoDark);
             }
         }
     }
@@ -182,7 +185,8 @@ public class ConfiguracionController {
 
         // 4. Ordenamos a la vista reabrir la ventana de Login/Bloqueo
         View.view.showPINInsert();
-    } catch (Exception e) {System.err.println("Error al intentar cambiar de usuario: " + e.getMessage());}
+    } catch (Exception e) {
+        logger.info("Error al intentar cambiar de usuario: " + e.getMessage());}
     }
 
     @FXML
@@ -210,13 +214,13 @@ public class ConfiguracionController {
 
     @FXML
     private void onCambiarPinClick() {
-
         String nuevoPin = txtNuevoPin.getText();
 
         if (nuevoPin == null || nuevoPin.isBlank()) {
             mostrarAlerta("Campo vacío", "Por favor, introduce un nuevo PIN.", javafx.scene.control.Alert.AlertType.WARNING);
             return;
-        }if (nuevoPin.length() != 4) {
+        }else if (nuevoPin.length() <= 4) {
+            //longitud maxima de la contraseña
             mostrarAlerta("Seguridad", "El PIN de seguridad debe tener exactamente 4 dígitos.", javafx.scene.control.Alert.AlertType.WARNING);
             return;
         }

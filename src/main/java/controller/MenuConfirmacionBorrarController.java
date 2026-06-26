@@ -1,7 +1,7 @@
-package Controller;
+package controller;
 
-import Model.GestorTareas;
-import Model.Tarea;
+import model.GestorTareas;
+import model.Tarea;
 import javafx.fxml.FXML;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;

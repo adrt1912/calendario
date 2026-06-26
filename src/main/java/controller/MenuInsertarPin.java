@@ -1,7 +1,7 @@
-package Controller;
+package controller;
 
-import Model.ConexionBD;
-import Model.GestorTareas;
+import model.ConexionBD;
+import model.GestorTareas;
 import View.view;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
