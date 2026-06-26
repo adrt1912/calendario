@@ -14,7 +14,6 @@ import javafx.util.Duration;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.prefs.Preferences;
 
 import static javafx.scene.paint.Color.web;
 
@@ -23,8 +22,6 @@ public class TareaVisualizer {
     //Patron singletone
     private static final TareaVisualizer tareaVisualizer=new TareaVisualizer();
     private TareaVisualizer (){}
-
-    private final Preferences prefs = Preferences.userNodeForPackage(GestorTareas.class);
 
     public static TareaVisualizer getTareaVisualizer() {
         return tareaVisualizer;

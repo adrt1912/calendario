@@ -30,7 +30,7 @@
                                 <Insets bottom="5.0" />
                             </VBox.margin>
                         </TextField>
-                        <PasswordField fx:id="campoContraseña" alignment="CENTER" maxWidth="220.0" onAction="#comprobarPIN" prefHeight="35.0" promptText="••••" style="-fx-background-radius: 6px; -fx-border-radius: 6px; -fx-font-size: 15px;" />
+                        <PasswordField fx:id="campoContrasenia" alignment="CENTER" maxWidth="220.0" onAction="#comprobarPIN" prefHeight="35.0" promptText="••••" style="-fx-background-radius: 6px; -fx-border-radius: 6px; -fx-font-size: 15px;" />
                     </children>
                 </VBox>
 

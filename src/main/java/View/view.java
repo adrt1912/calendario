@@ -4,7 +4,6 @@ import Model.GestorTareas;
 import Model.Tarea;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -17,7 +16,7 @@ public class view {
 
     private static Stage stage;
 
-    // Método para fijar el stage que viene de la Application
+    // Metodo para fijar el stage que viene de la Application
     public static void setPrimaryStage(Stage s) {
         stage = s;
     }

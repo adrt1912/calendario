@@ -48,7 +48,7 @@
                         <Font size="13.0" />
                      </font>
                   </Text>
-                  <PasswordField fx:id="campoContraseña" prefHeight="32.0" promptText="••••" style="-fx-background-radius: 6px; -fx-border-radius: 6px;" />
+                  <PasswordField fx:id="campoContrasenia" prefHeight="32.0" promptText="••••" style="-fx-background-radius: 6px; -fx-border-radius: 6px;" />
                </children>
             </VBox>
 
@@ -59,7 +59,7 @@
                         <Font size="13.0" />
                      </font>
                   </Text>
-                  <PasswordField fx:id="campoConfirmarContraseña" prefHeight="32.0" promptText="••••" style="-fx-background-radius: 6px; -fx-border-radius: 6px;" />
+                  <PasswordField fx:id="campoConfirmarContrasenia" prefHeight="32.0" promptText="••••" style="-fx-background-radius: 6px; -fx-border-radius: 6px;" />
                </children>
             </VBox>
 

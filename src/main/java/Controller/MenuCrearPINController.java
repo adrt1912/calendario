@@ -19,13 +19,16 @@ public class MenuCrearPINController {
     private AnchorPane rootPane;
 
     @FXML
-    private PasswordField campoContraseña;
+    private PasswordField campoContrasenia;
 
     @FXML
-    private PasswordField campoConfirmarContraseña;
+    private PasswordField campoConfirmarContrasenia;
 
     @FXML
     private Button botonCancelar;
+
+    @FXML
+    private Text textoError;
 
     @FXML
     private TextField campoNuevoUsuario;
@@ -45,13 +48,11 @@ public class MenuCrearPINController {
         ventanaActual.close();
     }
 
-    @FXML
-    private Text textoError;
 
     @FXML
     private void guardarPIN(){
-        String pin = campoContraseña.getText();
-        String confirmacion = campoConfirmarContraseña.getText();
+        String pin = campoContrasenia.getText();
+        String confirmacion = campoConfirmarContrasenia.getText();
         String nomUsuario=campoNuevoUsuario.getText();
 
         // Cargamos el diccionario de idiomas activo (ES, EN, EU, FR, DE)

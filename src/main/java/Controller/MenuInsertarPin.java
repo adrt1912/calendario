@@ -23,7 +23,7 @@ public class MenuInsertarPin {
     private TextField boxUsuarios;
 
     @FXML
-    private PasswordField campoContraseña;
+    private PasswordField campoContrasenia;
 
     @FXML
     private Text err;
@@ -39,7 +39,7 @@ public class MenuInsertarPin {
     @FXML
     private void comprobarPIN() {
         String usuario = boxUsuarios.getText();
-        String pin = campoContraseña.getText();
+        String pin = campoContrasenia.getText();
         ResourceBundle bundle = GestorTareas.getGestorTareas().obtenerDiccionario();
 
         if (usuario == null || usuario.isBlank() || pin == null || pin.isBlank()) {
@@ -70,12 +70,11 @@ public class MenuInsertarPin {
                     GestorTareas.getGestorTareas().verificarTareasHoy();
                 } catch (Exception e) {
                     err.setText("Error crítico al cargar el menú principal");
-                    e.printStackTrace();
                 }
             });
         } else {
-            campoContraseña.clear();
-            campoContraseña.requestFocus();
+            campoContrasenia.clear();
+            campoContrasenia.requestFocus();
             err.setText("Usuario o PIN incorrectos. Inténtalo de nuevo.");
         }
     }

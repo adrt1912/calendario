@@ -2,7 +2,6 @@ package Model;
 
 import Utils.SeguridadUtils;
 
-import javax.crypto.spec.SecretKeySpec;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -363,8 +362,6 @@ public class ConexionBD {
         }
     }
 
-
-
     public boolean cambiarPin(String nuevoPin){
 
         var claveVieja = GestorTareas.getGestorTareas().getClaveCifradoActiva();
@@ -392,11 +389,11 @@ public class ConexionBD {
 
             int numa = ps1.executeUpdate();
             if(numa == 1){
-                // 1. Purgamos del disco las etiquetas encriptadas con el PIN viejo
+                //  Purgamos del disco las etiquetas encriptadas con el PIN viejo
                 psEtiquetas.setInt(1, idUsuarioCambiar);
                 psEtiquetas.executeUpdate();
 
-                // 2. Insertamos las etiquetas en lote con el nuevo cifrado
+                //  Insertamos las etiquetas en lote con el nuevo cifrado
                 for (Etiqueta etiqueta : GestorTareas.getGestorTareas().getListaEtiquetas()) {
                     if (!etiqueta.nombreEtiqueta().equals("Sin Etiqueta")) {
 
@@ -408,7 +405,7 @@ public class ConexionBD {
                 }
                 psInsertEtiqueta.executeBatch();
 
-                // 3. Modificamos todas las tareas del usuario aplicando el nuevo escudo AES
+                // Modificamos todas las tareas del usuario aplicando el nuevo escudo AES
                 for (Tarea tarea : GestorTareas.getGestorTareas().getTodasTareas()) {
                     psTareas.setString(1, SeguridadUtils.cifrarTexto(tarea.getNombreTarea(), claveNueva));
                     psTareas.setString(2, tarea.getFechaInicio() != null ? tarea.getFechaInicio().toString() : null);
@@ -428,7 +425,7 @@ public class ConexionBD {
                 }
                 psTareas.executeBatch();
 
-                // 4. Actualizamos la clave en memoria RAM y consolidamos los cambios en el archivo .db
+                //  Actualizamos la clave en memoria RAM y consolidamos los cambios en el archivo .db
                 GestorTareas.getGestorTareas().setClaveCifradoActiva(claveNueva);
                 c.commit();
                 return true;
