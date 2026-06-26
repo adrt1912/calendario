@@ -2,7 +2,7 @@ package controller;
 
 import model.ConexionBD;
 import model.GestorTareas;
-import View.view;
+import view.View;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
@@ -59,14 +59,14 @@ public class MenuInsertarPin {
             // 2. Saltamos al calendario en el hilo gráfico
             Platform.runLater(() -> {
                 try {
-                    Stage stagePrincipal = view.getPrimaryStage();
+                    Stage stagePrincipal = View.getPrimaryStage();
                     stagePrincipal.setOnCloseRequest(event -> {
                         event.consume();
                         stagePrincipal.hide();
                     });
 
                     // Renderiza la vista leyendo el nuevo idioma cargado
-                    view.showInitialView();
+                    View.showInitialView();
                     GestorTareas.getGestorTareas().verificarTareasHoy();
                 } catch (Exception e) {
                     err.setText("Error crítico al cargar el menú principal");
@@ -93,12 +93,12 @@ public class MenuInsertarPin {
 
             Platform.runLater(() -> {
                 try {
-                    Stage stagePrincipal = view.getPrimaryStage();
+                    Stage stagePrincipal = View.getPrimaryStage();
                     stagePrincipal.setOnCloseRequest(event -> {
                         event.consume();
                         stagePrincipal.hide();
                     });
-                    view.showInitialView();
+                    View.showInitialView();
                     GestorTareas.getGestorTareas().verificarTareasHoy();
                 } catch (Exception e) {
                     err.setText("Error al entrar como Invitado");
@@ -110,7 +110,7 @@ public class MenuInsertarPin {
     @FXML
     private void abrirRegistroNuevoUsuario(){
         try {
-            view.showCrearPIN();
+            View.showCrearPIN();
         } catch (Exception e) {
             err.setText("Error al abrir la ventana de registro");
         }

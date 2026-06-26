@@ -27,7 +27,7 @@ public class ConexionBD {
         return conexionBD;
     }
 
-    // Método de conexión limpio y estándar
+    // MEtodo de conexión limpio y estándar
     private Connection obtenerConexion() throws SQLException {
         Connection c = DriverManager.getConnection(URL);
         try (Statement stmt = c.createStatement()) {
@@ -96,64 +96,76 @@ public class ConexionBD {
         }
     }
 
-    // Submétodo privado para extraer tareas (Especificando las columnas exactas del SELECT)
     private void cargarTareasDesdeBD(Connection c, int idObtenido, javax.crypto.spec.SecretKeySpec clave) throws SQLException {
         String sqlTareas = "SELECT Titulo, FechaInicio, FechaFin, EstadoTarea, HoraInicio, HoraFin, Frecuencia, Descripcion, Sitio, idTarea, idFamilia, Etiqueta FROM Tarea WHERE usuario_id = ?";
+
         try (PreparedStatement ps = c.prepareStatement(sqlTareas)) {
             ps.setInt(1, idObtenido);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    String titulo = SeguridadUtils.descifrarTexto(rs.getString("Titulo"), clave);
-                    String descripcion = SeguridadUtils.descifrarTexto(rs.getString("Descripcion"), clave);
-                    String sitio = SeguridadUtils.descifrarTexto(rs.getString("Sitio"), clave);
-                    String etiqueta = SeguridadUtils.descifrarTexto(rs.getString("Etiqueta"), clave);
-
-                    String fechaInicStr = rs.getString("FechaInicio");
-                    LocalDate fechainic = (fechaInicStr != null && !fechaInicStr.isBlank() && !fechaInicStr.equals("null"))
-                            ? LocalDate.parse(fechaInicStr) : null;
-
-                    String fechaFinS = rs.getString("FechaFin");
-                    LocalDate fechaFin = (fechaFinS != null && !fechaFinS.isBlank() && !fechaFinS.equals("null"))
-                            ? LocalDate.parse(fechaFinS) : null;
-
-                    String estadoTareaS = rs.getString("EstadoTarea");
-                    EstadoTarea estadoTarea = null;
-                    if (estadoTareaS != null && !estadoTareaS.isBlank() && !estadoTareaS.equals("null")) {
-                        estadoTarea = EstadoTarea.valueOf(estadoTareaS);
-                    }
-
-                    String horaInicioStr = rs.getString("HoraInicio");
-                    LocalTime timeInicio = (horaInicioStr != null && !horaInicioStr.isBlank() && !horaInicioStr.equals("null"))
-                            ? LocalTime.parse(horaInicioStr) : null;
-
-                    String horaFinStr = rs.getString("HoraFin");
-                    LocalTime timeFin = (horaFinStr != null && !horaFinStr.isBlank() && !horaFinStr.equals("null"))
-                            ? LocalTime.parse(horaFinStr) : null;
-
-                    String frecuenciaStr = rs.getString("Frecuencia");
-                    Periodicidad frecuencia = (frecuenciaStr != null && !frecuenciaStr.isBlank() && !frecuenciaStr.equals("null"))
-                            ? Periodicidad.valueOf(frecuenciaStr) : null;
-
-                    String idTarea = rs.getString("idTarea");
-                    String idFamilia = rs.getString("idFamilia");
-
-                    Etiqueta etiquetaAsignada = null;
-                    if (etiqueta != null) {
-                        etiquetaAsignada = GestorTareas.getGestorTareas().getListaEtiquetas().stream()
-                                .filter(e -> e.nombreEtiqueta() != null && e.nombreEtiqueta().equals(etiqueta))
-                                .findFirst()
-                                .orElse(null);
-                    }
-
-                    // 🚀 Usamos el constructor refactorizado acoplándolo al record TareaDatos
-                    TareaDatos datos = new TareaDatos(titulo, fechainic, fechaFin, descripcion, sitio, timeInicio, timeFin, frecuencia, idFamilia, etiquetaAsignada);
-                    Tarea tarea = new Tarea(datos, estadoTarea);
-                    if (idTarea != null) tarea.setIdTarea(idTarea);
-
-                    GestorTareas.getGestorTareas().aniadirTareaAListaDeDocumento(tarea);
+                    // Procesamos cada fila de forma independiente
+                    procesarFilaTarea(rs, clave);
                 }
             }
         }
+    }
+
+    //  submetodo aislado para procesar la fila individualmente (Mantiene la claridad)
+    private void procesarFilaTarea(ResultSet rs, javax.crypto.spec.SecretKeySpec clave) throws SQLException {
+        String titulo = SeguridadUtils.descifrarTexto(rs.getString("Titulo"), clave);
+        String descripcion = SeguridadUtils.descifrarTexto(rs.getString("Descripcion"), clave);
+        String sitio = SeguridadUtils.descifrarTexto(rs.getString("Sitio"), clave);
+        String etiqueta = SeguridadUtils.descifrarTexto(rs.getString("Etiqueta"), clave);
+
+        // Parseos limpios usando los ayudantes de abajo
+        LocalDate fechainic = parsearFecha(rs.getString("FechaInicio"));
+        LocalDate fechaFin = parsearFecha(rs.getString("FechaFin"));
+
+        String estadoTareaS = rs.getString("EstadoTarea");
+        EstadoTarea estadoTarea = esCadenaValida(estadoTareaS) ? EstadoTarea.valueOf(estadoTareaS) : null;
+
+        LocalTime timeInicio = parsearHora(rs.getString("HoraInicio"));
+        LocalTime timeFin = parsearHora(rs.getString("HoraFin"));
+
+        String frecuenciaStr = rs.getString("Frecuencia");
+        Periodicidad frecuencia = esCadenaValida(frecuenciaStr) ? Periodicidad.valueOf(frecuenciaStr) : null;
+
+        String idTarea = rs.getString("idTarea");
+        String idFamilia = rs.getString("idFamilia");
+
+        Etiqueta etiquetaAsignada = buscarEtiquetaEnLista(etiqueta);
+
+        // Construcción limpia con el record
+        TareaDatos datos = new TareaDatos(titulo, fechainic, fechaFin, descripcion, sitio, timeInicio, timeFin, frecuencia, idFamilia, etiquetaAsignada);
+        Tarea tarea = new Tarea(datos, estadoTarea);
+
+        if (idTarea != null) {
+            tarea.setIdTarea(idTarea);
+        }
+
+        GestorTareas.getGestorTareas().aniadirTareaAListaDeDocumento(tarea);
+    }
+
+    private boolean esCadenaValida(String str) {
+        return str != null && !str.isBlank() && !"null".equals(str);
+    }
+
+    private LocalDate parsearFecha(String fechaStr) {
+        return esCadenaValida(fechaStr) ? LocalDate.parse(fechaStr) : null;
+    }
+
+    private LocalTime parsearHora(String horaStr) {
+        return esCadenaValida(horaStr) ? LocalTime.parse(horaStr) : null;
+    }
+
+    private Etiqueta buscarEtiquetaEnLista(String nombreEtiqueta) {
+        if (nombreEtiqueta == null) {
+            return null;
+        }
+        return GestorTareas.getGestorTareas().getListaEtiquetas().stream()
+                .filter(e -> e.nombreEtiqueta() != null && e.nombreEtiqueta().equals(nombreEtiqueta))
+                .findFirst()
+                .orElse(null);
     }
 
     // Borra una tarea de la BD
@@ -390,38 +402,15 @@ public class ConexionBD {
 
             int numa = ps1.executeUpdate();
             if(numa == 1){
+                // Purgamos y re-encriptamos las etiquetas del usuario
                 psEtiquetas.setInt(1, idUsuarioCambiar);
                 psEtiquetas.executeUpdate();
+                reencriptarEtiquetasBatch(psInsertEtiqueta, idUsuarioCambiar, claveNueva);
 
-                psInsertEtiqueta.setInt(3, idUsuarioCambiar);
-                for (Etiqueta etiqueta : GestorTareas.getGestorTareas().getListaEtiquetas()) {
-                    if (!etiqueta.nombreEtiqueta().equals("Sin Etiqueta")) {
-                        psInsertEtiqueta.setString(1, SeguridadUtils.cifrarTexto(etiqueta.nombreEtiqueta(), claveNueva));
-                        psInsertEtiqueta.setString(2, etiqueta.codColor());
-                        psInsertEtiqueta.addBatch();
-                    }
-                }
-                psInsertEtiqueta.executeBatch();
+                // Modificamos todas las tareas aplicando el nuevo escudo AES
+                reencriptarTareasBatch(psTareas, idUsuarioCambiar, claveNueva);
 
-                psTareas.setInt(12, idUsuarioCambiar);
-                for (Tarea tarea : GestorTareas.getGestorTareas().getTodasTareas()) {
-                    psTareas.setString(1, SeguridadUtils.cifrarTexto(tarea.getNombreTarea(), claveNueva));
-                    psTareas.setString(2, tarea.getFechaInicio() != null ? tarea.getFechaInicio().toString() : null);
-                    psTareas.setString(3, tarea.getFechaFin() != null ? tarea.getFechaFin().toString() : null);
-                    psTareas.setString(4, tarea.getEstadoTarea() != null ? tarea.getEstadoTarea().name() : null);
-                    psTareas.setString(5, tarea.getHoraInicio() != null ? tarea.getHoraInicio().toString() : null);
-                    psTareas.setString(6, tarea.getHoraFin() != null ? tarea.getHoraFin().toString() : null);
-                    psTareas.setString(7, tarea.getFrecuencia() != null ? tarea.getFrecuencia().name() : null);
-                    psTareas.setString(8, SeguridadUtils.cifrarTexto(tarea.getDescripcion(), claveNueva));
-                    psTareas.setString(9, SeguridadUtils.cifrarTexto(tarea.getSitio(), claveNueva));
-                    psTareas.setString(10, tarea.getIdFamilia());
-                    psTareas.setString(11, tarea.getEtiqueta() != null ? SeguridadUtils.cifrarTexto(tarea.getEtiqueta().nombreEtiqueta(), claveNueva) : null);
-                    psTareas.setString(13, tarea.getIdTarea()); // Filtro WHERE
-
-                    psTareas.addBatch();
-                }
-                psTareas.executeBatch();
-
+                //  Actualizamos la clave en memoria RAM y consolidamos los cambios en el archivo .db
                 GestorTareas.getGestorTareas().setClaveCifradoActiva(claveNueva);
                 c.commit();
                 return true;
@@ -435,5 +424,44 @@ public class ConexionBD {
             logger.error("Error crítico al re-cifrar los registros por cambio de PIN: ", e);
             return false;
         }
+    }
+
+    //  SUBMeTODO 1: Aísla el procesamiento por lotes de las etiquetas
+    private void reencriptarEtiquetasBatch(PreparedStatement psInsert, int idUsuario, javax.crypto.spec.SecretKeySpec claveNueva) throws SQLException {
+        psInsert.setInt(3, idUsuario);
+        for (Etiqueta etiqueta : GestorTareas.getGestorTareas().getListaEtiquetas()) {
+            if (!"Sin Etiqueta".equals(etiqueta.nombreEtiqueta())) {
+                psInsert.setString(1, SeguridadUtils.cifrarTexto(etiqueta.nombreEtiqueta(), claveNueva));
+                psInsert.setString(2, etiqueta.codColor());
+                psInsert.addBatch();
+            }
+        }
+        psInsert.executeBatch();
+    }
+
+    // SUBMeTODO 2: Controla de forma limpia el bucle de actualización masiva de tareas
+    private void reencriptarTareasBatch(PreparedStatement psTareas, int idUsuario, javax.crypto.spec.SecretKeySpec claveNueva) throws SQLException {
+        psTareas.setInt(12, idUsuario);
+        for (Tarea tarea : GestorTareas.getGestorTareas().getTodasTareas()) {
+            mapearParametrosTareaBatch(psTareas, tarea, claveNueva);
+            psTareas.addBatch();
+        }
+        psTareas.executeBatch();
+    }
+
+    //  SUBMeTODO 3: Absorbe la batería de operadores ternarios para que no penalicen el flujo principal
+    private void mapearParametrosTareaBatch(PreparedStatement ps, Tarea tarea, javax.crypto.spec.SecretKeySpec claveNueva) throws SQLException {
+        ps.setString(1, SeguridadUtils.cifrarTexto(tarea.getNombreTarea(), claveNueva));
+        ps.setString(2, tarea.getFechaInicio() != null ? tarea.getFechaInicio().toString() : null);
+        ps.setString(3, tarea.getFechaFin() != null ? tarea.getFechaFin().toString() : null);
+        ps.setString(4, tarea.getEstadoTarea() != null ? tarea.getEstadoTarea().name() : null);
+        ps.setString(5, tarea.getHoraInicio() != null ? tarea.getHoraInicio().toString() : null);
+        ps.setString(6, tarea.getHoraFin() != null ? tarea.getHoraFin().toString() : null);
+        ps.setString(7, tarea.getFrecuencia() != null ? tarea.getFrecuencia().name() : null);
+        ps.setString(8, SeguridadUtils.cifrarTexto(tarea.getDescripcion(), claveNueva));
+        ps.setString(9, SeguridadUtils.cifrarTexto(tarea.getSitio(), claveNueva));
+        ps.setString(10, tarea.getIdFamilia());
+        ps.setString(11, tarea.getEtiqueta() != null ? SeguridadUtils.cifrarTexto(tarea.getEtiqueta().nombreEtiqueta(), claveNueva) : null);
+        ps.setString(13, tarea.getIdTarea()); // Filtro WHERE
     }
 }

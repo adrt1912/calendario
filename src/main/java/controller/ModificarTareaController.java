@@ -1,7 +1,7 @@
 package controller;
 
 import model.*;
-import View.view;
+import view.View;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -116,7 +116,7 @@ public void setTareaMos(Tarea tareaMos) {
 private void eliminarTarea(){//En caso de que sea periodica sale una pantalla emergente
     if(tareaMos.getFrecuencia()!=Periodicidad.NUNCA){
         try{
-            view.showConfirmacionEl(tareaMos);
+            View.showConfirmacionEl(tareaMos);
         } catch (Exception e) {
             throw new RuntimeException(e) ;
         }

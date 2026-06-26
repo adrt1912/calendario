@@ -1,4 +1,4 @@
-package View;
+package view;
 
 import model.GestorTareas;
 import model.Tarea;
@@ -12,9 +12,11 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
-public class view {
+public class View {
 
     private static Stage stage;
+
+    private View(){}
 
     // Metodo para fijar el stage que viene de la Application
     public static void setPrimaryStage(Stage s) {
@@ -45,7 +47,7 @@ public class view {
         if (stage == null) stage = new Stage();
 
         ResourceBundle bundle = obtenerBundleActual();
-        FXMLLoader fxmlLoader = new FXMLLoader(view.class.getResource("/View/MenuPrincipal.fxml"), bundle);
+        FXMLLoader fxmlLoader = new FXMLLoader(View.class.getResource("/view/MenuPrincipal.fxml"), bundle);
         Scene scene = new Scene(fxmlLoader.load(), 1800, 900);
 
         if (prefs.getBoolean("modo_oscuro", false)) scene.getRoot().getStyleClass().add("dark-mode");
@@ -64,7 +66,7 @@ public class view {
         ResourceBundle bundle = obtenerBundleActual();
 
         // CRITICAL: Asegúrate de que el archivo se llame EXACTAMENTE "menuPIN.fxml" (revisa las mayúsculas)
-        FXMLLoader fxmlLoader = new FXMLLoader(view.class.getResource("/View/menuInsertarPin.fxml"), bundle);
+        FXMLLoader fxmlLoader = new FXMLLoader(View.class.getResource("/view/menuInsertarPin.fxml"), bundle);
         Scene scene = new Scene(fxmlLoader.load(), 600, 500);
 
         if (stage == null) stage = new Stage();
@@ -80,7 +82,7 @@ public class view {
         ResourceBundle bundle = obtenerBundleActual();
 
         // CRITICAL: Asegúrate de que el archivo se llame EXACTAMENTE "menuPIN.fxml" (revisa las mayúsculas)
-        FXMLLoader fxmlLoader = new FXMLLoader(view.class.getResource("/View/menuCrearPin.fxml"), bundle);
+        FXMLLoader fxmlLoader = new FXMLLoader(View.class.getResource("/view/menuCrearPin.fxml"), bundle);
         Scene scene = new Scene(fxmlLoader.load(), 600, 500);
 
         Stage ventanaModal = new Stage();
@@ -94,7 +96,7 @@ public class view {
 
     public static void showCrearTArea(LocalDate fecha, LocalTime hora) throws IOException {
         ResourceBundle bundle = obtenerBundleActual();
-        FXMLLoader fxmlLoader = new FXMLLoader(view.class.getResource("/View/crearTarea.fxml"), bundle);
+        FXMLLoader fxmlLoader = new FXMLLoader(View.class.getResource("/view/crearTarea.fxml"), bundle);
         Scene scene = new Scene(fxmlLoader.load(), 600, 500);
 
         controller.CrearTareaController controlador = fxmlLoader.getController();
@@ -108,7 +110,7 @@ public class view {
 
     public static void showTareaVentana(Tarea tarea) throws IOException {
         ResourceBundle bundle = obtenerBundleActual();
-        FXMLLoader fxmlLoader = new FXMLLoader(view.class.getResource("/View/modificarTarea.fxml"), bundle);
+        FXMLLoader fxmlLoader = new FXMLLoader(View.class.getResource("/view/modificarTarea.fxml"), bundle);
         Scene scene = new Scene(fxmlLoader.load(), 600, 500);
 
         controller.ModificarTareaController controlador = fxmlLoader.getController();
@@ -122,7 +124,7 @@ public class view {
 
     public static void showConfirmacionEl(Tarea tarea) throws IOException {
         ResourceBundle bundle = obtenerBundleActual();
-        FXMLLoader fxmlLoader = new FXMLLoader(view.class.getResource("/View/menuConfirmacionPer.fxml"), bundle);
+        FXMLLoader fxmlLoader = new FXMLLoader(View.class.getResource("/view/menuConfirmacionPer.fxml"), bundle);
         Scene scene = new Scene(fxmlLoader.load(), 600, 222);
 
         controller.MenuConfirmacionBorrarController controlador = fxmlLoader.getController();
@@ -136,7 +138,7 @@ public class view {
 
     public static void showNuevaEtiqueta() throws IOException {
         ResourceBundle bundle = obtenerBundleActual();
-        FXMLLoader fxmlLoader = new FXMLLoader(view.class.getResource("/View/crearEtiqueta.fxml"), bundle);
+        FXMLLoader fxmlLoader = new FXMLLoader(View.class.getResource("/view/crearEtiqueta.fxml"), bundle);
         Scene scene = new Scene(fxmlLoader.load(), 600, 232);
 
         Stage stage1 = new Stage();
@@ -147,7 +149,7 @@ public class view {
 
     public static void showConfiguracionMenu() throws IOException {
         ResourceBundle bundle = obtenerBundleActual();
-        FXMLLoader fxmlLoader = new FXMLLoader(view.class.getResource("/View/menuConfiguracion.fxml"), bundle);
+        FXMLLoader fxmlLoader = new FXMLLoader(View.class.getResource("/view/menuConfiguracion.fxml"), bundle);
         Scene scene = new Scene(fxmlLoader.load(), 600, 600);
 
         Stage stage1 = new Stage();

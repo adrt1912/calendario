@@ -26,13 +26,13 @@ public class CalendarioRender {
     //Patrón singletone
     private static CalendarioRender calendarioRender;
 
-    private static final String textoDark = "modo_oscuro";
+    private static final String TEXTO_DARK = "modo_oscuro";
 
-    private static final String textTransparente ="transparent";
+    private static final String TEXT_TRANSPARENTE ="transparent";
 
-    private static final String textcodColor1 = "#333333";
+    private static final String TEXTCOD_COLOR_1 = "#333333";
 
-    private static final String textcodColor2 ="#e4e4e4";
+    private static final String TEXTCOD_COLOR_2 ="#e4e4e4";
 
     public static CalendarioRender getCalendarioRender() {
         if (calendarioRender == null) calendarioRender = new CalendarioRender();
@@ -103,11 +103,11 @@ public class CalendarioRender {
                 casillaActual.setOnDragExited(null);
                 casillaActual.setOnDragDropped(null);
 
-                boolean esOscuro = prefs.getBoolean(textoDark, false);
+                boolean esOscuro = prefs.getBoolean(TEXTO_DARK, false);
                 String colorBorde = esOscuro ? "#555555" : "#666666";
-                String colorFondo=textTransparente;
+                String colorFondo= TEXT_TRANSPARENTE;
 
-                if(j==6||j==5) colorFondo = prefs.getBoolean(textoDark,false) ? textcodColor1 : textcodColor2;
+                if(j==6||j==5) colorFondo = prefs.getBoolean(TEXTO_DARK,false) ? TEXTCOD_COLOR_1 : TEXTCOD_COLOR_2;
                 casillaActual.setStyle("-fx-background-color: " + colorFondo + "; " +
                         "-fx-border-color: " + colorBorde + "; " +
                         "-fx-border-width: 0 1 1 0; " +
@@ -150,8 +150,8 @@ public class CalendarioRender {
                         casillaActual.setOnDragExited(event -> {
                             String colorOriginal;
 
-                            if (finalJ == 5 || finalJ == 6) colorOriginal = prefs.getBoolean("modo_oscuro", false) ? textcodColor1 : textcodColor2;
-                            else {colorOriginal = textTransparente;}
+                            if (finalJ == 5 || finalJ == 6) colorOriginal = prefs.getBoolean("modo_oscuro", false) ? TEXTCOD_COLOR_1 : TEXTCOD_COLOR_2;
+                            else {colorOriginal = TEXT_TRANSPARENTE;}
                             casillaActual.setStyle("-fx-background-color: " + colorOriginal + ";");
                         });
 
@@ -215,8 +215,8 @@ public class CalendarioRender {
             label.setMinHeight(80);
             HBox.setHgrow(label, Priority.ALWAYS);
 
-            String colorFondo=textTransparente;
-            if(i==5 || i==6) colorFondo = prefs.getBoolean(textoDark,false) ? textcodColor1 : textcodColor2;
+            String colorFondo= TEXT_TRANSPARENTE;
+            if(i==5 || i==6) colorFondo = prefs.getBoolean(TEXTO_DARK,false) ? TEXTCOD_COLOR_1 : TEXTCOD_COLOR_2;
             String estiloBase = "-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: " + colorFondo + ";";
 
             cajaNombresSemana.getChildren().add(label);

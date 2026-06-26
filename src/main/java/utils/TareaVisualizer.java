@@ -2,7 +2,7 @@ package utils;
 
 import controller.MenuPrincipalController;
 import model.*;
-import View.view;
+import view.View;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
@@ -29,9 +29,9 @@ public class TareaVisualizer {
 
     private GestorTareas gestorTareas=GestorTareas.getGestorTareas();
 
-    private static final String textSinEtiqueta="Sin Etiqueta";
-    private static final String textfxBackgroundcolor="-fx-background-color: ";
-    private static final String textTareaSinEtiqueta  ="tarea-sin-etiqueta";
+    private static final String TEXT_SIN_ETIQUETA ="Sin Etiqueta";
+    private static final String TEXTFX_BACKGROUNDCOLOR ="-fx-background-color: ";
+    private static final String TEXT_TAREA_SIN_ETIQUETA ="tarea-sin-etiqueta";
 
 
     public void mostrarEtiquetasClasificaciones(GridPane vBoxEtiquetas, MenuPrincipalController jefe){
@@ -41,7 +41,7 @@ public class TareaVisualizer {
         int i=0;
         for(Etiqueta etiqueta : listaEtiquetas){
             //Se muestran todas menos la etiqueta neutra o sin etiqueta
-            if(!Objects.equals(etiqueta.nombreEtiqueta(), textSinEtiqueta)){
+            if(!Objects.equals(etiqueta.nombreEtiqueta(), TEXT_SIN_ETIQUETA)){
                 vBoxEtiquetas.add(new Label(etiqueta.nombreEtiqueta()),1,i);
                 String colorHex = etiqueta.codColor();
                 javafx.scene.paint.Color colorFinal;
@@ -66,7 +66,7 @@ public class TareaVisualizer {
     public void mostrarEtiquetasMensuales(Etiqueta etiqueta, String buscadorTareas, LocalDate fechaSeleccionada,VBox[][] calendarioVBoxMensual,MenuPrincipalController jefe) {
         //Obtenemos todas las tareas
         List<Tarea> listaTareas = gestorTareas.getTodasTareas();
-        if (etiqueta != null && !etiqueta.nombreEtiqueta().equals(textSinEtiqueta))
+        if (etiqueta != null && !etiqueta.nombreEtiqueta().equals(TEXT_SIN_ETIQUETA))
             listaTareas = listaTareas.stream().filter(tarea -> tarea.getEtiqueta() != null && tarea.getEtiqueta().equals(etiqueta)).toList();
 
         String textoBusqueda = buscadorTareas != null ? buscadorTareas.toLowerCase() : "";
@@ -110,10 +110,10 @@ public class TareaVisualizer {
                             infoFlotante.setShowDelay(Duration.millis(100));
                             label.setTooltip(infoFlotante);
                             //Se ven distintos wi tiene etiqueta o no
-                            if (tarea.getEtiqueta() != null && !Objects.equals(tarea.getEtiqueta().nombreEtiqueta(), textSinEtiqueta)) {
+                            if (tarea.getEtiqueta() != null && !Objects.equals(tarea.getEtiqueta().nombreEtiqueta(), TEXT_SIN_ETIQUETA)) {
                                 String colorHex = tarea.getEtiqueta().codColor();
                                 label.setStyle(
-                                        textfxBackgroundcolor + colorHex + ";" +
+                                        TEXTFX_BACKGROUNDCOLOR + colorHex + ";" +
                                                 "-fx-border-color: derive(" + colorHex + ", -60%);" +
                                                 "-fx-border-width: 2px;" +
                                                 "-fx-border-radius: 5px;" +                           // Esquinas del borde redondeadas
@@ -121,7 +121,7 @@ public class TareaVisualizer {
                                                 "-fx-text-fill: white;" +                             // Texto blanco para que contraste con el fondo relleno
                                                 "-fx-font-weight: bold;"                         // Texto en negrita para que se lea mejor
                                 );
-                            } else label.getStyleClass().add(textTareaSinEtiqueta);
+                            } else label.getStyleClass().add(TEXT_TAREA_SIN_ETIQUETA);
 
                             label.setContextMenu(crearMenuContextual(tarea, jefe));
                             label.setOnDragDetected(event -> {
@@ -153,7 +153,7 @@ public class TareaVisualizer {
         List<Tarea> listaTareas = gestorTareas.getTodasTareas();
 
         //Se mira qeu que condiciones hay (etiquetas o en la busqueta)
-        if (etiqueta != null && !etiqueta.nombreEtiqueta().equals(textSinEtiqueta))
+        if (etiqueta != null && !etiqueta.nombreEtiqueta().equals(TEXT_SIN_ETIQUETA))
             listaTareas = listaTareas.stream().filter(t -> t.getEtiqueta() != null && t.getEtiqueta().equals(etiqueta)).toList();
         if (textoBusqueda != null && !textoBusqueda.isEmpty())
             listaTareas = listaTareas.stream().filter(t -> t.getNombreTarea().toLowerCase().contains(textoBusqueda.toLowerCase())).toList();
@@ -201,15 +201,15 @@ public class TareaVisualizer {
 
                     // Estilos y eventos
                     if (tarea.getEstadoTarea() != EstadoTarea.EN_PROCESO) label.setOpacity(0.2);
-                    if (tarea.getEtiqueta() != null && !tarea.getEtiqueta().nombreEtiqueta().equals(textSinEtiqueta))
-                        label.setStyle(textfxBackgroundcolor + tarea.getEtiqueta().codColor() + "; -fx-text-fill: white; -fx-font-weight: bold;");
-                    else label.getStyleClass().add(textTareaSinEtiqueta);
+                    if (tarea.getEtiqueta() != null && !tarea.getEtiqueta().nombreEtiqueta().equals(TEXT_SIN_ETIQUETA))
+                        label.setStyle(TEXTFX_BACKGROUNDCOLOR + tarea.getEtiqueta().codColor() + "; -fx-text-fill: white; -fx-font-weight: bold;");
+                    else label.getStyleClass().add(TEXT_TAREA_SIN_ETIQUETA);
 
                     label.setContextMenu(crearMenuContextual(tarea,jefe));
                     //Si se clica el boton principal se muestra la tarea
                     label.setOnMouseClicked(e -> { if(e.getButton() == MouseButton.PRIMARY) {
                         try {
-                            view.showTareaVentana(tarea);
+                            View.showTareaVentana(tarea);
                             jefe.mostrarCalendario();
                         } catch (IOException ex) {
                             throw new RuntimeException(ex);
@@ -228,7 +228,7 @@ public class TareaVisualizer {
                     labelTodoDia.setContextMenu(crearMenuContextual(tarea,jefe));
                     labelTodoDia.setOnMouseClicked(e -> { if(e.getButton() == MouseButton.PRIMARY) {
                         try {
-                            view.showTareaVentana(tarea);
+                            View.showTareaVentana(tarea);
                             jefe.mostrarCalendario();
                         } catch (IOException ex) {
                             throw new RuntimeException(ex);
@@ -254,7 +254,7 @@ public class TareaVisualizer {
         }
         //Se cogen todas las tareas y se filtra npor condiciones (etiquetas o busqueda)
         List<Tarea> listaTareas=gestorTareas.getTodasTareas();
-        if(etiqueta != null && !etiqueta.nombreEtiqueta().equals(textSinEtiqueta)) listaTareas=listaTareas.stream().filter(tarea -> tarea.getEtiqueta() != null &&tarea.getEtiqueta().equals(etiqueta)).toList();
+        if(etiqueta != null && !etiqueta.nombreEtiqueta().equals(TEXT_SIN_ETIQUETA)) listaTareas=listaTareas.stream().filter(tarea -> tarea.getEtiqueta() != null &&tarea.getEtiqueta().equals(etiqueta)).toList();
 
         String busquedaMinuscula = textoBusqueda != null ? textoBusqueda.toLowerCase().trim() : "";
         if(!busquedaMinuscula.isEmpty()) {
@@ -264,7 +264,7 @@ public class TareaVisualizer {
         }
         //Que dia empieza la seman
         int diaDeLaSemana = fechaSeleccionada.getDayOfWeek().getValue();
-        LocalDate lunesDeEstaSemana = fechaSeleccionada.minusDays(diaDeLaSemana - 1);
+        LocalDate lunesDeEstaSemana = fechaSeleccionada.minusDays(diaDeLaSemana - 1L);
 
         //Se recorren todos los dias
         for(Tarea tarea:listaTareas){
@@ -309,13 +309,13 @@ public class TareaVisualizer {
                         label.setOpacity(tarea.getEstadoTarea() != EstadoTarea.EN_PROCESO ? 0.2 : 1);
 
                         //Se aplica estilos a las etiquetas
-                        if (tarea.getEtiqueta() != null && !Objects.equals(tarea.getEtiqueta().nombreEtiqueta(), textSinEtiqueta)) label.setStyle(textfxBackgroundcolor + tarea.getEtiqueta().codColor() + "; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5px; -fx-background-radius: 5px;");
-                        else label.getStyleClass().add(textTareaSinEtiqueta);
+                        if (tarea.getEtiqueta() != null && !Objects.equals(tarea.getEtiqueta().nombreEtiqueta(), TEXT_SIN_ETIQUETA)) label.setStyle(TEXTFX_BACKGROUNDCOLOR + tarea.getEtiqueta().codColor() + "; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5px; -fx-background-radius: 5px;");
+                        else label.getStyleClass().add(TEXT_TAREA_SIN_ETIQUETA);
 
                         label.setContextMenu(crearMenuContextual(tarea, jefe));
                         label.setOnMouseClicked(event -> {
                             try {
-                                view.showTareaVentana(tarea);
+                                View.showTareaVentana(tarea);
                                 jefe.mostrarCalendario();
                             } catch (Exception ignored) {
                             }
@@ -333,7 +333,7 @@ public class TareaVisualizer {
                         labelTodoDia.setMaxWidth(Double.MAX_VALUE);
 
                         //se aplica nestilos
-                        if (tarea.getEtiqueta() != null && !Objects.equals(tarea.getEtiqueta().nombreEtiqueta(), textSinEtiqueta)) labelTodoDia.setStyle(textfxBackgroundcolor + tarea.getEtiqueta().codColor() + "; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 2;");
+                        if (tarea.getEtiqueta() != null && !Objects.equals(tarea.getEtiqueta().nombreEtiqueta(), TEXT_SIN_ETIQUETA)) labelTodoDia.setStyle(TEXTFX_BACKGROUNDCOLOR + tarea.getEtiqueta().codColor() + "; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 2;");
                         else labelTodoDia.getStyleClass().add("tarea-todo-dia");
 
                         // Usamos la 'i' del bucle para ponerlo en la columna exacta que estamos evaluando
@@ -341,7 +341,7 @@ public class TareaVisualizer {
 
                         labelTodoDia.setOnMouseClicked(event -> {
                             try {
-                                view.showTareaVentana(tarea);
+                                View.showTareaVentana(tarea);
                                 jefe.mostrarCalendario();
                             } catch (Exception ignored) {}
                         });
@@ -358,7 +358,7 @@ public class TareaVisualizer {
         MenuItem itemCompletar = new MenuItem("✅ Completar");
         MenuItem itemBorrar = new MenuItem("🗑️ Borrar");
 
-        itemEditar.setOnAction(e -> {try { view.showTareaVentana(tarea);
+        itemEditar.setOnAction(e -> {try { View.showTareaVentana(tarea);
             jefe.mostrarCalendario();
         } catch (Exception ignored) {}});
         itemCompletar.setOnAction(e -> {

@@ -14,7 +14,7 @@
 }
 
 /* Textos blancos en modo oscuro */
-.dark-mode Text,
+.dark-mode .text, /* 🚀 CORREGIDO: Con punto y minúscula para evitar la alerta de SonarQube */
 .dark-mode .label,
 .dark-mode .check-box,
 .dark-mode .radio-button {

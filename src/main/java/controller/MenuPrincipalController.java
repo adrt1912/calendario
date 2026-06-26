@@ -3,7 +3,7 @@ package controller;
 import model.*;
 import utils.CalendarioRender;
 import utils.TareaVisualizer;
-import View.view;
+import view.View;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -59,7 +59,7 @@ public class MenuPrincipalController {
     private static final String MODO_MENSUAL = "Mensual";
     private static final String MODO_SEMANAL = "Semanal";
     private static final String MODO_DIARIO = "Diario";
-    private static final String textoDark = "dark-mode";
+    private static final String TEXTO_DARK = "dark-mode";
     Logger logger = Logger.getLogger(getClass().getName());
 
 
@@ -152,8 +152,8 @@ public class MenuPrincipalController {
         //Para guardar de forma global si esta en modo oscuro o no
         Preferences prefs = Preferences.userNodeForPackage(GestorTareas.class);
         if (prefs.getBoolean("modo_oscuro", false)) {
-        if (!rootPane.getStyleClass().contains(textoDark)) rootPane.getStyleClass().add(textoDark);
-        } else rootPane.getStyleClass().remove(textoDark);
+        if (!rootPane.getStyleClass().contains(TEXTO_DARK)) rootPane.getStyleClass().add(TEXTO_DARK);
+        } else rootPane.getStyleClass().remove(TEXTO_DARK);
 
         //Se ponen los textos, por si se añade alguna tarea para hoy
         tareasPendientesHoy.setText(gestorTareas.mostrarTareasUrgentesHoy());
@@ -224,7 +224,7 @@ public class MenuPrincipalController {
            //Por si se clica en la tarea se abre el menu de edicion
            text.setOnMouseClicked(event -> {
                try{
-                   view.showTareaVentana(tarea);
+                   View.showTareaVentana(tarea);
                    mostrarCalendario();
                    mostrarTareas();
                } catch (Exception e) {
@@ -297,7 +297,7 @@ public class MenuPrincipalController {
     @FXML
     private void aniadirEvento(LocalDate fecha, LocalTime horaInicio) {
         try {
-            view.showCrearTArea(fecha,horaInicio);
+            View.showCrearTArea(fecha,horaInicio);
             mostrarCalendario();
             mostrarTareas();
         } catch (Exception e) {
@@ -309,7 +309,7 @@ public class MenuPrincipalController {
     @FXML
     private void nuevaEtiqueta(){
         try {
-            view.showNuevaEtiqueta();
+            View.showNuevaEtiqueta();
             TareaVisualizer.getTareaVisualizer().mostrarEtiquetasClasificaciones(vBoxEtiquetas,this);
 
             comboFiltroEtiquetas.setItems(FXCollections.observableArrayList(gestorTareas.getListaEtiquetas()));
@@ -322,7 +322,7 @@ public class MenuPrincipalController {
     @FXML
     private void abrirConfiguracion(){
         try {
-            view.showConfiguracionMenu();
+            View.showConfiguracionMenu();
             mostrarCalendario();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -332,7 +332,7 @@ public class MenuPrincipalController {
     //Boton para volver al dia de hoy
     @FXML
     private void volverHoy(){
-        fechaSeleccionada = LocalDate.now(ZoneId.systemDefault());;
+        fechaSeleccionada = LocalDate.now(ZoneId.systemDefault());
         mostrarCalendario();
     }
 

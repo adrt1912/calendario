@@ -1,6 +1,6 @@
 package app;
 
-import View.view;
+import view.View;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
@@ -20,7 +20,7 @@ public class CalenadrioApplication extends Application {
         // OBLIGATORIO: Registramos el Stage principal y el ciclo de vida antes de evaluar nada
         this.primaryStage = stage;
         Platform.setImplicitExit(false);
-        view.setPrimaryStage(stage);
+        View.setPrimaryStage(stage);
 
 
         // Inicializamos el SystemTray de fondo para que esté listo desde el segundo cero
@@ -36,7 +36,7 @@ public class CalenadrioApplication extends Application {
             });
 
             // Al arrancar, vamos SIEMPRE al Login multiusuario para poder seleccionar perfil
-            view.showPINInsert();
+            View.showPINInsert();
 
         } catch (Exception e) {
             logger.info("Error catastrófico al cargar la pantalla de PIN: " + e.getMessage());
@@ -48,7 +48,7 @@ public class CalenadrioApplication extends Application {
         try {SystemTray tray = SystemTray.getSystemTray();
 
             // Carga segura del icono de la aplicación
-            java.awt.Image image = javax.imageio.ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/View/icono.png")));
+            java.awt.Image image = javax.imageio.ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/view/icono.png")));
             TrayIcon trayIcon = getTrayIcon(image);
 
             // Doble clic en el icono de la barra de herramientas restaura la ventana

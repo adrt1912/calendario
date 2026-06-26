@@ -10,7 +10,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.prefs.Preferences;
 
-import View.view;
+import view.View;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +65,7 @@ public class GestorTareas {
     // Lista etiquetas
     private final List<Etiqueta> listaEtiquetas = new ArrayList<>();
 
-    // Para evitar repetir la llamada al método constantemente lo guardamos
+    // Para evitar repetir la llamada al mEtodo constantemente lo guardamos
     private final GestionEnFicheros gestionEnFicheros = GestionEnFicheros.getGestionEnFicheros();
 
     public List<Etiqueta> getListaEtiquetas() {
@@ -93,7 +93,7 @@ public class GestorTareas {
         listaEtiquetas.add(etiquetaNeutra);
         setFormatoHora();
 
-        Preferences prefs = Preferences.userNodeForPackage(View.view.class);
+        Preferences prefs = Preferences.userNodeForPackage(View.class);
         String codIdioma = prefs.get("idioma_actual", "es");
         this.idioma = Idiomas.desdeCodigo(codIdioma);
 
@@ -134,7 +134,7 @@ public class GestorTareas {
 
     // Establece el formato hora
     private void setFormatoHora() {
-        Preferences prefs = Preferences.userNodeForPackage(view.class);
+        Preferences prefs = Preferences.userNodeForPackage(View.class);
         String opcionGuardada = prefs.get("formato_hora", "24h");
 
         if (opcionGuardada.equals("12h")) {
@@ -146,7 +146,7 @@ public class GestorTareas {
 
     // Obtiene el ResourceBundle del idioma guardado
     public ResourceBundle obtenerDiccionario() {
-        Preferences prefs = Preferences.userNodeForPackage(view.class);
+        Preferences prefs = Preferences.userNodeForPackage(View.class);
         String codIdioma = prefs.get("idioma_actual", "es");
         Idiomas idiomaSeleccionado = Idiomas.desdeCodigo(codIdioma);
         setIdioma(idiomaSeleccionado);

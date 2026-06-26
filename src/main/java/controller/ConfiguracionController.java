@@ -11,7 +11,7 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
-import View.view;
+import view.View;
 import java.io.File;
 import java.io.IOException;
 import java.util.ResourceBundle;
@@ -28,7 +28,7 @@ public class ConfiguracionController {
     @FXML
     private Button botonCancelar;
 
-    private static final String textoDark = "dark-mode";  // Compliant
+    private static final String TEXTO_DARK = "dark-mode";  // Compliant
 
     @FXML
     private Pane rootPane;
@@ -69,7 +69,7 @@ public class ConfiguracionController {
         boolean isDark = prefs.getBoolean("modo_oscuro", false);
         checkModoOscuro.setSelected(isDark);
         // Si estaba guardado como oscuro, pintamos el rootPane
-        if (isDark) rootPane.getStyleClass().add(textoDark);
+        if (isDark) rootPane.getStyleClass().add(TEXTO_DARK);
     }
 
     //Al clicar en el boton se pone a true, y solo se borra si se da a guardar y salir
@@ -111,7 +111,7 @@ public class ConfiguracionController {
         cancelar();
 
         try {
-            view.showInitialView();
+            View.showInitialView();
         } catch (Exception e) {
             logger.info("Error al recargar el menú principal: " + e.getMessage());
         }
@@ -133,7 +133,7 @@ public class ConfiguracionController {
             GestorTareas.getGestorTareas().borrarContenido();
             gf.leerFicheroTareas();
             if (ultimasEtiquetas != null) gf.leerEtiquetas();
-            view.showInitialView();
+            View.showInitialView();
         }
     }
 
@@ -150,8 +150,8 @@ public class ConfiguracionController {
         //Se recorren todas las ventanas aberitas y se les cambia el color
         for (Window ventanaAbierta : Window.getWindows()) {
             if (ventanaAbierta.getScene() != null && ventanaAbierta.getScene().getRoot() != null && activado) {
-                    if (!ventanaAbierta.getScene().getRoot().getStyleClass().contains(textoDark)) ventanaAbierta.getScene().getRoot().getStyleClass().add(textoDark);
-                    else ventanaAbierta.getScene().getRoot().getStyleClass().remove(textoDark);
+                    if (!ventanaAbierta.getScene().getRoot().getStyleClass().contains(TEXTO_DARK)) ventanaAbierta.getScene().getRoot().getStyleClass().add(TEXTO_DARK);
+                    else ventanaAbierta.getScene().getRoot().getStyleClass().remove(TEXTO_DARK);
             }
         }
     }
@@ -184,7 +184,7 @@ public class ConfiguracionController {
         ventanaActual.close();
 
         // 4. Ordenamos a la vista reabrir la ventana de Login/Bloqueo
-        View.view.showPINInsert();
+        View.showPINInsert();
     } catch (Exception e) {
         logger.info("Error al intentar cambiar de usuario: " + e.getMessage());}
     }
@@ -207,8 +207,10 @@ public class ConfiguracionController {
             Stage ventanaActual = (Stage) rootPane.getScene().getWindow();
             ventanaActual.close();
             try {
-                View.view.showPINInsert();
-            } catch (Exception ignored) {}
+                View.showPINInsert();
+            } catch (Exception e) {
+                logger.info("Error en la operación previa al cambio de PIN: "+e);
+            }
         }
     }
 
