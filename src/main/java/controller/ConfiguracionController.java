@@ -47,7 +47,7 @@ public class ConfiguracionController {
     private boolean cambiarMdooVisual=false;
     private boolean descargarICS=false;
 
-    Logger logger = Logger.getLogger(getClass().getName());
+    private final Logger logger = Logger.getLogger(getClass().getName());
 
     //Llama al metodo para crear un CSV
     @FXML
@@ -59,7 +59,7 @@ public class ConfiguracionController {
     public void initialize(){
         boxIdioma.setItems(FXCollections.observableArrayList(Idiomas.values()));
         Idiomas idiomaActual=GestorTareas.getGestorTareas().getIdioma();
-        boxIdioma.getSelectionModel().select(idiomaActual != null ? idiomaActual : Idiomas.Espaniol);
+        boxIdioma.getSelectionModel().select(idiomaActual != null ? idiomaActual : Idiomas.ESPANIOL);
 
         boxFormatoHora.setItems(FXCollections.observableArrayList("24h", "12h"));
 

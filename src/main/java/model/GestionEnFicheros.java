@@ -27,7 +27,7 @@ public class GestionEnFicheros {
 
     public static GestionEnFicheros getGestionEnFicheros() {return gestionEnFicheros;}
 
-    private final static String TEXT_BACK_UP ="backups";
+    private static final String TEXT_BACK_UP ="backups";
     Logger logger = Logger.getLogger(getClass().getName());
 
 

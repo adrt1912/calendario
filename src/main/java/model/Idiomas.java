@@ -1,7 +1,7 @@
 package model;
 
 public enum Idiomas {
-    Espaniol("es", "Español"),
+    ESPANIOL("es", "Español"),
     INGLES("en", "English"),
     FRANCES("fr", "Français"),
     EUSKERA("eu", "Euskara"),
@@ -28,6 +28,6 @@ public enum Idiomas {
                 return idioma;
             }
         }
-        return Espaniol;
+        return ESPANIOL;
     }
 }
