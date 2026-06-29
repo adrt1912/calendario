@@ -167,7 +167,8 @@ public class GestionEnFicheros {
 
     public void borrarFichero(String nomF) {
         File archivo = new File(nomF);
-        if (!archivo.delete()) logger.info("No se pudo eliminar el archivo físico del disco: {}"+ nomF);
+        String textoFinal = "No se pudo eliminar el archivo físico del disco: {}+" + nomF;
+        if (!archivo.delete()) logger.info(textoFinal);
     }
 
     public void guardarEtiquetasCopiaSeguridadEtiquetas(List<Etiqueta> listaEtiquetas) {

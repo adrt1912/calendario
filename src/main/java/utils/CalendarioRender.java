@@ -94,7 +94,7 @@ public class CalendarioRender {
 
                 if (!calendarioMensual.getChildren().contains(casillaActual)) calendarioMensual.add(casillaActual, j, i);
 
-                limpiarYEstilarCasilla(casillaActual, i, j);
+                limpiarYEstilarCasilla(casillaActual, j);
 
                 if (i == 0) {
                     // Fila de cabecera: Nombres de los días
@@ -111,7 +111,7 @@ public class CalendarioRender {
     }
 
     // SUBMETODO 1: Purgado de listeners antiguos y cálculo estético de bordes/fondos
-    private void limpiarYEstilarCasilla(VBox casilla, int fila, int col) {
+    private void limpiarYEstilarCasilla(VBox casilla, int col) {
         casilla.getChildren().clear();
         casilla.setOnMouseClicked(null);
         casilla.setOnDragOver(null);
@@ -163,9 +163,9 @@ public class CalendarioRender {
 
         casilla.setOnDragExited(event -> {
             boolean esOscuro = prefs.getBoolean(TEXTO_DARK, false);
-            String colorOriginal = (col == 5 || col == 6)
-                    ? (esOscuro ? TEXTCOD_COLOR_1 : TEXTCOD_COLOR_2)
-                    : TEXT_TRANSPARENTE;
+            String colorOriginal;
+            if (col == 5 || col == 6) colorOriginal = esOscuro ? TEXTCOD_COLOR_1 : TEXTCOD_COLOR_2;
+             else colorOriginal = TEXT_TRANSPARENTE;
             casilla.setStyle("-fx-background-color: " + colorOriginal + ";");
         });
 
@@ -212,7 +212,7 @@ public class CalendarioRender {
         //  5. Construimos el cuerpo del calendario (Horas + Columnas de días con su rejilla de guías)
         HBox cajaDeTareas = new HBox();
         configurarPanelHorasLateral(cajaDeTareas);
-        configurarColumnasDiasConRejilla(cajaDeTareas, lunesDeEstaSemana, panelesDiasSemanales);
+        configurarColumnasDiasConRejilla(cajaDeTareas, panelesDiasSemanales);
 
         ScrollPane scrollReal = new ScrollPane(cajaDeTareas);
         scrollReal.setFitToWidth(true);
@@ -259,7 +259,7 @@ public class CalendarioRender {
         return cabecerasDia;
     }
 
-    //  SUBMETODO 2: Construye los contenedores verticales para almacenar las tareas de "Todo el día"
+    //  SUBMETODO 2: Construye los contenedores verticales para almacenar las tareas del día entero
     private void configurarFilaTodoElDia(VBox contenedorSemanal, VBox[] panelesTareasTodoDia) {
         HBox filaTodoElDia = new HBox();
         filaTodoElDia.setMinHeight(30);
@@ -302,7 +302,7 @@ public class CalendarioRender {
     }
 
     //  SUBMETODO 4: Construye las columnas horarias por día e inyecta las líneas de cuadrícula divisorias
-    private void configurarColumnasDiasConRejilla(HBox cajaDeTareas, LocalDate lunesDeEstaSemana, Pane[] panelesDiasSemanales) {
+    private void configurarColumnasDiasConRejilla(HBox cajaDeTareas, Pane[] panelesDiasSemanales) {
         for (int i = 0; i < 7; i++) {
             Pane panelDia = new Pane();
             panelDia.setPrefHeight(24 * 60);
