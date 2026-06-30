@@ -97,13 +97,15 @@ public class View {
     public static void showCrearTArea(LocalDate fecha, LocalTime hora) throws IOException {
         ResourceBundle bundle = obtenerBundleActual();
         FXMLLoader fxmlLoader = new FXMLLoader(View.class.getResource("/view/crearTarea.fxml"), bundle);
-        Scene scene = new Scene(fxmlLoader.load(), 600, 500);
+        Scene scene = new Scene(fxmlLoader.load(),800,800);
 
         controller.CrearTareaController controlador = fxmlLoader.getController();
         controlador.initialize(fecha, hora);
 
         Stage stage1 = new Stage();
         stage1.setTitle("Crear Tarea Nueva");
+        stage1.sizeToScene();
+        stage1.setResizable(false);
         stage1.setScene(scene);
         stage1.showAndWait();
     }
@@ -118,6 +120,8 @@ public class View {
 
         Stage stage1 = new Stage();
         stage1.setTitle("Modificar Tarea");
+        stage1.sizeToScene();
+        stage1.setResizable(false);
         stage1.setScene(scene);
         stage1.showAndWait();
     }
@@ -132,6 +136,8 @@ public class View {
 
         Stage stage1 = new Stage();
         stage1.setTitle("Eliminar Tarea");
+        stage1.sizeToScene();
+        stage1.setResizable(false);
         stage1.setScene(scene);
         stage1.showAndWait();
     }
@@ -139,10 +145,12 @@ public class View {
     public static void showNuevaEtiqueta() throws IOException {
         ResourceBundle bundle = obtenerBundleActual();
         FXMLLoader fxmlLoader = new FXMLLoader(View.class.getResource("/view/crearEtiqueta.fxml"), bundle);
-        Scene scene = new Scene(fxmlLoader.load(), 600, 232);
+        Scene scene = new Scene(fxmlLoader.load());
 
         Stage stage1 = new Stage();
         stage1.setTitle("Crear Etiqueta");
+        stage1.sizeToScene();
+        stage1.setResizable(false);
         stage1.setScene(scene);
         stage1.showAndWait();
     }
@@ -154,6 +162,8 @@ public class View {
 
         Stage stage1 = new Stage();
         stage1.setTitle("Configuracion");
+        stage1.sizeToScene();
+        stage1.setResizable(false);
         stage1.setScene(scene);
         stage1.showAndWait();
     }

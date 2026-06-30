@@ -17,11 +17,9 @@ public class CalenadrioApplication extends Application {
 
     @Override
     public void start(Stage stage){
-        // OBLIGATORIO: Registramos el Stage principal y el ciclo de vida antes de evaluar nada
         this.primaryStage = stage;
         Platform.setImplicitExit(false);
         View.setPrimaryStage(stage);
-
 
         // Inicializamos el SystemTray de fondo para que esté listo desde el segundo cero
         configurarSystemTray();
@@ -34,7 +32,6 @@ public class CalenadrioApplication extends Application {
                 Platform.exit();
                 System.exit(0);
             });
-
             // Al arrancar, vamos SIEMPRE al Login multiusuario para poder seleccionar perfil
             View.showPINInsert();
 
