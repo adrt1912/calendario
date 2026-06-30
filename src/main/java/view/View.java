@@ -48,18 +48,18 @@ public class View {
 
         ResourceBundle bundle = obtenerBundleActual();
         FXMLLoader fxmlLoader = new FXMLLoader(View.class.getResource("/view/MenuPrincipal.fxml"), bundle);
-        Scene scene = new Scene(fxmlLoader.load(), 1800, 900);
+        Scene scene = new Scene(fxmlLoader.load(),1550,800);
 
         if (prefs.getBoolean("modo_oscuro", false)) scene.getRoot().getStyleClass().add("dark-mode");
 
         stage.setResizable(true);
-        stage.setMaximized(true);
         stage.setTitle("Calendario");
         stage.setScene(scene);
+        stage.setOnShown(event -> stage.setMaximized(true));
+        stage.centerOnScreen();
         stage.show();
+
     }
-
-
 
     // PANTALLA B: La pantalla de bloqueo que salta al arrancar la app si ya existe un PIN
     public static void showPINInsert() throws IOException {

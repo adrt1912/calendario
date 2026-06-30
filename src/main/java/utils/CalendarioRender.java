@@ -78,8 +78,11 @@ public class CalendarioRender {
     public void mostrarCalendarioMensual(GridPane calendarioMensual, VBox contenedorSemanal, VBox contenedorDiario, LocalDate fechaSeleccionada, MenuPrincipalController jefe, VBox[][] calendarioVBoxMensual) {
         // . Sincronizamos la visibilidad del panel de vistas
         contenedorSemanal.setVisible(false);
+        contenedorSemanal.setManaged(false);
         calendarioMensual.setVisible(true);
+        calendarioMensual.setManaged(true);
         contenedorDiario.setVisible(false);
+        contenedorDiario.setManaged(false);
 
         // . Preparamos las variables métricas del mes actual
         int numDiasMes = fechaSeleccionada.lengthOfMonth();
@@ -87,7 +90,7 @@ public class CalendarioRender {
         LocalDate fechaHoy = LocalDate.now(ZoneId.systemDefault());
         int numMes = 1;
 
-        // 🚀 3. Orquestamos el bucle de renderizado de celdas delegando la carga pesada
+        //  3. Orquestamos el bucle de renderizado de celdas delegando la carga pesada
         for (int i = 0; i < calendarioMensual.getRowCount(); i++) {
             for (int j = 0; j < calendarioMensual.getColumnCount(); j++) {
                 VBox casillaActual = calendarioVBoxMensual[j][i];
@@ -194,8 +197,11 @@ public class CalendarioRender {
     public void mostrarCalendarioSemanal(GridPane calendarioMensual, VBox contenedorSemanal, VBox contenedorDiario, LocalDate fechaSeleccionada, MenuPrincipalController jefe, Pane[] panelesDiasSemanales, VBox[] panelesTareasTodoDia) {
         // 1. Sincronizamos e inicializamos la visibilidad de los contenedores
         calendarioMensual.setVisible(false);
+        calendarioMensual.setManaged(false);
         contenedorSemanal.setVisible(true);
+        contenedorSemanal.setManaged(true);
         contenedorDiario.setVisible(false);
+        contenedorDiario.setManaged(false);
         contenedorSemanal.getChildren().clear();
 
         //  2. Calculamos las métricas temporales de la semana actual
@@ -355,8 +361,11 @@ public class CalendarioRender {
     public Pane mostrarCalendarioDiario(GridPane calendarioMensual, VBox contenedorSemanal, VBox contenedorDiario, LocalDate fechaSeleccionada, MenuPrincipalController jefe,VBox panelTareasTodoDiaDiario){
         //Se ponene invisibles el semanal y mensual y el diario visible
         contenedorSemanal.setVisible(false);
+        contenedorSemanal.setManaged(false);
         calendarioMensual.setVisible(false);
+        calendarioMensual.setManaged(false);
         contenedorDiario.setVisible(true);
+        contenedorDiario.setManaged(true);
         contenedorDiario.getChildren().clear();
 
         String fechaFormateada = fechaSeleccionada.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault())
