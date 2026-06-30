@@ -42,7 +42,7 @@ Puedes colaborar abriendo un Issue o enviando un Pull Request directamente al re
 Para clonar el repositorio, compilar el código fuente y lanzar la aplicación directamente desde la terminal, ejecuta:
 
 ```bash
-git clone [https://github.com/adr71912/calendario.git](https://github.com/adr71912/calendario.git)
+git clone https://github.com/adrt1912/calendario.git
 cd calendario
 mvn clean package
 mvn exec:java -Dexec.mainClass="app.Main"
