@@ -49,25 +49,6 @@
             <artifactId>slf4j-api</artifactId>
             <version>2.0.13</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.testfx</groupId>
-            <artifactId>testfx-core</artifactId>
-            <version>4.0.18</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testfx</groupId>
-            <artifactId>testfx-junit5</artifactId>
-            <version>4.0.18</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.10.2</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
@@ -151,7 +132,6 @@
                     <mainJar>${project.build.finalName}.jar</mainJar>
                     <mainClass>app.Main</mainClass>
                     <linuxShortcut>true</linuxShortcut>
-
                     <vendor>AdGitHub</vendor>
                     <description>Un gestor de tareas privado y seguro con cifrado local AES-256.</description>
                     <copyright>Copyright 2026 Aday</copyright>
